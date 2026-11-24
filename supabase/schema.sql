@@ -62,3 +62,14 @@ end $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- 6) 線上主城（Realtime）：只有登入的玩家可以加入 town:* 頻道、收發表情和位置
+--    另外要到 Project Settings → Realtime 把「Allow public access」關掉，強制只能用 private 頻道
+drop policy if exists "town: read"  on realtime.messages;
+drop policy if exists "town: write" on realtime.messages;
+create policy "town: read" on realtime.messages
+  for select to authenticated
+  using (realtime.topic() like 'town:%' and realtime.messages.extension in ('broadcast', 'presence'));
+create policy "town: write" on realtime.messages
+  for insert to authenticated
+  with check (realtime.topic() like 'town:%' and realtime.messages.extension in ('broadcast', 'presence'));

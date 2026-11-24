@@ -130,6 +130,37 @@
     }
   };
 
+  // ---------- 線上主城（Supabase Realtime）----------
+  // 只有登入的玩家可以加入；頻道是 private，伺服器端用 RLS 檢查是否登入。
+  // 為了省訊息量：位置只在「目的地改變」時送出，表情、句子都有冷卻時間。
+  const ROOM_CAP = 16, MAX_ROOM = 8;
+  api.townEnabled = () => enabled && cfg.town !== false;
+  api.userId = () => (user ? user.id : '');
+  api.joinTown = async function (meta, h) {
+    needUser();
+    try { await sb.realtime.setAuth(); } catch (e) { /* 舊版 supabase-js 會自動帶入 */ }
+    for (let room = 1; room <= MAX_ROOM; room++) {
+      const ch = sb.channel('town:' + room, { config: { private: true, broadcast: { self: false }, presence: { key: user.id } } });
+      const peers = () => { const st = ch.presenceState(), out = []; for (const k in st) { const m = st[k][st[k].length - 1]; if (k !== user.id && m) out.push(Object.assign({}, m, { id: k })); } return out; };
+      let synced = false;
+      ch.on('presence', { event: 'sync' }, () => { synced = true; if (h.onPeers) h.onPeers(peers()); });
+      for (const ev of ['mv', 'em', 'say', 'it']) ch.on('broadcast', { event: ev }, (m) => { if (h.onEvent) h.onEvent(ev, m.payload || {}); });
+      const status = await new Promise((res) => { let done = false; const t = setTimeout(() => { if (!done) { done = true; res('TIMED_OUT'); } }, 8000); ch.subscribe((s) => { if (done) { if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT' || s === 'CLOSED') { if (h.onState) h.onState('error'); } return; } if (s === 'SUBSCRIBED' || s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') { done = true; clearTimeout(t); res(s); } }); });
+      if (status !== 'SUBSCRIBED') { try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } throw new Error(status === 'CHANNEL_ERROR' ? '主城連線被拒絕（伺服器設定還沒完成）' : '連不上主城伺服器'); }
+      const t0 = Date.now(); while (!synced && Date.now() - t0 < 1500) await new Promise((r) => setTimeout(r, 100));
+      if (peers().length >= ROOM_CAP) { try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } continue; }
+      await ch.track(meta);
+      return {
+        room,
+        id: user.id,
+        send(ev, payload) { return ch.send({ type: 'broadcast', event: ev, payload: Object.assign({ id: user.id }, payload) }).catch(() => {}); },
+        track(m) { return ch.track(m).catch(() => {}); },
+        async leave() { try { await ch.untrack(); } catch (e) { /* ignore */ } try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } }
+      };
+    }
+    throw new Error('主城人太多了，稍後再試');
+  };
+
   // 關掉分頁或切到背景時，把還沒上傳的存檔送出去
   document.addEventListener('visibilitychange', () => { if (document.hidden) api.flush(); });
   window.DogCloud = api;

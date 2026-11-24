@@ -75,6 +75,9 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .tbtns{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap}.tbtns .btn{margin:0;min-height:44px;padding:8px 16px;font-size:16px}.tbtns .btn.ghost{background:#fff8e6;color:#5a3a10;border-color:#fff8e6}
 .talkb{position:absolute;bottom:68px;left:50%;transform:translateX(-50%);margin:0;min-height:44px;animation:pop .9s ease-in-out infinite alternate}@keyframes pop{to{transform:translateX(-50%) scale(1.06)}}
 .editbar{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:42%;overflow:auto}.editbar p{margin:0 0 6px;font-size:13px}
+.netchip{position:absolute;top:10px;right:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 10px;font-size:12px;max-width:52%;cursor:pointer}.netchip b{color:#7fe36b}.netchip[data-s=error] b,.netchip[data-s=guest]{color:#ffe27a}
+.emoteb{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:46%;overflow:auto}.emr{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.emr .btn{margin:0}
+.peerm{position:absolute;left:50%;transform:translateX(-50%);bottom:66px;width:min(360px,calc(100% - 16px));background:rgba(255,248,230,.98);color:var(--pink);border-radius:14px;padding:8px 10px}.pmh{display:flex;gap:8px;align-items:center}.pmh canvas{width:80px;height:60px}.pmh div{display:grid;flex:1;font-size:12px}.pmh b{font-size:15px}.pmb{display:flex;gap:6px;margin-top:6px}.pmb .btn{margin:0}
 .fchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.fchip{border:2px solid #e8d8b0;background:#fff;border-radius:10px;padding:4px;display:grid;justify-items:center;min-width:76px;cursor:pointer;color:var(--pink)}.fchip.on{border-color:#f5c542;background:#fff3c0}.fchip canvas{width:42px;height:42px}.fchip small{font-size:11px}
 .furn{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.fc{background:#fff;border:2px solid #eadbb4;border-radius:12px;padding:8px;display:grid;justify-items:center;text-align:center;gap:2px}.fc canvas{width:56px;height:56px}.fc small{font-size:12px}.fc .btn{margin:4px 0 0}
 .hub{position:absolute;inset:0;background:linear-gradient(#fbf6e6,#f1e6c8);color:var(--pink);display:flex;flex-direction:column}
@@ -174,7 +177,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <button id="dashb" class="dashb hide" aria-label="衝刺">衝</button>
       <button id="spdb" class="pbtn hide" style="right:58px" aria-label="切換速度">×1</button>
-      <div id="townui" class="townui hide"><div class="tinfo" id="tinfo"></div><div class="tinfo t2 hide" id="tinfo2"></div><button id="talkb" class="btn talkb hide"></button><div id="editbar" class="editbar hide"></div><div class="tbtns" id="tbtns"></div></div>
+      <div id="townui" class="townui hide"><div class="tinfo" id="tinfo"></div><div class="tinfo t2 hide" id="tinfo2"></div><button id="talkb" class="btn talkb hide"></button><div id="editbar" class="editbar hide"></div><div id="netchip" class="netchip hide"></div><div id="emoteb" class="emoteb hide"></div><div id="peerm" class="peerm hide"></div><div class="tbtns" id="tbtns"></div></div>
       <div class="hub hide" id="hub">
         <div class="htop"><button class="btn sm ghost" id="hubBack" style="margin:0">← 回城鎮</button><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button><button class="btn sm" id="acctBtn" style="margin:0">登入／註冊</button></div>
         <div class="tabs" id="tabs"></div>
@@ -219,8 +222,8 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
   </section>
 </main>
 <script src="vendor/supabase.js"></script>
-<script src="config.js?v=0.11.1"></script>
-<script src="cloud.js?v=0.11.1"></script>
+<script src="config.js?v=0.14.0"></script>
+<script src="cloud.js?v=0.14.0"></script>
 <script>
 {
 const $=id=>document.getElementById(id);
@@ -1210,8 +1213,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.13.0';
+const VERSION='0.14.0';
 const NEWS=[
+ {v:'0.14.0',d:'11/24',t:'線上同城',items:[['新增','登入帳號後，在主城可以看到其他玩家的狗狗：毛色、職業、時裝、寵物都看得到，頭上會顯示名字和等級'],['新增','表情：搖尾巴、坐下、打滾、轉圈、汪一聲、比愛心；還有 12 句可愛的固定句子可以說（按下方「表情」）'],['新增','點別人的狗可以「聞聞」「摸摸頭」，也能看牠的等級、塔層和時裝數量'],['新增','勿擾模式（別人不能對你聞聞、摸摸）、隱藏其他玩家、屏蔽特定玩家'],['新增','頻道：每個頻道最多 16 隻狗，人滿會自動分到下一個頻道，右上角會顯示目前的頻道和人數'],['調整','為了安全，只能用固定的句子和表情，不能自由打字']]},
  {v:'0.13.0',d:'11/24',t:'主城・狗狗的家',items:[['新增','主城：回城鎮後可以帶著狗狗在城裡散步，用方向鍵／WASD 或點畫面移動，走到 NPC 旁邊按「對話」（或 E／空白鍵）'],['新增','每個功能都有對應的 NPC：守門犬（出戰）、塔守（無限之塔）、地城嚮導（副本）、轉職教官、長老（天賦）、鐵匠（裝備）、卡片研究員、狗狗美容院（造型）、時裝店、孵蛋婆婆（寵物）、公告欄（任務）、雜貨商、報童（消息）、郵差（雲端存檔）、家具店'],['新增','城裡有其他狗狗在散步，走過去可以「摸摸」牠們'],['新增','狗狗公園：每天有 4 個可以挖的土堆，挖到金幣、狗屋材料，運氣好有狗骨頭'],['新增','狗狗的家：從紙箱小窩一路升級到庭院小別墅，房間越來越大；36 種家具、6 種牆壁、5 種地板，可以自由擺放'],['新增','舒適度：家具擺越多種越舒服，最多讓出戰經驗 +20%、離線收入 +100%；家裡也會有你其他的寵物在玩'],['新增','狗屋材料（木材、布料、石材、亮晶晶）：每次出戰都會拿到，打越多怪、打倒越多魔王和菁英越多'],['調整','畫面下方仍有「出戰」「選單」「回家」按鈕，不想走路也可以直接點']]},
  {v:'0.12.1',d:'11/24',t:'抽卡畫面改版',items:[['調整','抽造型、抽時裝的結果改成跳出視窗顯示，可以直接「再抽一次」，關掉後會回到收藏'],['新增','收藏可以按分類切換：造型分品種；時裝分頭飾、臉部、頸部、背部、特效，還有「剛抽到」「只看已擁有」，剛抽到的可以馬上換上'],['新增','寵物新增「自動」模式（預設）：平常跟著你攻擊，地上掉的東西一多就自己跑去叼回來']]},
  {v:'0.12.0',d:'11/24',t:'時裝扭蛋・寵物撿東西',items:[['新增','時裝系統：194 款可愛時裝，分頭飾、臉部、頸部、背部、特效五個部位，穿上後打怪時也看得到'],['新增','26 個主題套裝：草莓甜心、小蜜蜂、聖誕快樂、小天使、小惡魔、海盜船長、魔法少女、星空魔導、櫻花祭、南瓜派對、夢幻獨角獸、小火龍、太空探險……集滿一整套傷害 +1%'],['新增','時裝扭蛋（「時裝」分頁）：用狗骨頭抽，SSR 3%，十連保底 SR，60 抽必中 SSR；每收集一件都會永久加能力，不用穿也有效，重複的會升星'],['新增','寵物可以切換「跟著我攻擊」或「幫我撿東西」：撿東西模式會把附近的寶石、金幣和寶箱叼回來'],['新增','雲端存檔正式開放：點「雲端存檔」註冊帳號，換裝置也能接著玩'],['新增','3 個新成就：收集時裝、集滿套裝']]},
@@ -1790,6 +1794,7 @@ addEventListener('keydown',e=>{const k=e.key.toLowerCase();
   if(state==='play'&&(k===' '||k==='shift')){dash();return}
   if(state==='tip'&&(k==='enter'||k===' '||k==='escape')){closeTip();return}
   if((state==='town'||state==='house')&&['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
+  if((state==='town'||state==='house')&&k==='escape'){closeEmoteBar();closePeerMenu();return}
   if((state==='town'||state==='house')&&(k==='e'||k===' '||k==='enter')){townInteract();return}
   if(state==='hub'&&k==='escape'&&$('acctov').classList.contains('hide')){backToTown();return}
   if(k==='escape'||k==='p'){if(state==='play')pause();else if(state==='pause')resume();return}
@@ -1811,7 +1816,7 @@ cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
-$('tbtns').addEventListener('click',townBtn);$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
+$('tbtns').addEventListener('click',townBtn);$('emoteb').addEventListener('click',emoteClick);$('peerm').addEventListener('click',peerMenuClick);$('netchip').addEventListener('click',()=>{if(NET.status==='guest')openAcct();else if(NET.status==='error'){NET.retry=0}});$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
 
 /* ---------- town (主城) & dog house ---------- */
 const TOWN={x0:-980,x1:980,y0:-640,y1:560};
@@ -1877,7 +1882,7 @@ function leaveHouse(){inHouse=false;state='town';houseEdit=false;TP.x=ENTERX;TP.
 function renderTownUI(){const tu=$('townui');if(!tu||!SV.breed)return;const h=homeData();
   $('tinfo').innerHTML=`<b>${esc(SKM[curSkin()].n)}</b><small>${JM[SV.job].n} · Base Lv ${SV.blv}</small><small>${SV.zeny.toLocaleString()} 金幣　🦴 ${SV.bones}</small>`;
   $('tbtns').innerHTML=inHouse?`<button class="btn sm" data-tw="edit">${houseEdit?'完成擺放':'擺放家具'}</button><button class="btn sm ghost" data-tw="shop">家具店</button><button class="btn sm ghost" data-tw="out">出門</button>`
-    :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
+    :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="emote">表情</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
   $('tinfo2').innerHTML=inHouse?`<b>${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
   $('tinfo2').classList.toggle('hide',!inHouse);
   const eb=$('editbar');eb.classList.toggle('hide',!(inHouse&&houseEdit));
@@ -1970,7 +1975,7 @@ function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
 const townFx=[];
 function camOf(){if(inHouse)return [0,0];const vw=W/S/2,vh=H/S/2;return [Math.max(TOWN.x0+vw,Math.min(TOWN.x1-vw,TP.x)),Math.max(TOWN.y0+vh,Math.min(TOWN.y1-vh,TP.y))].map((v,i)=>{const span=i?TOWN.y1-TOWN.y0:TOWN.x1-TOWN.x0,view=i?H/S:W/S;return span<view?(i?(TOWN.y0+TOWN.y1)/2:(TOWN.x0+TOWN.x1)/2):v})}
 function houseBounds(){const L=HOUSE_LV[homeData().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
-function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;
+function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;netTick(dt);
  let ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup'));
  if(ix||iy){TP.go=null;TP.tgt=null}
  let tx=null,ty=null;if(TP.go){tx=TP.go.x;ty=TP.go.y+(TP.go.n?TP.go.r||30:18)}else if(TP.tgt){tx=TP.tgt[0];ty=TP.tgt[1]}
@@ -2005,9 +2010,12 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(1.15,1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore()}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
+ if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
  // labels
+ if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
+ if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=DogCloud.status().username;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
  c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
    const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
  for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26)}
@@ -2015,7 +2023,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  if(TP.near&&!TP.near.exit){const a=TP.near;c.globalAlpha=.5+.3*Math.sin(t*6);c.strokeStyle='#fff6b0';c.lineWidth=3;c.beginPath();c.ellipse(a.x,a.y+(a.n?(a.r||0):0)+4,26,9,0,0,TAU);c.stroke();c.globalAlpha=1}
  if(TP.tgt){c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.ellipse(TP.tgt[0],TP.tgt[1],10,4,0,0,TAU);c.stroke();c.globalAlpha=1}
  c.restore()}
-function drawTownPlayer(c,t){c.save();c.translate(TP.x,TP.y);c.scale(1.2,1.2);drawDog(c,curSkin(),SV.job,0,0,t,TP.face,TP.mv,SV.wear);c.restore();
+function drawTownPlayer(c,t){drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2);if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
  if(SV.pet&&PM[SV.pet]){TP.px=(TP.px===undefined?TP.x:TP.px)+((TP.x-TP.face*26)-(TP.px===undefined?TP.x:TP.px))*.08;TP.py=(TP.py===undefined?TP.y:TP.py)+((TP.y+8)-(TP.py===undefined?TP.y:TP.py))*.08;drawPet(c,SV.pet,TP.px,TP.py,t)}
  if(TP.heart>0){c.globalAlpha=Math.min(1,TP.heart);heart(c,TP.x,TP.y-34-(1.2-TP.heart)*10,4,'#ff5a7a');c.globalAlpha=1}
  if(inHouse&&TP.idle>2.5){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',TP.x+12,TP.y-28-Math.sin(t)*3);c.globalAlpha=1}}
@@ -2039,6 +2047,8 @@ function townDown(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
    if(houseSel){if(idx>=0)return;if((h.inv[houseSel]||0)<=0){houseSel=null;renderTownUI();return}h.inv[houseSel]--;h.items.push({f:houseSel,x:gx,y:gy});sfx('drop');if(h.inv[houseSel]<=0)houseSel=null}
    else if(idx>=0){const it=h.items.splice(idx,1)[0];h.inv[it.f]=(h.inv[it.f]||0)+1;houseSel=it.f;sfx('ui')}
    save();renderTownUI();return}
+ if(!inHouse&&!SV.hidePeers){for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;if(Math.abs(wx-p.x)<24&&Math.abs(wy-(p.y-10))<24){openPeerMenu(p.id);closeEmoteBar();return}}}
+ closePeerMenu();
  let hit=null;if(!inHouse){for(const a of townTargets()){const ay=a.y-(a.n&&a.n.b&&a.n.b.k!=='myhouse'?40:a.n&&a.n.b?10:12);if(Math.abs(wx-a.x)<(a.n&&a.n.b?Math.max(40,(a.n.b.w||120)*.45):26)&&Math.abs(wy-ay)<(a.n&&a.n.b?60:28)){hit=a;break}}}
  if(hit){TP.go=hit;TP.tgt=null;sfx('ui');return}
  TP.go=null;TP.tgt=[wx,wy];townPtr={id:e.pointerId};try{cv.setPointerCapture(e.pointerId)}catch(err){}}
@@ -2047,16 +2057,82 @@ function townMove(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
  if(townPtr&&townPtr.id===e.pointerId)TP.tgt=[wx,wy]}
 function townUp(e){if(townPtr&&townPtr.id===e.pointerId)townPtr=null}
 function townBtn(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.tw==='emote'){openEmoteBar();return}closeEmoteBar();
  if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
  else if(d.tw==='edit'){houseEdit=!houseEdit;houseSel=null;renderTownUI()}else if(d.tw==='shop')openPanel('home');else if(d.tw==='out')leaveHouse();
  else if(d.fsel){houseSel=houseSel===d.fsel?null:d.fsel;renderTownUI()}}
+
+/* ---------- online town (線上同城) ---------- */
+const EMOTES=[['wag','搖尾巴'],['sit','坐下'],['roll','打滾'],['spin','轉圈'],['bark','汪一聲'],['heart','比愛心']];
+const PHRASES=['你好！','好可愛！','一起去打塔嗎？','謝謝！','加油！','我回來了～','好厲害！','等我一下','汪汪！','晚安','要不要去公園挖寶？','掰掰～'];
+const NET={ctl:null,status:'off',err:'',peers:new Map(),retry:0,away:0,sendT:0,lastDest:null,emCd:0,sayCd:0,itCd:0,me:{em:null,say:null},menu:null,busy:false};
+const netCan=()=>!!(window.DogCloud&&DogCloud.townEnabled&&DogCloud.townEnabled()&&DogCloud.status().loggedIn);
+function netMeta(){return{n:(DogCloud.status().username||'').slice(0,16),sk:curSkin(),j:SV.job,w:SV.wear||{},pt:SV.pet||'',lv:SV.blv,tb:SV.towerBest||0,cc:(SV.cown||[]).length,dnd:!!SV.dnd,x:Math.round(TP.x),y:Math.round(TP.y)}}
+function cleanPeer(m){const w={};for(const k in (m.w||{}))if(CSM[m.w[k]]&&CSM[m.w[k]].slot===k)w[k]=m.w[k];return{n:String(m.n||'狗狗').replace(/[^a-z0-9_]/gi,'').slice(0,16)||'狗狗',sk:SKM[m.sk]?m.sk:BASE.shiba,j:JM[m.j]?m.j:'novice',w,pt:PM[m.pt]?m.pt:'',lv:Math.max(1,Math.min(99,m.lv|0)),tb:Math.max(0,m.tb|0),cc:Math.max(0,m.cc|0),dnd:!!m.dnd}}
+const clampX=v=>Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,+v||0)),clampY=v=>Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,+v||0));
+function netPeers(list){const seen=new Set();let fresh=false;for(const m of list){seen.add(m.id);let p=NET.peers.get(m.id);const c=cleanPeer(m);if(!p){fresh=true;p={id:m.id,x:clampX(m.x),y:clampY(m.y),tx:clampX(m.x),ty:clampY(m.y),face:1,mv:false,em:null,say:null,heart:0};NET.peers.set(m.id,p)}Object.assign(p,c)}for(const id of [...NET.peers.keys()])if(!seen.has(id))NET.peers.delete(id);if(NET.menu&&!NET.peers.has(NET.menu))closePeerMenu();if(fresh&&NET.ctl)NET.force=.3+Math.random()*1.2;netChip()}
+function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.n))return;
+ if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
+ else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e))p.em={e:d.e,t:0};
+ else if(ev==='say'&&PHRASES[d.k|0])p.say={k:d.k|0,t:0};
+ else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};if(me){TP.heart=1.4;townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.heart=1.4}}
+async function netConnect(){if(NET.busy)return;NET.busy=true;NET.status='connecting';netChip();
+ try{NET.ctl=await DogCloud.joinTown(netMeta(),{onPeers:netPeers,onEvent:netEvent,onState:s=>{if(s==='error'){NET.status='error';NET.err='連線中斷，重新連線中…';NET.retry=5;netDrop()}}});NET.status='on';NET.err='';NET.lastDest=[TP.x,TP.y];NET.mk=netKey()}
+ catch(e){NET.status='error';NET.err=e.message||String(e);NET.retry=30}
+ finally{NET.busy=false;netChip()}}
+function netDrop(){const c=NET.ctl;NET.ctl=null;NET.peers.clear();closePeerMenu();if(c)c.leave();if(NET.status==='on')NET.status='off';netChip()}
+function netLife(dt){const want=SV.breed&&netCan()&&!document.hidden&&(state==='town'||(state==='hub'&&!inHouse&&!G));
+ if(want){NET.away=0;if(!NET.ctl&&!NET.busy){NET.retry-=dt;if(NET.retry<=0)netConnect()}}
+ else if(NET.ctl){NET.away+=dt;if(NET.away>(document.hidden?2:20)){NET.status='off';netDrop()}}
+ else if(!netCan()&&NET.status!=='guest'){NET.status='guest';netChip()}}
+function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;
+ for(const k of ['em','say'])if(NET.me[k]){NET.me[k].t+=dt;if(NET.me[k].t>(k==='say'?4:1.4))NET.me[k]=null}
+ for(const p of NET.peers.values()){const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){const sp=Math.min(d,190*dt);p.x+=dx/d*sp;p.y+=dy/d*sp;p.mv=true;if(Math.abs(dx)>2)p.face=dx>0?1:-1}else p.mv=false;
+   if(p.em){p.em.t+=dt;if(p.em.t>1.4)p.em=null}if(p.say){p.say.t+=dt;if(p.say.t>4)p.say=null}p.heart=Math.max(0,p.heart-dt)}
+ if(NET.ctl&&NET.force>0){NET.force-=dt;if(NET.force<=0){NET.force=0;NET.lastDest=[Math.round(TP.x),Math.round(TP.y)];NET.ctl.send('mv',{tx:NET.lastDest[0],ty:NET.lastDest[1]})}}
+ if(!NET.ctl||state!=='town')return;NET.sendT-=dt;if(NET.sendT>0)return;NET.sendT=.7;
+ let dest;if(TP.go)dest=[TP.go.x,TP.go.y+(TP.go.n?(TP.go.r||30):18)];else if(TP.tgt)dest=TP.tgt;else if(TP.mv){const ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup')),m=Math.hypot(ix,iy)||1;dest=[TP.x+ix/m*140,TP.y+iy/m*140]}else dest=[TP.x,TP.y];
+ dest=[Math.round(clampX(dest[0])),Math.round(clampY(dest[1]))];const L=NET.lastDest;if(!L||Math.hypot(dest[0]-L[0],dest[1]-L[1])>28||(!TP.mv&&Math.hypot(TP.x-L[0],TP.y-L[1])>10)){if(!TP.mv)dest=[Math.round(TP.x),Math.round(TP.y)];NET.lastDest=dest;NET.ctl.send('mv',{tx:dest[0],ty:dest[1]})}}
+function netEmote(e){if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
+function netSay(k){if(NET.sayCd>0)return;NET.sayCd=3;NET.me.say={k,t:0};sfx('ui');if(NET.ctl)NET.ctl.send('say',{k});closeEmoteBar()}
+function netInteract(id,a){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}if(Math.hypot(p.x-TP.x,p.y-TP.y)>120){TP.tgt=[p.x-30*Math.sign(p.x-TP.x||1),p.y];TP.go=null;townFx.push({x:TP.x,y:TP.y-46,s:'先走近一點',life:1.2});return}
+ NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};p.heart=1.4;sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});closePeerMenu()}
+function netChip(){const el=$('netchip');if(!el)return;const s=NET.status;el.classList.toggle('hide',!(state==='town'));
+ el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?'登入帳號後，就能在主城看到其他玩家':s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
+function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n);
+ $('peerm').innerHTML=`<div class="pmh"><canvas width="120" height="90" id="peerDog"></canvas><div><b>${esc(p.n)}</b><small>${JM[p.j].n}・Base Lv ${p.lv}</small><small>無限之塔 ${p.tb} 層・時裝 ${p.cc} 件</small>${p.dnd?'<small>（勿擾中）</small>':''}</div><button class="btn sm ghost" data-pm="x">✕</button></div>
+  <div class="pmb"><button class="btn sm" data-pm="sniff" ${p.dnd?'disabled':''}>聞聞</button><button class="btn sm" data-pm="pat" ${p.dnd?'disabled':''}>摸摸頭</button><button class="btn sm ghost" data-pm="block">${blocked?'取消屏蔽':'屏蔽'}</button></div>`;
+ $('peerm').classList.remove('hide');portrait($('peerDog'),p.sk,p.j,1,false,p.w)}
+function closePeerMenu(){NET.menu=null;const m=$('peerm');if(m)m.classList.add('hide')}
+function peerMenuClick(e){const b=e.target.closest('button');if(!b||!NET.menu)return;const a=b.dataset.pm,id=NET.menu,p=NET.peers.get(id);
+ if(a==='x'){closePeerMenu();return}if(a==='block'&&p){SV.block=SV.block||[];const i=SV.block.indexOf(p.n);if(i>=0)SV.block.splice(i,1);else SV.block.push(p.n);save();closePeerMenu();return}netInteract(id,a)}
+function openEmoteBar(){const el=$('emoteb');if(!el.classList.contains('hide')){closeEmoteBar();return}
+ el.innerHTML=`<div class="emr">${EMOTES.map(([k,n])=>`<button class="btn sm" data-em="${k}">${n}</button>`).join('')}</div><div class="emr">${PHRASES.map((t,i)=>`<button class="btn sm ghost" data-say="${i}">${t}</button>`).join('')}</div>
+  <label class="note"><input type="checkbox" id="dndChk" ${SV.dnd?'checked':''}> 勿擾模式（別人不能聞聞、摸摸你）</label>　<label class="note"><input type="checkbox" id="hidePeersChk" ${SV.hidePeers?'checked':''}> 隱藏其他玩家</label>${netCan()?'':'<p class="note">現在沒有登入，表情只有你自己看得到。</p>'}`;el.classList.remove('hide')}
+function closeEmoteBar(){const el=$('emoteb');if(el)el.classList.add('hide')}
+function emoteClick(e){if(e.target.id==='dndChk'){SV.dnd=e.target.checked;save();netRetrack();return}if(e.target.id==='hidePeersChk'){SV.hidePeers=e.target.checked;save();return}
+ const b=e.target.closest('button');if(!b)return;if(b.dataset.em)netEmote(b.dataset.em);else if(b.dataset.say!==undefined)netSay(+b.dataset.say)}
+/* drawing a dog with emote animation */
+function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc){c.save();c.translate(x,y);let f=face,ry=1,rot=0,dx=0;
+ if(em){const k=em.t/1.4;if(em.e==='roll')rot=k*TAU*face;else if(em.e==='spin')f=Math.floor(em.t*10)%2?1:-1;else if(em.e==='sit')ry=.82;else if(em.e==='wag'||em.e==='pat')dx=Math.sin(em.t*30)*1.5;else if(em.e==='sniff')dx=Math.sin(em.t*8)*4}
+ c.translate(dx,0);if(rot){c.translate(0,-6);c.rotate(rot);c.translate(0,6)}c.scale(sc,sc*ry);if(ry<1)c.translate(0,3);drawDog(c,sk,j,0,0,t,f,mv,wear);c.restore();
+ if(em){c.textAlign='center';const k=em.t/1.4,al=Math.min(1,(1.4-em.t)*3);c.globalAlpha=al;
+   if(em.e==='bark'){c.font='900 16px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText('汪！',x+face*22,y-30-k*8);c.fillStyle='#fff6b0';c.fillText('汪！',x+face*22,y-30-k*8)}
+   else if(em.e==='heart'||em.e==='pat'){for(let q=0;q<3;q++)heart(c,x-12+q*12,y-34-k*18-q*4,4,'#ff5a7a')}
+   else if(em.e==='wag'){c.font='900 14px Fredoka,sans-serif';c.fillStyle='#fff';c.fillText('♪',x-face*20,y-24-k*10)}
+   else if(em.e==='sniff'){c.font='900 13px "Noto Sans TC",sans-serif';c.fillStyle='#fff';c.fillText('嗅嗅',x+face*20,y-28-k*8)}
+   c.globalAlpha=1}}
+function drawBubble(c,x,y,txt,al){c.globalAlpha=al;c.font='700 13px "Noto Sans TC",sans-serif';const w=c.measureText(txt).width+16;rr(c,x-w/2,y-22,w,22,10,'#ffffff');tri(c,x-5,y,x+5,y,x,y+6,'#ffffff');c.fillStyle='#3a2a1a';c.textAlign='center';c.fillText(txt,x,y-6);c.globalAlpha=1}
+
+const netKey=()=>JSON.stringify([curSkin(),SV.job,SV.wear||{},SV.pet||'',SV.blv,!!SV.dnd]);
+function netRetrack(){if(!NET.ctl)return;const k=netKey();if(k!==NET.mk){NET.mk=k;const m=netMeta();m.x=Math.round(TP.x);m.y=Math.round(TP.y);NET.ctl.track(m)}}
 
 /* ---------- loop ---------- */
 function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.8,Math.min(1.15,Math.min(W,H)/480))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.max(0,flash-dt);
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
-  {const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv)renderTownUI()}}
+  netLife(dt);{const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv){renderTownUI();netRetrack()}else{closeEmoteBar();closePeerMenu()}}if(tv&&$('netchip').classList.contains('hide')===(state==='town'))netChip()}
   if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
 resize();buildDex();
 buildChangelog();

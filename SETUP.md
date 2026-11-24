@@ -28,6 +28,12 @@
    - Redirect URLs：加入 `https://jameschen0712.github.io/dog-survivors/`
 3. **Rate Limits**：維持預設即可（已內建防止暴力猜密碼）。
 
+## 3.5 線上主城（Realtime）
+
+1. 左側 **Realtime → Settings**，把 **Allow public access to channels** 關掉（只允許 private 頻道），按 Save changes。
+2. `supabase/schema.sql` 第 6 段的 Realtime 權限（只有登入玩家能加入 `town:*` 頻道）要在 SQL Editor 執行過一次。
+3. 免費方案每月 200 萬則 Realtime 訊息、同時 200 人連線。遊戲已經盡量省訊息（只在改變目的地時送位置、表情有冷卻），人多起來要升級 Pro 方案。要暫時關掉線上主城，在 `config.js` 加上 `town: false`。
+
 ## 4.（選用）讓「綁定 Email／忘記密碼」可以寄信
 Supabase 內建的寄信服務只適合測試，每小時只能寄幾封。正式要讓玩家收信，需要接一個寄信服務（例如 Resend 免費方案）：
 **Project Settings → Authentication → SMTP Settings** 填入寄信服務給的資料。這步之後再做也可以。
