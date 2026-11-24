@@ -196,7 +196,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。其他毛色可以在城鎮「造型」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
       <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
-      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
+      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><button class="btn ghost" id="lowPowBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
       <div class="ov hide" id="acctov" style="z-index:26"><div class="card"><h2 id="acctT">帳號與雲端存檔</h2><div id="acctB" style="text-align:left"></div><p class="note" id="acctMsg" role="status" aria-live="polite" style="min-height:1.4em;text-align:center"></p><button class="btn ghost" id="acctClose">關閉</button></div></div>
       <div class="ov hide" id="resumeov" style="z-index:30"><div class="card"><h2>繼續上一局？</h2><div id="resumeB"></div><button class="btn" id="resumeYes">繼續關卡</button><button class="btn ghost" id="resumeNo">放棄（本局獎勵不會拿到）</button></div></div>
@@ -941,6 +941,7 @@ const xpNeed=l=>Math.floor(3+l*2.5+l*l*.45);
 const fmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 function pause(){if(state!=='play')return;state='pause';keys.clear();joy.on=false;
   $('plist').innerHTML=Object.values(G.wep).map(w=>`<div><b style="background:${w.evo?'#ffd35a':w.s.c}">${w.s.g}</b><span><strong>${w.s.n}${w.evo?'・進化':''}</strong> Lv ${w.l}<small>${skDesc(w.s,w.evo?8:w.l)}${!w.evo&&EVO[w.s.k]?`（Lv5 ＋ ${PD[EVO[w.s.k]].n} 可進化）`:''}</small></span></div>`).join('')+Object.keys(G.pas).map(k=>`<div><b style="background:${PD[k].c}">${PD[k].g}</b><span><strong>${PD[k].n}</strong> Lv ${G.pas[k]}<small>${PD[k].d()}</small></span></div>`).join('');
+  $('lowPowBtn').textContent=lowPower()?'省電模式：開（30 FPS，點一下關閉）':'省電模式：關（點一下開啟）';
   $('miniBtn').textContent=SV.minimap!==false?'小地圖：開（點一下關閉）':'小地圖：關（點一下開啟）';
   $('autoPickBtn').textContent=SV.autoPick?'自動選技能：開（點一下關閉）':'自動選技能：關（點一下開啟）';
   show('pause')}
@@ -1093,7 +1094,7 @@ function update(dt){
 
   G.spawn-=dt;
   const TT=tE();
-  if(G.spawn<=0){G.spawn=Math.max(.16,(TT<60?1.3:1)-TT/300)*(G.boss?1.6:1);const n=Math.round((1+Math.floor(TT/55))*G.cur.spawn);for(let i=0;i<n&&G.E.length<380;i++)spawnEnemy(pickType(TT))}
+  if(G.spawn<=0){G.spawn=Math.max(.16,(TT<60?1.3:1)-TT/300)*(G.boss?1.6:1);const n=Math.round((1+Math.floor(TT/55))*G.cur.spawn);for(let i=0;i<n&&G.E.length<(IS_TOUCH?260:380);i++)spawnEnemy(pickType(TT))}
   if(G.t>=G.eliteT){G.eliteT+=G.eliteGap;spawnEnemy(pickType(TT),true)}
   if(G.mode!=='tower'){const P=STAGES[G.stage].pool;if(!G.ring2&&G.t>=110){G.ring2=1;ring(P[1],28)}if(!G.ring4&&G.t>=220){G.ring4=1;ring(P[2],32)}}
   if(G.mode==='tower'){G.ft+=dt;if(!G.boss&&G.ft>=40){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,sg=STAGES[G.stage],hp=4200*sg.hp*G.mul.hp*.16;const e={type:sg.bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:34,hp,max:hp,spd:46,dmg:Math.round(18*sg.dmg*G.mul.dmg),boss:true,guard:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};G.E.push(e);G.boss=e;banner(`第 ${G.floor} 層守衛出現了！`);sfx('bossin');playMusic('boss'+G.stage)}}
@@ -1164,6 +1165,7 @@ function update(dt){
   G.E=G.E.filter(e=>!e.dead);
   for(const b of G.B){b.life-=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.x-p.x,b.y-p.y)<p.r+b.r){b.life=0;damageP(b.dmg);if(b.web){p.slow=1.6;txt(p.x,p.y-40,'被蛛網黏住！','#c8a8ff')}if(b.ice)p.slow=1}}
   G.B=G.B.filter(b=>b.life>0);
+  G.mergeT=(G.mergeT||0)-dt;if(G.mergeT<=0&&G.J.length>140){G.mergeT=1;const cells=new Map();for(const j of G.J){if(j.got||j.m||j.heal||j.chest||j.mag||j.coin)continue;const k=Math.floor(j.x/90)*100003+Math.floor(j.y/90);const h=cells.get(k);if(h){h.v+=j.v;j.got=true}else cells.set(k,j)}G.J=G.J.filter(j=>!j.got)}
   for(const j of G.J){const dx=p.x-j.x,dy=p.y-j.y,d=Math.hypot(dx,dy)||1;
     if(!j.m&&d<G.st.mag*(j.mag||j.chest?.5:1))j.m=true;
     if(j.m){const sp=Math.max(260,520-d,d*2.2);j.x+=dx/d*sp*dt;j.y+=dy/d*sp*dt}
@@ -1256,8 +1258,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.16.1';
+const VERSION='0.16.2';
 const NEWS=[
+ {v:'0.16.2',d:'11/24',t:'手機發燙改善',items:[['新增','省電模式（手機預設開啟）：戰鬥維持 30 FPS、解析度稍微降低，手機比較不會發燙；可以在暫停選單關掉'],['調整','高更新率手機（120Hz）不會再用 120 FPS 狂跑，戰鬥最多 60 FPS；主城最多 30～45 FPS；打開選單、暫停、看結算時幾乎不重畫'],['調整','手機上同一時間最多 260 隻怪（電腦 380 隻），畫面不會塞爆'],['調整','地上寶石太多時，附近的寶石會自動合成一顆比較大的（經驗不會少）；寶石改用預先畫好的圖']]},
  {v:'0.16.1',d:'11/24',t:'貓咪寵物',items:[['新增','三隻英國短毛貓寵物：傳說「錢錢」（銀白英短，戴著金幣鈴鐺，金幣 +18%）、史詩「阿咪」（三花英短，爆擊率 +6%）、稀有「小卡」（灰色英短，生命 +30）；孵寵物蛋就有機會抽到'],['修正','時裝預覽會用你現在穿的整套搭配，再換上要看的那一件；不會再出現換了頭飾、看其他部位時還是顯示舊樣子的問題']]},
  {v:'0.16.0',d:'11/24',t:'真實動作・效能優化',items:[['調整','社交動作全部重做，改成像真的狗：坐下會把後腳收起來、趴下睡覺會把下巴靠在前腳上、打滾會翻肚子四腳朝天亂踢、汪一聲會張嘴、嗷嗚會抬頭對天長嚎、轉圈是在原地追自己的尾巴、比愛心改成狗狗的「伸懶腰邀玩」姿勢、搖尾巴會連屁股一起扭'],['調整','聞聞會先走到對方屁股後面再聞；摸摸頭會走到對方面前、坐下抬起前腳拍拍牠，被摸的狗會瞇眼搖尾巴'],['調整','坐下、趴下會一直維持，直到你移動為止'],['新增','衝刺按鈕會顯示冷卻倒數，還有一圈慢慢轉回來的進度，冷卻好時按鈕會閃一下'],['調整','怪物變多時大幅減少卡頓：怪物改用預先畫好的圖、畫面外的東西不畫、特效和傷害數字太多時自動精簡'],['新增','手機跑不動時會自動降低一點解析度保持順暢，順了再自動調回來']]},
  {v:'0.15.4',d:'11/24',t:'城裡的新朋友',items:[['調整','出戰和每日副本的 NPC 改回「守門犬・阿布」和「地城嚮導・波波」'],['新增','城裡多了兩隻到處亂逛的臘腸狗：「襪子獵人・庫里」（巧克力奶油長毛臘腸，嘴裡叼著骨頭）和「公主・巴塔」（奶油長毛臘腸，戴著小皇冠），走過去可以摸摸牠們']]},
@@ -1534,7 +1537,11 @@ function pickBreed(k){SV.breed=k;save();if(breedMode==='new'){tab='go';goTown()}
   if(breedMode==='new')showTip('hub','歡迎來到城鎮！','這裡是你的基地：<br>・<b>出戰</b>：選關卡開打，也有無限之塔和每日副本<br>・<b>天賦／裝備／卡片</b>：讓角色變強<br>・<b>造型／寵物</b>：用狗骨頭抽造型、孵寵物<br>・<b>成就</b>：完成目標領骨頭<br>先按「青青草原」的<b>出發</b>試試看吧！送你 10 根狗骨頭，可以先去「造型」十連抽一次。')}
 
 /* ---------- render ---------- */
+const GCACHE={};
+function gemSprite(tier){if(GCACHE[tier])return GCACHE[tier];const s=[6,7.5,9][tier],col=['#3fd0ff','#c27bff','#ff6a3a'][tier],R2=3,n=Math.ceil(44*R2),cv2=document.createElement('canvas');cv2.width=cv2.height=n;const c=cv2.getContext('2d');c.translate(n/2,n/2);c.scale(R2,R2);
+  ell(c,0,8,6,2.2,0,'rgba(0,0,0,.22)');c.globalAlpha=.38;circ(c,0,0,s*2,col);c.globalAlpha=1;c.beginPath();c.moveTo(0,-s-1.5);c.lineTo(s*.75+1.5,0);c.lineTo(0,s+1.5);c.lineTo(-s*.75-1.5,0);c.closePath();c.fillStyle='#14202a';c.fill();c.beginPath();c.moveTo(0,-s);c.lineTo(s*.75,0);c.lineTo(0,s);c.lineTo(-s*.75,0);c.closePath();c.fillStyle=col;c.fill();tri(c,0,-s,-s*.75,0,0,0,'rgba(255,255,255,.55)');return GCACHE[tier]=cv2}
 function drawGem(j,t){const c=ctx,y=j.y+Math.sin(t*4+j.x)*2,pulse=.5+.5*Math.sin(t*6+j.x);
+  if(!j.heal&&!j.chest&&!j.mag&&!j.coin){c.drawImage(gemSprite(j.v>=5?2:j.v>=2?1:0),j.x-22,y-22,44,44);return}
   shadow(c,j.x,j.y+8,6,2.2);
   if(j.heal){c.save();c.translate(j.x,y);c.rotate(-.5);c.globalAlpha=.35+.25*pulse;circ(c,0,0,13,'#ffffff');c.globalAlpha=1;for(const sx of [-6,6])for(const sy of [-2.5,2.5])circ(c,sx,sy,3.6,'#3a2a1c');rr(c,-7,-3,14,6,3,'#3a2a1c');rr(c,-6,-2,12,4,2,'#fbf2dc');for(const sx of [-6,6])for(const sy of [-2.5,2.5])circ(c,sx,sy,2.6,'#fbf2dc');c.restore();return}
   if(j.chest){c.save();c.translate(j.x,y);c.globalAlpha=.3+.3*pulse;circ(c,0,0,18,'#ffe27a');c.globalAlpha=1;rr(c,-11,-6,22,15,3,'#2a1e12');rr(c,-10,-5,20,13,2,'#a8642a');rr(c,-10,-8,20,6,3,'#c87a3a');rr(c,-10,-2,20,2,1,'#f5c542');rr(c,-2,-4,4,6,1,'#f5c542');c.restore();return}
@@ -1825,6 +1832,7 @@ $('dashb').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagati
 $('spdb').addEventListener('click',()=>{if(!G)return;G.speed=G.speed===2?1:2;$('spdb').textContent='×'+G.speed});
 $('resume').addEventListener('click',resume);
 $('miniBtn').addEventListener('click',()=>{SV.minimap=SV.minimap===false;save();$('miniBtn').textContent=SV.minimap!==false?'小地圖：開（點一下關閉）':'小地圖：關（點一下開啟）'});
+$('lowPowBtn').addEventListener('click',()=>{SV.lowPower=!lowPower();save();resize();$('lowPowBtn').textContent=lowPower()?'省電模式：開（30 FPS，點一下關閉）':'省電模式：關（點一下開啟）'});
 $('autoPickBtn').addEventListener('click',()=>{SV.autoPick=!SV.autoPick;save();$('autoPickBtn').textContent=SV.autoPick?'自動選技能：開（點一下關閉）':'自動選技能：關（點一下開啟）'});
 $('autoOnLv').addEventListener('click',()=>{if(state!=='level')return;SV.autoPick=true;save();const cs=choicesNow.slice().sort((a,b)=>choiceScore(b)-choiceScore(a));applyChoice(cs[0]);G.pend--;txt(G.p.x,G.p.y-46,'自動：'+choiceName(cs[0]),'#9fe0ff',true);if(G.pend>0)openLevel();else resume()});
 $('quit').addEventListener('click',()=>{if(!G)return;G.retreat=1;state='play';end(false)});
@@ -2278,12 +2286,17 @@ function visitorsHTML(){if(!MYVIS)return '<p class="note">登入帳號後，可�
 const QL={lvl:0,avg:16,bad:0,good:0};
 function qualityTick(dt){if(state!=='play'){QL.bad=QL.good=0;return}const ms=dt*1000;QL.avg=QL.avg*.95+ms*.05;if(QL.avg>23){QL.bad+=dt;QL.good=0}else if(QL.avg<15){QL.good+=dt;QL.bad=0}else{QL.bad=Math.max(0,QL.bad-dt);QL.good=0}
   if(QL.bad>1.2&&QL.lvl<3){QL.lvl++;QL.bad=0;QL.avg=16;resize()}else if(QL.good>8&&QL.lvl>0){QL.lvl--;QL.good=0;resize()}}
-function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1)*[1,.8,.65,.5][QL.lvl]);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
+function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.max(1,Math.min(lowPower()?1.5:2,window.devicePixelRatio||1)*[1,.8,.65,.5][QL.lvl]);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
-function loop(now){const rawDt=(now-last)/1000,dt=Math.min(.05,rawDt);last=now;if(rawDt<.25)qualityTick(rawDt);flash=Math.max(0,flash-dt);
+const IS_TOUCH=(()=>{try{return matchMedia('(pointer:coarse)').matches}catch(e){return false}})();
+const lowPower=()=>SV.lowPower===undefined?IS_TOUCH:!!SV.lowPower;
+let lastFrame=0;
+function loop(now){const hubOpen=state==='hub'&&!$('hub').classList.contains('hide'),cap=state==='play'?(lowPower()||QL.lvl>=3?30:60):(state==='town'||state==='house')?(lowPower()?30:45):hubOpen?8:12;
+  if(now-lastFrame<1000/cap-4){requestAnimationFrame(loop);return}lastFrame=now;
+  const rawDt=(now-last)/1000,dt=Math.min(state==='play'?.05:.1,rawDt);last=now;if(rawDt<.25)qualityTick(rawDt);flash=Math.max(0,flash-dt);
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
   netLife(dt);{const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv){renderTownUI();netRetrack()}else{closeEmoteBar();closePeerMenu()}}if(tv&&$('netchip').classList.contains('hide')===(state==='town'))netChip()}
-  if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
+  if(hubOpen){}else if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
 resize();buildDex();
 buildChangelog();
 if(window.DogCloud){DogCloud.onChange(acctBtnTxt);DogCloud.init().then(()=>{acctBtnTxt();if(DogCloud.status().loggedIn)syncAfterLogin().then(()=>{if(!$('acctov').classList.contains('hide'))renderAcct()})}).catch(()=>{})}
