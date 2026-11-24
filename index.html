@@ -99,6 +99,17 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:8px;margin:0 0 14px}
 textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;border:2px solid #e3d6b0;padding:8px;background:#fff;color:#2a2116}
 .note{font-size:13px;color:#7a6a50}
+.news{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:12px;max-height:56vh}
+.nlist{overflow:auto;display:grid;gap:4px;align-content:start;max-height:56vh}
+.nv{text-align:left;background:#fff;border:2px solid #e3d6b0;border-radius:10px;padding:6px 8px;cursor:pointer;font:700 13px Fredoka,"Noto Sans TC",sans-serif}
+.nv small{display:block;font-weight:500;color:#7a6a50;font-size:12px}.nv.on{border-color:#2f7a3e;background:#eef7ea}
+.nbody{overflow:auto;max-height:56vh}.nbody h3{font:900 16px "Noto Sans TC",sans-serif;margin:0 0 8px}
+.nl{list-style:none;padding:0;margin:0;display:grid;gap:6px;font-size:14px}.nl li{display:flex;gap:8px;align-items:baseline}
+.ntag{flex:none;color:#fff;font:700 12px "Noto Sans TC",sans-serif;border-radius:6px;padding:1px 7px}
+#changelog details{background:var(--bg2);border:1px solid #2c5a37;border-radius:12px;padding:8px 12px;margin:0 0 6px}
+#changelog summary{cursor:pointer;font-weight:900}#changelog summary span{float:right;font-weight:500;color:var(--mute);font-size:13px}
+#changelog .nl{margin-top:8px;color:var(--ink)}
+@media(max-width:560px){.news{grid-template-columns:minmax(0,1fr)}.nlist{display:flex;overflow-x:auto;max-height:none}.nv{flex:none}}
 .pulls{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
 .pr,.sk2{position:relative;display:grid;justify-items:center;background:#fff;border:2px solid #e3d6b0;border-radius:12px;padding:6px 4px 8px;text-align:center}
 .pr canvas,.sk2 canvas{width:96px;height:72px}
@@ -144,7 +155,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <button id="spdb" class="pbtn hide" style="right:58px" aria-label="切換速度">×1</button>
       <div class="hub hide" id="hub">
-        <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div></div>
+        <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button></div>
         <div class="tabs" id="tabs"></div>
         <div class="hbody" id="hbody"></div>
       </div>
@@ -152,6 +163,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
+      <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
       <div class="ov hide" id="tipov" style="z-index:30"><div class="card"><h2 id="tipT"></h2><div id="tipB" style="text-align:left;font-size:15px;line-height:1.7;margin:0 0 12px"></div><button class="btn" id="tipOk">知道了</button></div></div>
       <div class="ov hide" id="over"><div class="card"><h2 id="ovT"></h2><div class="stats" id="ovS"></div><div class="rw" id="ovR"></div><button class="btn" id="toTown">回到城鎮</button></div></div>
     </div>
@@ -170,6 +182,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <li>存檔放在這個瀏覽器裡。要換手機玩，可以在城鎮「角色」頁複製存檔碼，到新裝置貼上。</li>
     </ul>
   </section>
+  <section class="how" id="clog"><h2>更新紀錄</h2><div id="changelog"></div></section>
   <section class="dex">
     <h2>職業圖鑑</h2>
     <p>用你的狗示範每個職業的樣子。點一下可以「試玩」那個職業一局（不會存檔、不會影響你的角色）。</p>
@@ -924,6 +937,31 @@ function toTown(){G=null;state='hub';playMusic('town');document.body.classList.r
   else if(Object.keys(SV.cards||{}).length)showTip('card','拿到卡片了！','卡片要插在<b>有空卡槽</b>的裝備上才有效果。到<b>「裝備」</b>分頁，在裝備旁邊按「插卡」。注意：插進去就拿不出來了。');
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
+/* ---------- changelog ---------- */
+const VERSION='0.9.3';
+const NEWS=[
+ {v:'0.9.3',d:'11/24',t:'更新公告',items:[['新增','城鎮右上角的「最新消息」：每次更新都會列出新增、調整和修正的內容'],['新增','改版後第一次打開遊戲，會自動跳出這次的更新內容'],['新增','網頁下方的「更新紀錄」可以看到所有歷史版本']]},
+ {v:'0.9.2',d:'11/24',t:'天賦精通・自動選技能',items:[['新增','三條天賦分支各多三格：獵王／爆裂、貪婪／技巧大師、鐵壁／生命汲取'],['新增','每條分支最後一格「精通」沒有上限，多出來的天賦點可以一直加'],['新增','「自動分配剩下的點數」按鈕'],['新增','成就頁「一鍵全部領取」'],['新增','升級時可以開「自動選技能」，暫停畫面隨時可以關掉']]},
+ {v:'0.9.1',d:'11/24',t:'魔王專屬音樂',items:[['新增','五個魔王各有自己的主題曲：古樹王、巨蛛女王、熔岩巨人、雪原猛獁、雷鳥'],['調整','無限之塔守衛出現時，會播該區魔王的主題曲']]},
+ {v:'0.9.0',d:'11/24',t:'無限之塔・副本・寵物',items:[['新增','9 種新怪物，每個關卡有自己的怪物組合'],['新增','4 個新魔王，各有不同招式：蛛網、火焰雨、衝撞、落雷'],['新增','無限之塔：每層 40 秒後打倒守衛上樓，每 10 層存檔點'],['新增','每日副本：黃金、卡片、經驗，每天 3 次'],['新增','已通關的關卡可以開 ×2 速度'],['新增','8 隻寵物：跟隨攻擊並給加成，可用金幣或骨頭孵蛋'],['新增','23 個成就，完成後領狗骨頭'],['新增','離線收益（最多 12 小時）與新手教學提示'],['新增','卡片增加到 20 張']]},
+ {v:'0.8.3',d:'11/24',t:'造型收藏加成',items:[['新增','每抽到一款造型就永久增加能力，不用穿上也有效'],['新增','重複的造型會升星（最多 ★3）'],['新增','集滿同一隻狗的全部毛色，額外加傷害']]},
+ {v:'0.8.2',d:'11/24',t:'音樂重寫',items:[['調整','所有背景音樂改成手寫旋律，音色更柔和，加上殘響']]},
+ {v:'0.8.1',d:'11/24',t:'磁鐵',items:[['新增','紅色磁鐵道具：撿到會把畫面上的經驗、金幣全部吸過來']]},
+ {v:'0.8.0',d:'11/24',t:'卡片系統',items:[['新增','打倒怪物有機率掉卡片，可以插在裝備的卡槽上'],['新增','裝備帶 0～3 個卡槽、卡片圖鑑分頁'],['新增','「一鍵換上最好的」與每局結束自動換裝'],['新增','菁英怪與魔王頭上顯示名字和血條']]},
+ {v:'0.7.1',d:'11/24',t:'職業名稱',items:[['調整','「侍僧」改名為「服事」']]},
+ {v:'0.7.0',d:'11/24',t:'抽造型・打擊感',items:[['調整','開局可選的狗精簡為 10 種'],['新增','抽造型：44 款毛色，R／SR／SSR，十連保底、60 抽必中 SSR'],['新增','狗骨頭貨幣'],['調整','打擊感：爆擊停頓、受擊壓扁、火花、傷害數字彈跳、擊殺碎裂'],['新增','每件裝備都有圖示'],['調整','經驗寶石加外框和光暈，金幣改成要撿的硬幣']]},
+ {v:'0.6.0',d:'11/24',t:'音樂與音效',items:[['新增','城鎮、各關卡、魔王戰的背景音樂'],['新增','招式、打擊、撿東西、升級等音效'],['新增','音量滑桿與靜音按鈕']]},
+ {v:'0.5.0',d:'11/24',t:'肉鴿大改版',items:[['調整','開局選一隻狗，轉職只換裝扮，不換品種'],['調整','每個職業只會用自己職業線的招式'],['新增','參考 RO 的招式與特效：狂擊、怒爆、劍氣斬、火箭術、暴風雪、箭雨、阿修羅霸凰拳等'],['新增','城鎮：出戰、角色、天賦、裝備、商店'],['新增','Base／Job 等級、轉職、天賦樹、裝備品質與精煉'],['新增','5 個關卡、存檔碼']]},
+ {v:'0.4.0',d:'11/24',t:'操作修正',items:[['調整','近戰招式自動瞄準最近的怪'],['調整','開局難度降低'],['新增','手機全螢幕、滑鼠按住移動'],['新增','升級選項加上編號，暫停畫面顯示技能說明']]},
+ {v:'0.3.0',d:'11/24',t:'新狗狗',items:[['新增','西高地白㹴（超級見習生系）、吉娃娃（槍手系）']]},
+ {v:'0.2.0',d:'11/24',t:'汪汪倖存者',items:[['調整','改成狗狗主題，46 種職業對應不同的狗'],['新增','職業圖鑑']]},
+ {v:'0.1.0',d:'11/24',t:'第一版',items:[['新增','倖存者類網頁遊戲雛形：3 個職業、6 種武器、魔王戰']]}];
+const NTAG={'新增':'#2f7a3e','調整':'#3d6fd6','修正':'#c0407a'};
+const newsItems=n=>n.items.map(([k,txt])=>`<li><b class="ntag" style="background:${NTAG[k]}">${k}</b>${txt}</li>`).join('');
+let newsSel=0;
+function openNews(){$('newsList').innerHTML=NEWS.map((n,i)=>`<button class="nv${i===newsSel?' on':''}" data-nv="${i}">V${n.v}<small>${n.t}</small></button>`).join('');const n=NEWS[newsSel];$('newsBody').innerHTML=`<h3>${n.d} 更新公告・V${n.v}　${n.t}</h3><ul class="nl">${newsItems(n)}</ul>`;$('newsov').classList.remove('hide')}
+function buildChangelog(){$('changelog').innerHTML=NEWS.map(n=>`<details${n===NEWS[0]?' open':''}><summary>V${n.v}　${n.t}<span>${n.d}</span></summary><ul class="nl">${newsItems(n)}</ul></details>`).join('')}
+
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
 const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['pet','寵物'],['ach','成就'],['shop','商店']];
@@ -1337,6 +1375,9 @@ $('autoOnLv').addEventListener('click',()=>{if(state!=='level')return;SV.autoPic
 $('quit').addEventListener('click',()=>{if(!G)return;G.retreat=1;state='play';end(false)});
 $('toTown').addEventListener('click',toTown);
 $('tipOk').addEventListener('click',closeTip);
+$('newsBtn').addEventListener('click',()=>{newsSel=0;openNews()});
+$('newsClose').addEventListener('click',()=>$('newsov').classList.add('hide'));
+$('newsList').addEventListener('click',e=>{const b=e.target.closest('.nv');if(b){newsSel=+b.dataset.nv;openNews()}});
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
   if(state==='play'&&['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
   if(state==='tip'&&(k==='enter'||k===' '||k==='escape')){closeTip();return}
@@ -1361,7 +1402,8 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.ma
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
   render();requestAnimationFrame(loop)}
 resize();buildDex();
-if(SV.breed){renderHub();show('hub');idleIncome()}else openBreeds('new');
+buildChangelog();
+if(SV.breed){renderHub();show('hub');idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}}else{SV.newsSeen=VERSION;openBreeds('new')}
 requestAnimationFrame(loop);
 }
 </script>
