@@ -2,7 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2f6b3c">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>汪汪倖存者</title>
@@ -163,6 +169,8 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
 .dc canvas{width:110px;height:84px;background:#5a9a46;border-radius:9px;margin-bottom:4px}
 .dc i{font-style:normal;font:700 12px "Noto Sans TC",sans-serif;color:#10261a;background:var(--gold);border-radius:20px;padding:0 8px}
 .dc strong{font-size:16px}.dc small{font-size:13px;color:#9be36b}
+@media(max-width:760px),(max-height:520px){body.app{overflow:hidden}body.app .cab{position:fixed;inset:0;z-index:50;border-radius:0;padding:0}body.app .frame{height:100%;min-height:0;border-radius:0}body.app header.top{display:none}.htop #hubDog{display:none}.htop{padding:8px 10px;gap:8px}}
+.frame{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}button,.btn,.tab{touch-action:manipulation}
 @media(max-width:760px){.frame{height:calc(100svh - 24px)}body.playing{overflow:hidden}body.playing .cab{position:fixed;inset:0;z-index:50;border-radius:0;padding:0}body.playing .frame{height:100%;min-height:0;border-radius:0}.talents{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.htop canvas{width:64px;height:50px}}
 @media(prefers-reduced-motion:reduce){.ch,.jb,.br{transition:none}.ch:hover,.jb:hover,.br:hover{transform:none}}
@@ -1215,8 +1223,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.15.1';
+const VERSION='0.15.2';
 const NEWS=[
+ {v:'0.15.2',d:'11/24',t:'手機版優化',items:[['調整','手機上主城、選單、戰鬥都改成全螢幕，不會再被網頁標題擠到、也不用上下捲動才找得到按鈕'],['調整','手機直立時畫面稍微拉遠，看得到更多從旁邊衝過來的怪物'],['調整','戰鬥上方的金幣／裝備／卡片和魔王倒數不會再重疊；小地圖跟著往下移'],['修正','長按畫面不會再跳出選單或選取文字，連點按鈕不會放大畫面'],['新增','可以「加入主畫面」：用手機瀏覽器的分享選單加到主畫面，打開就是全螢幕的 App']]},
  {v:'0.15.1',d:'11/24',t:'操作改善',items:[['調整','走到 NPC 旁邊，下方按鈕會寫「跟 守門犬・阿布 說話（出戰）」，一看就知道要做什麼'],['新增','第一次進主城會跳出操作教學：點 NPC 就能使用功能'],['新增','按 Esc 可以關掉視窗：帳號、最新消息、抽卡結果、提示、轉職視窗、選單和社交面板'],['修正','連續按 Enter 會一直跳出雲端存檔視窗的問題'],['調整','轉職、天賦的提示改成告訴你要去找哪位 NPC']]},
  {v:'0.15.0',d:'11/24',t:'狗狗社交・拜訪好友的家',items:[['新增','一起散步：點別人的狗按「一起散步」，對方答應後兩隻狗會牽著繩子一起走'],['新增','丟球：在「社交」選「丟球」，球會飛出去，大家都可以衝去搶，搶到的狗會叼著跑'],['新增','一起午睡：選「趴下睡覺」，旁邊也有狗在睡就會一起睡，睡滿 20 秒每天可以拿一次獎勵'],['新增','汪汪合唱：幾隻狗在 3 秒內一起「嗷嗚～」就會合唱，3 隻以上每天可以拿一次獎勵'],['新增','送點心：每天可以送每位朋友一份點心，收到的狗會拿到金幣'],['新增','好感度：聞聞、摸摸、散步、丟球、午睡、合唱、送點心都會增加，從「路過的狗」一路升到「最佳拍檔」；在「社交 → 好友」可以看到好友列表和誰在線'],['新增','拜訪好友的家：點別人的狗或從好友列表按「拜訪家」，可以參觀牠布置的狗屋，主人會在家裡睡午覺'],['新增','留下腳印：去別人家可以選一句話留下腳印（每天一次），回自己家按「訪客」就能看到誰來過，門口也會出現腳印']]},
  {v:'0.14.0',d:'11/24',t:'線上同城',items:[['新增','登入帳號後，在主城可以看到其他玩家的狗狗：毛色、職業、時裝、寵物都看得到，頭上會顯示名字和等級'],['新增','表情：搖尾巴、坐下、打滾、轉圈、汪一聲、比愛心；還有 12 句可愛的固定句子可以說（按下方「表情」）'],['新增','點別人的狗可以「聞聞」「摸摸頭」，也能看牠的等級、塔層和時裝數量'],['新增','勿擾模式（別人不能對你聞聞、摸摸）、隱藏其他玩家、屏蔽特定玩家'],['新增','頻道：每個頻道最多 16 隻狗，人滿會自動分到下一個頻道，右上角會顯示目前的頻道和人數'],['調整','為了安全，只能用固定的句子和表情，不能自由打字']]},
@@ -1611,7 +1620,7 @@ function hud(){
   if(G.mode!=='tower'&&!G.boss&&!G.bossDone)T(`魔王出現 ${fmt(Math.max(0,G.bossT-G.t))}`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   T(fmt(G.t),W/2,14,'center','700 26px Fredoka, sans-serif');
   T('擊倒 '+G.kills,W-62,18,'right','700 16px "Noto Sans TC", sans-serif');
-  if(!G.trial)T(`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}  卡片 ${G.rw.cards.length}`,W-62,40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
+  if(!G.trial)T(W<560?`金${Math.round(G.rw.zeny)} 裝${G.rw.items.length} 卡${G.rw.cards.length}`:`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}  卡片 ${G.rw.cards.length}`,W-62,W<560?62:40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
   const items=[...Object.values(G.wep).map(w=>[w.evo?{...w.s,c:'#ffd35a'}:w.s,w.evo?5:w.l]),...Object.keys(G.pas).map(k=>[PD[k],G.pas[k]])],per=Math.max(1,Math.floor((W-20)/36));
   items.forEach(([d,l],i)=>{const x=12+(i%per)*36,y=H-46-Math.floor(i/per)*42;
     rr(c,x,y,30,30,8,'rgba(16,38,26,.82)');c.strokeStyle=d.c;c.lineWidth=2;c.beginPath();if(c.roundRect)c.roundRect(x,y,30,30,8);else c.rect(x,y,30,30);c.stroke();
@@ -1619,7 +1628,7 @@ function hud(){
     for(let q=0;q<5;q++)rr(c,x+3+q*5.2,y+33,4,3,1,q<l?d.c:'rgba(255,255,255,.25)')});
   if(G.boss){const bw=Math.min(420,W-40),bx=(W-bw)/2;T(G.boss.guard?`第 ${G.floor} 層守衛・${STAGES[G.stage].boss}`:STAGES[G.stage].boss,W/2,48,'center','900 14px "Noto Sans TC", sans-serif');rr(c,bx,68,bw,10,5,'rgba(0,0,0,.5)');rr(c,bx,68,bw*Math.max(0,G.boss.hp/G.boss.max),10,5,'#9be36b')}
   for(const z of G.Z)if(z.k==='shrine'&&!z.used){const dx=(z.x-G.p.x)*S,dy=(z.y-G.p.y)*S;if(Math.abs(dx)>W/2-20||Math.abs(dy)>H/2-20){const a=Math.atan2(dy,dx),k=Math.min((W/2-30)/Math.abs(Math.cos(a)||1e-6),(H/2-30)/Math.abs(Math.sin(a)||1e-6)),ax=W/2+Math.cos(a)*k,ay=H/2+Math.sin(a)*k;c.save();c.translate(ax,ay);c.rotate(a);tri(c,12,0,-6,-8,-6,8,'#ffe27a');c.restore()}}
-  if(SV.minimap!==false){const ms=Math.round(Math.min(104,W*.24)),mx=W-ms-10,my=G.boss?88:62,rad=700,k=ms/2/rad,cx=mx+ms/2,cy=my+ms/2;
+  if(SV.minimap!==false){const ms=Math.round(Math.min(104,W*.24)),mx=W-ms-10,my=(G.boss?88:62)+(W<560?22:0),rad=700,k=ms/2/rad,cx=mx+ms/2,cy=my+ms/2;
     c.save();c.beginPath();if(c.roundRect)c.roundRect(mx,my,ms,ms,10);else c.rect(mx,my,ms,ms);c.fillStyle='rgba(10,24,16,.62)';c.fill();c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1.5;c.stroke();c.clip();
     c.strokeStyle='rgba(255,255,255,.18)';c.lineWidth=1;c.strokeRect(cx-W/S/2*k,cy-H/S/2*k,W/S*k,H/S*k);
     const P=(x,y)=>[cx+Math.max(-rad,Math.min(rad,x-G.p.x))*k,cy+Math.max(-rad,Math.min(rad,y-G.p.y))*k];
@@ -1822,7 +1831,7 @@ cv.addEventListener('pointerdown',e=>{if(state!=='play')return;joy.on=true;joy.i
 cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();let dx=e.clientX-r.left-joy.ox,dy=e.clientY-r.top-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d}joy.x=dx/m;joy.y=dy/m;placeJoy()});
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
+cv.addEventListener('contextmenu',e=>e.preventDefault());cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
 $('tbtns').addEventListener('click',townBtn);$('emoteb').addEventListener('click',emoteClick);$('peerm').addEventListener('click',peerMenuClick);$('invpop').addEventListener('click',e=>{const b=e.target.closest('button');if(b)answerInvite(b.dataset.inv==='1')});$('netchip').addEventListener('click',()=>{if(NET.status==='guest')openAcct();else if(NET.status==='error'){NET.retry=0}});$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
 
 /* ---------- town (主城) & dog house ---------- */
@@ -1883,7 +1892,7 @@ function runMats(){if(!G||G.trial)return null;const k=1+G.stage*.6,win=G.bossDon
 /* panel helpers */
 function openPanel(t,scrollTo){tab=t;state='hub';keys.clear();blurActive();renderHub();show('hub');$('hbody').scrollTop=0;if(scrollTo){const el=$('hbody').querySelector('[data-anchor="'+scrollTo+'"]');if(el)try{el.scrollIntoView({block:'start'})}catch(e){}}sfx('ui')}
 function backToTown(){blurActive();show(null);state=inHouse?'house':'town';last=performance.now();renderTownUI()}
-function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI();blurActive();
+function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.add('app');document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI();blurActive();
   showTip('town2','歡迎來到主城！','・<b>走路</b>：電腦用方向鍵／WASD；手機按住畫面拖曳，或點一下想去的地方<br>・<b>使用功能</b>：直接<b>點 NPC</b>，狗狗會自己走過去打開；或走到 NPC 旁邊按下方黃色按鈕（電腦可按 E／空白鍵／Enter）<br>・NPC 頭上的<b>黃色標籤</b>是他負責的功能，有紅色 <b>!</b> 代表有事要處理<br>・不想走路也可以按下方「出戰」「選單」<br>・按 <kbd>Esc</kbd> 可以關掉視窗')}
 function blurActive(){try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()}catch(e){}}
 const MODALS=['acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
@@ -2206,7 +2215,7 @@ function visitorsHTML(){if(!MYVIS)return '<p class="note">登入帳號後，可�
  return `<div class="frl">${MYVIS.map(v=>`<div class="fr"><div><b>${esc(v.visitor_name||'狗狗')}</b><small>${esc(String(v.day))}　🐾 「${PHRASES[v.phrase]||''}」</small></div></div>`).join('')}</div>`}
 
 /* ---------- loop ---------- */
-function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.8,Math.min(1.15,Math.min(W,H)/480))}
+function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.max(0,flash-dt);
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
