@@ -72,12 +72,14 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 /* town hub */
 .townui{position:absolute;inset:0;pointer-events:none;z-index:5}.townui>*{pointer-events:auto}
 .tinfo{position:absolute;top:10px;left:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 12px;display:grid;font-size:12px;line-height:1.45;max-width:calc(100% - 20px)}.tinfo b{font-size:15px}.tinfo.t2{top:76px}
-.tbtns{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap}.tbtns .btn{margin:0;min-height:44px;padding:8px 16px;font-size:16px}.tbtns .btn.ghost{background:#fff8e6;color:#5a3a10;border-color:#fff8e6}
+.tbtns{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap}.tbtns .btn{margin:0;min-height:44px;padding:8px 16px;font-size:16px}.tbtns .btn.ghost{background:#fff8e6;color:#5a3a10;border-color:#fff8e6}@media(max-width:520px){.tbtns{gap:5px;left:8px;right:56px;transform:none;justify-content:center;flex-wrap:wrap}.tbtns .btn{padding:6px 10px;font-size:14px;min-height:40px}}
 .talkb{position:absolute;bottom:68px;left:50%;transform:translateX(-50%);margin:0;min-height:44px;animation:pop .9s ease-in-out infinite alternate}@keyframes pop{to{transform:translateX(-50%) scale(1.06)}}
 .editbar{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:42%;overflow:auto}.editbar p{margin:0 0 6px;font-size:13px}
 .netchip{position:absolute;top:10px;right:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 10px;font-size:12px;max-width:52%;cursor:pointer}.netchip b{color:#7fe36b}.netchip[data-s=error] b,.netchip[data-s=guest]{color:#ffe27a}
 .emoteb{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:46%;overflow:auto}.emr{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.emr .btn{margin:0}
-.peerm{position:absolute;left:50%;transform:translateX(-50%);bottom:66px;width:min(360px,calc(100% - 16px));background:rgba(255,248,230,.98);color:var(--pink);border-radius:14px;padding:8px 10px}.pmh{display:flex;gap:8px;align-items:center}.pmh canvas{width:80px;height:60px}.pmh div{display:grid;flex:1;font-size:12px}.pmh b{font-size:15px}.pmb{display:flex;gap:6px;margin-top:6px}.pmb .btn{margin:0}
+.etabs{display:flex;gap:6px;margin-bottom:8px}.etabs .btn{margin:0}.frl{display:grid;gap:6px}.fr{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#fff;border-radius:10px;padding:6px 8px}.fr div{display:grid}.fr small{font-size:12px;color:#a0661e}.fr .on{color:#2f9a3e;font-size:12px}.fr span{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.fr .btn{margin:0}
+.invpop{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:#fff8e6;color:var(--pink);border-radius:14px;padding:10px 14px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3);font-size:14px}.invpop .btn{margin:6px 4px 0}
+.peerm{position:absolute;left:50%;transform:translateX(-50%);bottom:66px;width:min(360px,calc(100% - 16px));background:rgba(255,248,230,.98);color:var(--pink);border-radius:14px;padding:8px 10px}.pmh{display:flex;gap:8px;align-items:center}.pmh canvas{width:80px;height:60px}.pmh div{display:grid;flex:1;font-size:12px}.pmh b{font-size:15px}.pmb{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.pmb .btn{margin:0}
 .fchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.fchip{border:2px solid #e8d8b0;background:#fff;border-radius:10px;padding:4px;display:grid;justify-items:center;min-width:76px;cursor:pointer;color:var(--pink)}.fchip.on{border-color:#f5c542;background:#fff3c0}.fchip canvas{width:42px;height:42px}.fchip small{font-size:11px}
 .furn{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.fc{background:#fff;border:2px solid #eadbb4;border-radius:12px;padding:8px;display:grid;justify-items:center;text-align:center;gap:2px}.fc canvas{width:56px;height:56px}.fc small{font-size:12px}.fc .btn{margin:4px 0 0}
 .hub{position:absolute;inset:0;background:linear-gradient(#fbf6e6,#f1e6c8);color:var(--pink);display:flex;flex-direction:column}
@@ -177,7 +179,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <button id="dashb" class="dashb hide" aria-label="衝刺">衝</button>
       <button id="spdb" class="pbtn hide" style="right:58px" aria-label="切換速度">×1</button>
-      <div id="townui" class="townui hide"><div class="tinfo" id="tinfo"></div><div class="tinfo t2 hide" id="tinfo2"></div><button id="talkb" class="btn talkb hide"></button><div id="editbar" class="editbar hide"></div><div id="netchip" class="netchip hide"></div><div id="emoteb" class="emoteb hide"></div><div id="peerm" class="peerm hide"></div><div class="tbtns" id="tbtns"></div></div>
+      <div id="townui" class="townui hide"><div class="tinfo" id="tinfo"></div><div class="tinfo t2 hide" id="tinfo2"></div><button id="talkb" class="btn talkb hide"></button><div id="editbar" class="editbar hide"></div><div id="netchip" class="netchip hide"></div><div id="emoteb" class="emoteb hide"></div><div id="peerm" class="peerm hide"></div><div id="invpop" class="invpop hide"></div><div class="tbtns" id="tbtns"></div></div>
       <div class="hub hide" id="hub">
         <div class="htop"><button class="btn sm ghost" id="hubBack" style="margin:0">← 回城鎮</button><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button><button class="btn sm" id="acctBtn" style="margin:0">登入／註冊</button></div>
         <div class="tabs" id="tabs"></div>
@@ -223,7 +225,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
 </main>
 <script src="vendor/supabase.js"></script>
 <script src="config.js?v=0.14.0"></script>
-<script src="cloud.js?v=0.14.1"></script>
+<script src="cloud.js?v=0.15.0"></script>
 <script>
 {
 const $=id=>document.getElementById(id);
@@ -1213,8 +1215,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.14.0';
+const VERSION='0.15.0';
 const NEWS=[
+ {v:'0.15.0',d:'11/24',t:'狗狗社交・拜訪好友的家',items:[['新增','一起散步：點別人的狗按「一起散步」，對方答應後兩隻狗會牽著繩子一起走'],['新增','丟球：在「社交」選「丟球」，球會飛出去，大家都可以衝去搶，搶到的狗會叼著跑'],['新增','一起午睡：選「趴下睡覺」，旁邊也有狗在睡就會一起睡，睡滿 20 秒每天可以拿一次獎勵'],['新增','汪汪合唱：幾隻狗在 3 秒內一起「嗷嗚～」就會合唱，3 隻以上每天可以拿一次獎勵'],['新增','送點心：每天可以送每位朋友一份點心，收到的狗會拿到金幣'],['新增','好感度：聞聞、摸摸、散步、丟球、午睡、合唱、送點心都會增加，從「路過的狗」一路升到「最佳拍檔」；在「社交 → 好友」可以看到好友列表和誰在線'],['新增','拜訪好友的家：點別人的狗或從好友列表按「拜訪家」，可以參觀牠布置的狗屋，主人會在家裡睡午覺'],['新增','留下腳印：去別人家可以選一句話留下腳印（每天一次），回自己家按「訪客」就能看到誰來過，門口也會出現腳印']]},
  {v:'0.14.0',d:'11/24',t:'線上同城',items:[['新增','登入帳號後，在主城可以看到其他玩家的狗狗：毛色、職業、時裝、寵物都看得到，頭上會顯示名字和等級'],['新增','表情：搖尾巴、坐下、打滾、轉圈、汪一聲、比愛心；還有 12 句可愛的固定句子可以說（按下方「表情」）'],['新增','點別人的狗可以「聞聞」「摸摸頭」，也能看牠的等級、塔層和時裝數量'],['新增','勿擾模式（別人不能對你聞聞、摸摸）、隱藏其他玩家、屏蔽特定玩家'],['新增','頻道：每個頻道最多 16 隻狗，人滿會自動分到下一個頻道，右上角會顯示目前的頻道和人數'],['調整','為了安全，只能用固定的句子和表情，不能自由打字']]},
  {v:'0.13.0',d:'11/24',t:'主城・狗狗的家',items:[['新增','主城：回城鎮後可以帶著狗狗在城裡散步，用方向鍵／WASD 或點畫面移動，走到 NPC 旁邊按「對話」（或 E／空白鍵）'],['新增','每個功能都有對應的 NPC：守門犬（出戰）、塔守（無限之塔）、地城嚮導（副本）、轉職教官、長老（天賦）、鐵匠（裝備）、卡片研究員、狗狗美容院（造型）、時裝店、孵蛋婆婆（寵物）、公告欄（任務）、雜貨商、報童（消息）、郵差（雲端存檔）、家具店'],['新增','城裡有其他狗狗在散步，走過去可以「摸摸」牠們'],['新增','狗狗公園：每天有 4 個可以挖的土堆，挖到金幣、狗屋材料，運氣好有狗骨頭'],['新增','狗狗的家：從紙箱小窩一路升級到庭院小別墅，房間越來越大；36 種家具、6 種牆壁、5 種地板，可以自由擺放'],['新增','舒適度：家具擺越多種越舒服，最多讓出戰經驗 +20%、離線收入 +100%；家裡也會有你其他的寵物在玩'],['新增','狗屋材料（木材、布料、石材、亮晶晶）：每次出戰都會拿到，打越多怪、打倒越多魔王和菁英越多'],['調整','畫面下方仍有「出戰」「選單」「回家」按鈕，不想走路也可以直接點']]},
  {v:'0.12.1',d:'11/24',t:'抽卡畫面改版',items:[['調整','抽造型、抽時裝的結果改成跳出視窗顯示，可以直接「再抽一次」，關掉後會回到收藏'],['新增','收藏可以按分類切換：造型分品種；時裝分頭飾、臉部、頸部、背部、特效，還有「剛抽到」「只看已擁有」，剛抽到的可以馬上換上'],['新增','寵物新增「自動」模式（預設）：平常跟著你攻擊，地上掉的東西一多就自己跑去叼回來']]},
@@ -1816,7 +1819,7 @@ cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
-$('tbtns').addEventListener('click',townBtn);$('emoteb').addEventListener('click',emoteClick);$('peerm').addEventListener('click',peerMenuClick);$('netchip').addEventListener('click',()=>{if(NET.status==='guest')openAcct();else if(NET.status==='error'){NET.retry=0}});$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
+$('tbtns').addEventListener('click',townBtn);$('emoteb').addEventListener('click',emoteClick);$('peerm').addEventListener('click',peerMenuClick);$('invpop').addEventListener('click',e=>{const b=e.target.closest('button');if(b)answerInvite(b.dataset.inv==='1')});$('netchip').addEventListener('click',()=>{if(NET.status==='guest')openAcct();else if(NET.status==='error'){NET.retry=0}});$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
 
 /* ---------- town (主城) & dog house ---------- */
 const TOWN={x0:-980,x1:980,y0:-640,y1:560};
@@ -1877,13 +1880,14 @@ function runMats(){if(!G||G.trial)return null;const k=1+G.stage*.6,win=G.bossDon
 function openPanel(t,scrollTo){tab=t;state='hub';keys.clear();renderHub();show('hub');$('hbody').scrollTop=0;if(scrollTo){const el=$('hbody').querySelector('[data-anchor="'+scrollTo+'"]');if(el)try{el.scrollIntoView({block:'start'})}catch(e){}}sfx('ui')}
 function backToTown(){show(null);state=inHouse?'house':'town';last=performance.now();renderTownUI()}
 function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI()}
-function enterHouse(){inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
-function leaveHouse(){inHouse=false;state='town';houseEdit=false;TP.x=ENTERX;TP.y=ENTERY+30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
+function enterHouse(){VISIT=null;loadMyVisits();endWalk(true);inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
+function leaveHouse(){const wasVisit=!!VISIT;VISIT=null;closeEmoteBar();inHouse=false;state='town';houseEdit=false;TP.x=wasVisit?0:ENTERX;TP.y=wasVisit?110:ENTERY+30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
 function renderTownUI(){const tu=$('townui');if(!tu||!SV.breed)return;const h=homeData();
   $('tinfo').innerHTML=`<b>${esc(SKM[curSkin()].n)}</b><small>${JM[SV.job].n} · Base Lv ${SV.blv}</small><small>${SV.zeny.toLocaleString()} 金幣　🦴 ${SV.bones}</small>`;
-  $('tbtns').innerHTML=inHouse?`<button class="btn sm" data-tw="edit">${houseEdit?'完成擺放':'擺放家具'}</button><button class="btn sm ghost" data-tw="shop">家具店</button><button class="btn sm ghost" data-tw="out">出門</button>`
-    :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="emote">表情</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
-  $('tinfo2').innerHTML=inHouse?`<b>${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
+  homeSync();
+  $('tbtns').innerHTML=VISIT?`<button class="btn sm" data-tw="foot">留下腳印</button><button class="btn sm ghost" data-tw="out">回主城</button>`:inHouse?`<button class="btn sm" data-tw="edit">${houseEdit?'完成擺放':'擺放家具'}</button><button class="btn sm ghost" data-tw="shop">家具店</button><button class="btn sm ghost" data-tw="vis">訪客${MYVIS&&MYVIS.length?`（${MYVIS.length}）`:''}</button><button class="btn sm ghost" data-tw="out">出門</button>`
+    :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="emote">社交</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
+  $('tinfo2').innerHTML=VISIT?`<b>${esc(VISIT.n)} 的家</b><small>${HOUSE_LV[VISIT.h.lv].n}・家具 ${VISIT.h.items.length} 件</small>`:inHouse?`<b>${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
   $('tinfo2').classList.toggle('hide',!inHouse);
   const eb=$('editbar');eb.classList.toggle('hide',!(inHouse&&houseEdit));
   if(inHouse&&houseEdit){const inv=Object.entries(h.inv).filter(([k,v])=>v>0&&FM[k]);eb.innerHTML=`<p>${houseSel?`<b>${FM[houseSel].n}</b>：點地板上的空格放下`:'選一件家具，再點地板放下；點已經擺好的家具可以拿起來移動'}</p><div class="fchips">${inv.length?inv.map(([k,v])=>`<button class="fchip${houseSel===k?' on':''}" data-fsel="${k}"><canvas width="64" height="64" data-fi="${k}"></canvas><small>${FM[k].n} ×${v}</small></button>`).join(''):'<small class="note">沒有可以擺的家具，去家具店買吧！</small>'}</div>`;for(const pc of eb.querySelectorAll('canvas[data-fi]'))furnIcon(pc,pc.dataset.fi)}}
@@ -1974,7 +1978,7 @@ function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
  if(a.dog){a.dog.heart=1.6;a.dog.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:a.dog.x,y:a.dog.y-40,s:'♥',life:1.2})}}
 const townFx=[];
 function camOf(){if(inHouse)return [0,0];const vw=W/S/2,vh=H/S/2;return [Math.max(TOWN.x0+vw,Math.min(TOWN.x1-vw,TP.x)),Math.max(TOWN.y0+vh,Math.min(TOWN.y1-vh,TP.y))].map((v,i)=>{const span=i?TOWN.y1-TOWN.y0:TOWN.x1-TOWN.x0,view=i?H/S:W/S;return span<view?(i?(TOWN.y0+TOWN.y1)/2:(TOWN.x0+TOWN.x1)/2):v})}
-function houseBounds(){const L=HOUSE_LV[homeData().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
+function houseBounds(){const L=HOUSE_LV[curHome().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
 function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;netTick(dt);
  let ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup'));
  if(ix||iy){TP.go=null;TP.tgt=null}
@@ -2010,9 +2014,11 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(1.15,1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore()}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
- if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
+ if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,p.nap&&!p.mv);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
+ drawBalls(c);
+ if(NET.walk){const me=myId(),pos=id=>id===me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(id),L=pos(NET.walk.leader),F=pos(NET.walk.follower);if(L&&F){const ax=L.x+(L.face||1)*8,ay=L.y-6,bx=F.x+(F.face||1)*8,by=F.y-6;c.strokeStyle='#d0503a';c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+16,bx,by);c.stroke()}}
  // labels
  if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
  if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=DogCloud.status().username;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
@@ -2023,12 +2029,12 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  if(TP.near&&!TP.near.exit){const a=TP.near;c.globalAlpha=.5+.3*Math.sin(t*6);c.strokeStyle='#fff6b0';c.lineWidth=3;c.beginPath();c.ellipse(a.x,a.y+(a.n?(a.r||0):0)+4,26,9,0,0,TAU);c.stroke();c.globalAlpha=1}
  if(TP.tgt){c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.ellipse(TP.tgt[0],TP.tgt[1],10,4,0,0,TAU);c.stroke();c.globalAlpha=1}
  c.restore()}
-function drawTownPlayer(c,t){drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2);if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
+function drawTownPlayer(c,t){drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2,NET.me.nap&&!inHouse);if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
  if(SV.pet&&PM[SV.pet]){TP.px=(TP.px===undefined?TP.x:TP.px)+((TP.x-TP.face*26)-(TP.px===undefined?TP.x:TP.px))*.08;TP.py=(TP.py===undefined?TP.y:TP.py)+((TP.y+8)-(TP.py===undefined?TP.y:TP.py))*.08;drawPet(c,SV.pet,TP.px,TP.py,t)}
  if(TP.heart>0){c.globalAlpha=Math.min(1,TP.heart);heart(c,TP.x,TP.y-34-(1.2-TP.heart)*10,4,'#ff5a7a');c.globalAlpha=1}
  if(inHouse&&TP.idle>2.5){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',TP.x+12,TP.y-28-Math.sin(t)*3);c.globalAlpha=1}}
 const petWander={};
-function renderHouse(c,t){const h=homeData(),hb=houseBounds(),T=hb.T,wall=(WALLS.find(w=>w[0]===h.wall)||WALLS[0])[2],floor=(FLOORS.find(f=>f[0]===h.floor)||FLOORS[0])[2];
+function renderHouse(c,t){const h=curHome(),hb=houseBounds(),T=hb.T,wall=(WALLS.find(w=>w[0]===h.wall)||WALLS[0])[2],floor=(FLOORS.find(f=>f[0]===h.floor)||FLOORS[0])[2];
  c.fillStyle='#2a1e18';c.fillRect(0,0,W,H);const sc=Math.min(S*1.25,(W-20)/(hb.x1-hb.x0+40),(H-150)/(hb.y1-hb.y0+110));c.save();c.translate(W/2,H/2+30);c.scale(sc,sc);
  rr(c,hb.x0-12,hb.y0-90,hb.x1-hb.x0+24,90,8,wall);for(let q=hb.x0;q<hb.x1;q+=22)rr(c,q,hb.y0-90,2,90,0,shade(wall,-.04));rr(c,hb.x0-12,hb.y0-8,hb.x1-hb.x0+24,8,2,shade(wall,-.25));
  for(const dx of [hb.x0+T*1.5,hb.x1-T*1.5]){rr(c,dx-24,hb.y0-74,48,40,4,'#fff');rr(c,dx-21,hb.y0-71,42,34,3,'#bfe6ff');lineP(c,[[dx,hb.y0-71],[dx,hb.y0-37]],'#fff',2);lineP(c,[[dx-21,hb.y0-54],[dx+21,hb.y0-54]],'#fff',2);ell(c,dx-10,hb.y0-64,8,4,0,'rgba(255,255,255,.7)')}
@@ -2036,7 +2042,9 @@ function renderHouse(c,t){const h=homeData(),hb=houseBounds(),T=hb.T,wall=(WALLS
  rr(c,-24,hb.y1-4,48,14,3,'#8a5a3a');c.font='900 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='#fff6e0';c.fillText('門口',0,hb.y1+7);
  if(houseEdit){c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;for(let gx=0;gx<=hb.L.w;gx++)lineP(c,[[hb.x0+gx*T,hb.y0],[hb.x0+gx*T,hb.y1]],'rgba(255,255,255,.35)',1);for(let gy=0;gy<=hb.L.h;gy++)lineP(c,[[hb.x0,hb.y0+gy*T],[hb.x1,hb.y0+gy*T]],'rgba(255,255,255,.35)',1)}
  const ds=[];for(const it of h.items){if(!FM[it.f])continue;const fx=hb.x0+(it.x+.5)*T,fy=hb.y0+(it.y+.5)*T;ds.push({y:fy-(it.f.startsWith('rug')?100:0),f:()=>drawFurn(c,it.f,fx,fy,t)})}
- const pets=Object.keys(SV.pets||{}).filter(id=>PM[id]&&id!==SV.pet).slice(0,4);pets.forEach((id,i)=>{const w=petWander[id]=petWander[id]||{x:R(hb.x0+20,hb.x1-20),y:R(hb.y0+20,hb.y1-20),tx:0,ty:0,w:0};w.w-=1/60;if(w.w<=0){w.tx=R(hb.x0+20,hb.x1-20);w.ty=R(hb.y0+20,hb.y1-20);w.w=2+Math.random()*4}const dx=w.tx-w.x,dy=w.ty-w.y,d=Math.hypot(dx,dy);if(d>2){w.x+=dx/d*.6;w.y+=dy/d*.6}ds.push({y:w.y,f:()=>drawPet(c,id,w.x,w.y,t+i)})});
+ const pets=VISIT?VISIT.h.pets:Object.keys(SV.pets||{}).filter(id=>PM[id]&&id!==SV.pet).slice(0,4);
+ if(VISIT){const hx=hb.x0+T*1.2,hy=hb.y1-T*1.2;ds.push({y:hy,f:()=>{drawEmoteDog(c,VISIT.h.sk,VISIT.h.j,hx,hy,t,1,false,VISIT.h.w,null,1.2,true);c.font='700 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='#fff6b0';c.fillText(`${VISIT.n}（睡午覺中）`,hx,hy-34)}})}
+ if(!VISIT&&MYVIS&&MYVIS.length)for(let q=0;q<Math.min(8,MYVIS.length);q++){const px=-30+(q%4)*20+(q>3?10:0),py=hb.y1-14-(q>3?14:0);for(const [ox,oy,r] of [[0,0,3],[-3,-4,1.3],[0,-5,1.3],[3,-4,1.3]])circ(c,px+ox,py+oy,r,'rgba(120,80,50,.45)')}pets.forEach((id,i)=>{const w=petWander[id]=petWander[id]||{x:R(hb.x0+20,hb.x1-20),y:R(hb.y0+20,hb.y1-20),tx:0,ty:0,w:0};w.w-=1/60;if(w.w<=0){w.tx=R(hb.x0+20,hb.x1-20);w.ty=R(hb.y0+20,hb.y1-20);w.w=2+Math.random()*4}const dx=w.tx-w.x,dy=w.ty-w.y,d=Math.hypot(dx,dy);if(d>2){w.x+=dx/d*.6;w.y+=dy/d*.6}ds.push({y:w.y,f:()=>drawPet(c,id,w.x,w.y,t+i)})});
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
  if(houseEdit&&houseSel&&townPtr&&townPtr.hover){const [gx,gy]=townPtr.hover;c.globalAlpha=.55;drawFurn(c,houseSel,hb.x0+(gx+.5)*T,hb.y0+(gy+.5)*T,t);c.globalAlpha=1}
  c.restore();HS.sc=sc}
@@ -2057,25 +2065,31 @@ function townMove(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
  if(townPtr&&townPtr.id===e.pointerId)TP.tgt=[wx,wy]}
 function townUp(e){if(townPtr&&townPtr.id===e.pointerId)townPtr=null}
 function townBtn(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
- if(d.tw==='emote'){openEmoteBar();return}closeEmoteBar();
+ if(d.tw==='emote'){openEmoteBar('emote');return}if(d.tw==='foot'){openEmoteBar('foot');return}if(d.tw==='vis'){openEmoteBar('vis');return}closeEmoteBar();
  if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
  else if(d.tw==='edit'){houseEdit=!houseEdit;houseSel=null;renderTownUI()}else if(d.tw==='shop')openPanel('home');else if(d.tw==='out')leaveHouse();
  else if(d.fsel){houseSel=houseSel===d.fsel?null:d.fsel;renderTownUI()}}
 
 /* ---------- online town (線上同城) ---------- */
-const EMOTES=[['wag','搖尾巴'],['sit','坐下'],['roll','打滾'],['spin','轉圈'],['bark','汪一聲'],['heart','比愛心']];
+const EMOTES=[['wag','搖尾巴'],['sit','坐下'],['roll','打滾'],['spin','轉圈'],['bark','汪一聲'],['heart','比愛心'],['nap','趴下睡覺'],['howl','嗷嗚～合唱'],['ball','丟球']];
 const PHRASES=['你好！','好可愛！','一起去打塔嗎？','謝謝！','加油！','我回來了～','好厲害！','等我一下','汪汪！','晚安','要不要去公園挖寶？','掰掰～'];
-const NET={ctl:null,status:'off',err:'',peers:new Map(),retry:0,away:0,sendT:0,lastDest:null,emCd:0,sayCd:0,itCd:0,me:{em:null,say:null},menu:null,busy:false};
+const NET={ctl:null,status:'off',err:'',peers:new Map(),retry:0,away:0,sendT:0,lastDest:null,emCd:0,sayCd:0,itCd:0,me:{em:null,say:null},menu:null,busy:false,balls:[],walk:null,inv:null};
 const netCan=()=>!!(window.DogCloud&&DogCloud.townEnabled&&DogCloud.townEnabled()&&DogCloud.status().loggedIn);
 function netMeta(){return{n:(DogCloud.status().username||'').slice(0,16),sk:curSkin(),j:SV.job,w:SV.wear||{},pt:SV.pet||'',lv:SV.blv,tb:SV.towerBest||0,cc:(SV.cown||[]).length,dnd:!!SV.dnd,x:Math.round(TP.x),y:Math.round(TP.y)}}
 function cleanPeer(m){const w={};for(const k in (m.w||{}))if(CSM[m.w[k]]&&CSM[m.w[k]].slot===k)w[k]=m.w[k];return{n:String(m.n||'狗狗').replace(/[^a-z0-9_]/gi,'').slice(0,16)||'狗狗',sk:SKM[m.sk]?m.sk:BASE.shiba,j:JM[m.j]?m.j:'novice',w,pt:PM[m.pt]?m.pt:'',lv:Math.max(1,Math.min(99,m.lv|0)),tb:Math.max(0,m.tb|0),cc:Math.max(0,m.cc|0),dnd:!!m.dnd}}
 const clampX=v=>Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,+v||0)),clampY=v=>Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,+v||0));
 function netPeers(list){const seen=new Set();let fresh=false;for(const m of list){seen.add(m.id);let p=NET.peers.get(m.id);const c=cleanPeer(m);if(!p){fresh=true;p={id:m.id,x:clampX(m.x),y:clampY(m.y),tx:clampX(m.x),ty:clampY(m.y),face:1,mv:false,em:null,say:null,heart:0};NET.peers.set(m.id,p)}Object.assign(p,c)}for(const id of [...NET.peers.keys()])if(!seen.has(id))NET.peers.delete(id);if(NET.menu&&!NET.peers.has(NET.menu))closePeerMenu();if(fresh&&NET.ctl)NET.force=.3+Math.random()*1.2;netChip()}
 function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.n))return;
- if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
- else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e))p.em={e:d.e,t:0};
+ if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if(p.nap&&Math.hypot(tx-p.x,ty-p.y)>10)p.nap=false;if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
+ else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};if(d.e==='nap')p.nap=true;if(d.e==='howl'){p.howlT=townT;howlCheck()}}
+ else if(ev==='ball'){if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b))NET.balls.push({id:String(d.b).slice(0,60),owner:d.id,x0:clampX(d.x),y0:clampY(d.y),tx:clampX(d.tx),ty:clampY(d.ty),t:0,dur:.7,taken:null})}
+ else if(ev==='grab'){const b=NET.balls.find(x=>x.id===d.b);if(b)ballTaken(b,d.id)}
+ else if(ev==='inv'){if(d.to!==myId())return;if(SV.dnd||NET.walk){NET.ctl.send('acc',{to:d.id,k:'walk',ok:false});return}showInvite(d.id)}
+ else if(ev==='acc'){if(d.to!==myId())return;if(d.ok&&!NET.walk){NET.walk={leader:myId(),follower:d.id,t:0};townFx.push({x:TP.x,y:TP.y-46,s:`${p.n} 答應了！一起散步吧`,life:2})}else if(!d.ok)townFx.push({x:TP.x,y:TP.y-46,s:`${p.n} 說下次吧`,life:1.8})}
+ else if(ev==='unwalk'){if(d.to===myId()&&NET.walk){NET.walk=null;townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}}
+ else if(ev==='gift'){if(d.to===myId())gotGift(p)}
  else if(ev==='say'&&PHRASES[d.k|0])p.say={k:d.k|0,t:0};
- else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};if(me){TP.heart=1.4;townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.heart=1.4}}
+ else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};if(me){friendGain(p.id,p.n,1);TP.heart=1.4;townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.heart=1.4}}
 async function netConnect(){if(NET.busy)return;NET.busy=true;NET.status='connecting';netChip();
  try{NET.ctl=await DogCloud.joinTown(netMeta(),{onPeers:netPeers,onEvent:netEvent,onState:s=>{if(s==='error'){NET.status='error';NET.err='連線中斷，重新連線中…';NET.retry=5;netDrop()}}});NET.status='on';NET.err='';NET.lastDest=[TP.x,TP.y];NET.mk=netKey()}
  catch(e){NET.status='error';NET.err=e.message||String(e);NET.retry=30}
@@ -2085,7 +2099,10 @@ function netLife(dt){const want=SV.breed&&netCan()&&!document.hidden&&(state==='
  if(want){NET.away=0;if(!NET.ctl&&!NET.busy){NET.retry-=dt;if(NET.retry<=0)netConnect()}}
  else if(NET.ctl){NET.away+=dt;if(NET.away>(document.hidden?2:20)){NET.status='off';netDrop()}}
  else if(!netCan()&&NET.status!=='guest'){NET.status='guest';netChip()}}
-function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;
+function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;updateBalls(dt);if(!inHouse)napCheck(dt);
+ if(NET.inv){NET.inv.t-=dt;if(NET.inv.t<=0||!NET.peers.has(NET.inv.from)){NET.inv=null;$('invpop').classList.add('hide')}}
+ if(NET.walk){const w=NET.walk,me=myId(),other=w.leader===me?w.follower:w.leader,o=NET.peers.get(other);if(!o||inHouse||!NET.ctl){NET.walk=null;townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}else{w.t+=dt;if(w.t>=60){w.t=0;friendGain(o.id,o.n,1)}
+   if(w.follower===me){const kx=(keys.has('d')||keys.has('arrowright')||keys.has('a')||keys.has('arrowleft')||keys.has('w')||keys.has('arrowup')||keys.has('s')||keys.has('arrowdown'));if(kx)endWalk(true);else{const fx2=o.x-(o.face||1)*40,fy2=o.y+4;if(Math.hypot(fx2-TP.x,fy2-TP.y)>18){TP.tgt=[fx2,fy2];TP.go=null}}}}}
  for(const k of ['em','say'])if(NET.me[k]){NET.me[k].t+=dt;if(NET.me[k].t>(k==='say'?4:1.4))NET.me[k]=null}
  for(const p of NET.peers.values()){const dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){const sp=Math.min(d,190*dt);p.x+=dx/d*sp;p.y+=dy/d*sp;p.mv=true;if(Math.abs(dx)>2)p.face=dx>0?1:-1}else p.mv=false;
    if(p.em){p.em.t+=dt;if(p.em.t>1.4)p.em=null}if(p.say){p.say.t+=dt;if(p.say.t>4)p.say=null}p.heart=Math.max(0,p.heart-dt)}
@@ -2093,39 +2110,91 @@ function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;
  if(!NET.ctl||state!=='town')return;NET.sendT-=dt;if(NET.sendT>0)return;NET.sendT=.7;
  let dest;if(TP.go)dest=[TP.go.x,TP.go.y+(TP.go.n?(TP.go.r||30):18)];else if(TP.tgt)dest=TP.tgt;else if(TP.mv){const ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup')),m=Math.hypot(ix,iy)||1;dest=[TP.x+ix/m*140,TP.y+iy/m*140]}else dest=[TP.x,TP.y];
  dest=[Math.round(clampX(dest[0])),Math.round(clampY(dest[1]))];const L=NET.lastDest;if(!L||Math.hypot(dest[0]-L[0],dest[1]-L[1])>28||(!TP.mv&&Math.hypot(TP.x-L[0],TP.y-L[1])>10)){if(!TP.mv)dest=[Math.round(TP.x),Math.round(TP.y)];NET.lastDest=dest;NET.ctl.send('mv',{tx:dest[0],ty:dest[1]})}}
-function netEmote(e){if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
+function netEmote(e){if(e==='ball'){throwBall();return}if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};if(e==='nap'){NET.me.nap=true;NET.napDone=false}if(e==='howl'){NET.me.howlT=townT;setTimeout(howlCheck,60)}sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
 function netSay(k){if(NET.sayCd>0)return;NET.sayCd=3;NET.me.say={k,t:0};sfx('ui');if(NET.ctl)NET.ctl.send('say',{k});closeEmoteBar()}
 function netInteract(id,a){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}if(Math.hypot(p.x-TP.x,p.y-TP.y)>120){TP.tgt=[p.x-30*Math.sign(p.x-TP.x||1),p.y];TP.go=null;townFx.push({x:TP.x,y:TP.y-46,s:'先走近一點',life:1.2});return}
- NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};p.heart=1.4;sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});closePeerMenu()}
+ NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};p.heart=1.4;sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
 function netChip(){const el=$('netchip');if(!el)return;const s=NET.status;el.classList.toggle('hide',!(state==='town'));
  el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?'登入帳號後，就能在主城看到其他玩家':s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
-function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n);
- $('peerm').innerHTML=`<div class="pmh"><canvas width="120" height="90" id="peerDog"></canvas><div><b>${esc(p.n)}</b><small>${JM[p.j].n}・Base Lv ${p.lv}</small><small>無限之塔 ${p.tb} 層・時裝 ${p.cc} 件</small>${p.dnd?'<small>（勿擾中）</small>':''}</div><button class="btn sm ghost" data-pm="x">✕</button></div>
-  <div class="pmb"><button class="btn sm" data-pm="sniff" ${p.dnd?'disabled':''}>聞聞</button><button class="btn sm" data-pm="pat" ${p.dnd?'disabled':''}>摸摸頭</button><button class="btn sm ghost" data-pm="block">${blocked?'取消屏蔽':'屏蔽'}</button></div>`;
+function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n),fr=(SV.friends||{})[id],L=fr?flv(fr.p):0,walking=NET.walk&&(NET.walk.leader===id||NET.walk.follower===id);
+ $('peerm').innerHTML=`<div class="pmh"><canvas width="120" height="90" id="peerDog"></canvas><div><b>${esc(p.n)}</b><small>${JM[p.j].n}・Base Lv ${p.lv}</small><small>無限之塔 ${p.tb} 層・時裝 ${p.cc} 件</small><small>好感度：${FLV[L][1]} ${'♥'.repeat(L)}${fr?`（${fr.p}）`:''}</small>${p.dnd?'<small>（勿擾中）</small>':''}</div><button class="btn sm ghost" data-pm="x">✕</button></div>
+  <div class="pmb"><button class="btn sm" data-pm="sniff" ${p.dnd?'disabled':''}>聞聞</button><button class="btn sm" data-pm="pat" ${p.dnd?'disabled':''}>摸摸頭</button>${walking?'<button class="btn sm" data-pm="unwalk">放開牽繩</button>':`<button class="btn sm" data-pm="walk" ${p.dnd?'disabled':''}>一起散步</button>`}<button class="btn sm" data-pm="gift" ${soc().gift[id]?'disabled':''}>${soc().gift[id]?'今天送過了':'送點心'}</button><button class="btn sm ghost" data-pm="visit">拜訪牠的家</button><button class="btn sm ghost" data-pm="block">${blocked?'取消屏蔽':'屏蔽'}</button></div>`;
  $('peerm').classList.remove('hide');portrait($('peerDog'),p.sk,p.j,1,false,p.w)}
 function closePeerMenu(){NET.menu=null;const m=$('peerm');if(m)m.classList.add('hide')}
 function peerMenuClick(e){const b=e.target.closest('button');if(!b||!NET.menu)return;const a=b.dataset.pm,id=NET.menu,p=NET.peers.get(id);
- if(a==='x'){closePeerMenu();return}if(a==='block'&&p){SV.block=SV.block||[];const i=SV.block.indexOf(p.n);if(i>=0)SV.block.splice(i,1);else SV.block.push(p.n);save();closePeerMenu();return}netInteract(id,a)}
-function openEmoteBar(){const el=$('emoteb');if(!el.classList.contains('hide')){closeEmoteBar();return}
- el.innerHTML=`<div class="emr">${EMOTES.map(([k,n])=>`<button class="btn sm" data-em="${k}">${n}</button>`).join('')}</div><div class="emr">${PHRASES.map((t,i)=>`<button class="btn sm ghost" data-say="${i}">${t}</button>`).join('')}</div>
+ if(a==='x'){closePeerMenu();return}if(a==='walk'){walkInvite(id);return}if(a==='unwalk'){endWalk(true);closePeerMenu();return}if(a==='gift'){sendGift(id);return}if(a==='visit'&&p){visitHome(id,p.n);return}if(a==='block'&&p){SV.block=SV.block||[];const i=SV.block.indexOf(p.n);if(i>=0)SV.block.splice(i,1);else SV.block.push(p.n);save();closePeerMenu();return}netInteract(id,a)}
+let ebMode='emote';
+function openEmoteBar(mode){mode=mode||'emote';const el=$('emoteb');if(!el.classList.contains('hide')&&ebMode===mode){closeEmoteBar();return}ebMode=mode;
+ if(mode==='foot'){el.innerHTML=`<p><b>在 ${esc(VISIT?VISIT.n:'')} 家留下腳印</b>　<span class="note">選一句話，主人回家會看到（一天一次）</span></p><div class="emr">${PHRASES.map((t,i)=>`<button class="btn sm ghost" data-foot="${i}">🐾 ${t}</button>`).join('')}</div>`;el.classList.remove('hide');return}
+ if(mode==='vis'){el.innerHTML=`<p><b>最近 7 天來過的訪客</b></p>${visitorsHTML()}`;el.classList.remove('hide');return}
+ const tabs=`<div class="etabs"><button class="btn sm ${mode==='emote'?'':'ghost'}" data-etab="emote">表情・說話</button><button class="btn sm ${mode==='friends'?'':'ghost'}" data-etab="friends">好友（${Object.keys(SV.friends||{}).length}）</button></div>`;
+ if(mode==='friends'){el.innerHTML=tabs+friendsHTML();el.classList.remove('hide');return}
+ el.innerHTML=tabs+`<div class="emr">${EMOTES.map(([k,n])=>`<button class="btn sm" data-em="${k}">${n}</button>`).join('')}</div><div class="emr">${PHRASES.map((t,i)=>`<button class="btn sm ghost" data-say="${i}">${t}</button>`).join('')}</div>
   <label class="note"><input type="checkbox" id="dndChk" ${SV.dnd?'checked':''}> 勿擾模式（別人不能聞聞、摸摸你）</label>　<label class="note"><input type="checkbox" id="hidePeersChk" ${SV.hidePeers?'checked':''}> 隱藏其他玩家</label>${netCan()?'':'<p class="note">現在沒有登入，表情只有你自己看得到。</p>'}`;el.classList.remove('hide')}
 function closeEmoteBar(){const el=$('emoteb');if(el)el.classList.add('hide')}
 function emoteClick(e){if(e.target.id==='dndChk'){SV.dnd=e.target.checked;save();netRetrack();return}if(e.target.id==='hidePeersChk'){SV.hidePeers=e.target.checked;save();return}
- const b=e.target.closest('button');if(!b)return;if(b.dataset.em)netEmote(b.dataset.em);else if(b.dataset.say!==undefined)netSay(+b.dataset.say)}
+ const b=e.target.closest('button');if(!b)return;const d=b.dataset;if(d.etab){ebMode='';openEmoteBar(d.etab);return}if(d.visit){visitHome(d.visit,d.vn);return}if(d.gift){sendGift(d.gift);openEmoteBar('friends');return}if(d.foot!==undefined){leaveFootprint(+d.foot);return}if(d.em)netEmote(d.em);else if(d.say!==undefined)netSay(+d.say)}
 /* drawing a dog with emote animation */
-function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc){c.save();c.translate(x,y);let f=face,ry=1,rot=0,dx=0;
+function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc,nap){c.save();c.translate(x,y);let f=face,ry=nap?.74:1,rot=0,dx=0;
  if(em){const k=em.t/1.4;if(em.e==='roll')rot=k*TAU*face;else if(em.e==='spin')f=Math.floor(em.t*10)%2?1:-1;else if(em.e==='sit')ry=.82;else if(em.e==='wag'||em.e==='pat')dx=Math.sin(em.t*30)*1.5;else if(em.e==='sniff')dx=Math.sin(em.t*8)*4}
- c.translate(dx,0);if(rot){c.translate(0,-6);c.rotate(rot);c.translate(0,6)}c.scale(sc,sc*ry);if(ry<1)c.translate(0,3);drawDog(c,sk,j,0,0,t,f,mv,wear);c.restore();
+ c.translate(dx,0);if(rot){c.translate(0,-6);c.rotate(rot);c.translate(0,6)}c.scale(sc,sc*ry);if(ry<1)c.translate(0,3);drawDog(c,sk,j,0,0,nap?t*.3:t,f,mv,wear);c.restore();
+ if(nap){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',x+12,y-26-Math.sin(t)*3);c.globalAlpha=1}
  if(em){c.textAlign='center';const k=em.t/1.4,al=Math.min(1,(1.4-em.t)*3);c.globalAlpha=al;
    if(em.e==='bark'){c.font='900 16px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText('汪！',x+face*22,y-30-k*8);c.fillStyle='#fff6b0';c.fillText('汪！',x+face*22,y-30-k*8)}
    else if(em.e==='heart'||em.e==='pat'){for(let q=0;q<3;q++)heart(c,x-12+q*12,y-34-k*18-q*4,4,'#ff5a7a')}
    else if(em.e==='wag'){c.font='900 14px Fredoka,sans-serif';c.fillStyle='#fff';c.fillText('♪',x-face*20,y-24-k*10)}
+   else if(em.e==='howl'){c.font='900 14px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText('嗷嗚～',x,y-34-k*10);c.fillStyle='#d8ecff';c.fillText('嗷嗚～',x,y-34-k*10)}
    else if(em.e==='sniff'){c.font='900 13px "Noto Sans TC",sans-serif';c.fillStyle='#fff';c.fillText('嗅嗅',x+face*20,y-28-k*8)}
    c.globalAlpha=1}}
 function drawBubble(c,x,y,txt,al){c.globalAlpha=al;c.font='700 13px "Noto Sans TC",sans-serif';const w=c.measureText(txt).width+16;rr(c,x-w/2,y-22,w,22,10,'#ffffff');tri(c,x-5,y,x+5,y,x,y+6,'#ffffff');c.fillStyle='#3a2a1a';c.textAlign='center';c.fillText(txt,x,y-6);c.globalAlpha=1}
 
 const netKey=()=>JSON.stringify([curSkin(),SV.job,SV.wear||{},SV.pet||'',SV.blv,!!SV.dnd]);
 function netRetrack(){if(!NET.ctl)return;const k=netKey();if(k!==NET.mk){NET.mk=k;const m=netMeta();m.x=Math.round(TP.x);m.y=Math.round(TP.y);NET.ctl.track(m)}}
+
+/* ---------- social: friendship, walk, ball, nap, howl, gifts, visits ---------- */
+const FLV=[[0,'路過的狗'],[5,'認識'],[20,'好朋友'],[50,'好麻吉'],[100,'最佳拍檔']];
+const todayKey=()=>new Date().toDateString();
+const flv=p=>{let i=0;for(let k=0;k<FLV.length;k++)if(p>=FLV[k][0])i=k;return i};
+function soc(){const s=SV.social=SV.social||{};if(s.d!==todayKey()){s.d=todayKey();s.nap=0;s.howl=0;s.gift={};s.giftIn=0;s.ballN=0}return s}
+function friendGain(id,n,amt){if(!id||id===(NET.ctl&&NET.ctl.id))return;SV.friends=SV.friends||{};const f=SV.friends[id]=SV.friends[id]||{n:n||'狗狗',p:0,d:'',dc:0};if(n)f.n=n;const td=todayKey();if(f.d!==td){f.d=td;f.dc=0}const a=Math.max(0,Math.min(amt,20-f.dc));f.last=Date.now();if(!a){save();return}const b=flv(f.p);f.p+=a;f.dc+=a;if(flv(f.p)>b){townFx.push({x:TP.x,y:TP.y-64,s:`和 ${f.n} 變成「${FLV[flv(f.p)][1]}」了！`,life:2.8});sfx('job')}save()}
+function socReward(kind,msg){const s=soc();if(s[kind])return false;s[kind]=1;const z=Math.round(150*(1+(SV.stage||0)));SV.zeny+=z;homeData().mat.cloth+=2;save();townFx.push({x:TP.x,y:TP.y-76,s:`${msg} 金幣 +${z}、布料 +2`,life:3.2});sfx('job');renderTownUI();return true}
+const myId=()=>NET.ctl?NET.ctl.id:'';
+/* walk together */
+function walkInvite(id){const p=NET.peers.get(id);if(!p||!NET.ctl)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}if(NET.walk){townFx.push({x:TP.x,y:TP.y-46,s:'你已經在散步了',life:1.4});return}if(NET.itCd>0)return;NET.itCd=3;NET.ctl.send('inv',{to:id,k:'walk'});townFx.push({x:TP.x,y:TP.y-46,s:`邀請 ${p.n} 一起散步…`,life:1.8});closePeerMenu()}
+function showInvite(from){const p=NET.peers.get(from);if(!p)return;NET.inv={from,t:12};$('invpop').innerHTML=`<b>${esc(p.n)}</b> 邀請你一起散步！<div><button class="btn sm" data-inv="1">好啊</button><button class="btn sm ghost" data-inv="0">下次吧</button></div>`;$('invpop').classList.remove('hide');sfx('lvl')}
+function answerInvite(ok){const iv=NET.inv;NET.inv=null;$('invpop').classList.add('hide');if(!iv||!NET.ctl)return;NET.ctl.send('acc',{to:iv.from,k:'walk',ok:!!ok});if(ok&&NET.peers.has(iv.from)&&!NET.walk){NET.walk={leader:iv.from,follower:myId(),t:0};townFx.push({x:TP.x,y:TP.y-46,s:'牽好繩子，出發！',life:1.8})}}
+function endWalk(send){const w=NET.walk;if(!w)return;NET.walk=null;if(send&&NET.ctl){const other=w.leader===myId()?w.follower:w.leader;NET.ctl.send('unwalk',{to:other})}townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}
+/* ball */
+let ballSeq=0;
+function throwBall(){if((NET.ballCd||0)>0)return;NET.ballCd=3;const f=TP.face,tx=clampX(TP.x+f*R(160,260)),ty=clampY(TP.y+R(-70,70)),b={id:(myId()||'me')+':'+(++ballSeq),owner:myId()||'me',x0:TP.x+f*10,y0:TP.y-6,tx,ty,t:0,dur:.7,taken:null};NET.balls.push(b);if(NET.ctl)NET.ctl.send('ball',{b:b.id,x:Math.round(b.x0),y:Math.round(b.y0),tx:Math.round(tx),ty:Math.round(ty)});sfx('swing');closeEmoteBar()}
+function ballTaken(b,by,name){if(b.taken)return;b.taken=by;b.hold=2;const me=by===(myId()||'me');if(me){SV.st=SV.st||{};SV.st.balls=(SV.st.balls||0)+1;sfx('coin');townFx.push({x:TP.x,y:TP.y-50,s:'搶到球了！',life:1.6});if(b.owner!==myId()){const o=NET.peers.get(b.owner);if(o)friendGain(o.id,o.n,1)}save()}else{const p=NET.peers.get(by);if(p){townFx.push({x:p.x,y:p.y-50,s:`${p.n} 搶到球！`,life:1.6});if(b.owner===myId())friendGain(p.id,p.n,1)}}}
+function updateBalls(dt){NET.ballCd=(NET.ballCd||0)-dt;for(let i=NET.balls.length-1;i>=0;i--){const b=NET.balls[i];b.t+=dt;if(b.taken){b.hold-=dt;if(b.hold<=0)NET.balls.splice(i,1);continue}if(b.t>12){NET.balls.splice(i,1);continue}
+  if(b.t>=b.dur&&!inHouse&&Math.hypot(TP.x-b.tx,TP.y-b.ty)<26){ballTaken(b,myId()||'me');if(NET.ctl)NET.ctl.send('grab',{b:b.id})}}}
+function drawBalls(c){for(const b of NET.balls){let x,y,h;if(b.taken){const me=b.taken===(myId()||'me'),p=me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(b.taken);if(!p)continue;x=p.x+(p.face||1)*16;y=p.y-2;h=0}else{const k=Math.min(1,b.t/b.dur);x=b.x0+(b.tx-b.x0)*k;y=b.y0+(b.ty-b.y0)*k;h=Math.sin(k*Math.PI)*60*(1-Math.max(0,b.t-b.dur));if(k>=1){h=Math.abs(Math.sin((b.t-b.dur)*9))*6*Math.max(0,1-(b.t-b.dur))}}
+  shadow(c,x,y+6,6,2.4);circ(c,x,y-h,5.5,'#ff5a5a');lineP(c,[[x-5.5,y-h],[x+5.5,y-h]],'#fff',1.2);if(!b.taken&&b.t>=b.dur){c.globalAlpha=.4+.3*Math.sin(townT*8);c.strokeStyle='#fff6b0';c.lineWidth=2;c.beginPath();c.ellipse(x,y+6,12,5,0,0,TAU);c.stroke();c.globalAlpha=1}}}
+/* nap & howl */
+function napCheck(dt){if(NET.me.nap&&TP.mv){NET.me.nap=false}if(!NET.me.nap){NET.napT=0;return}const near=[...NET.peers.values()].filter(p=>p.nap&&Math.hypot(p.x-TP.x,p.y-TP.y)<130);if(!near.length){NET.napT=Math.max(0,(NET.napT||0)-dt);return}NET.napT=(NET.napT||0)+dt;
+  if(NET.napT>=20&&!NET.napDone){NET.napDone=true;for(const p of near)friendGain(p.id,p.n,2);if(!socReward('nap','一起睡了個好覺！'))townFx.push({x:TP.x,y:TP.y-60,s:'一起睡了個好覺～',life:2})}}
+function howlCheck(){const now=townT,me=NET.me.howlT||-99;if(now-me>3)return;const ps=[...NET.peers.values()].filter(p=>now-(p.howlT||-99)<3&&Math.hypot(p.x-TP.x,p.y-TP.y)<280);if(!ps.length)return;const n=ps.length+1;townFx.push({x:TP.x,y:TP.y-70,s:`汪汪合唱 ×${n}！`,life:2});for(const p of ps)friendGain(p.id,p.n,1);if(n>=3)socReward('howl','大合唱成功！')}
+/* gifts */
+function sendGift(id){const p=NET.peers.get(id),s=soc();if(!p||!NET.ctl||s.gift[id])return;s.gift[id]=1;NET.ctl.send('gift',{to:id});friendGain(id,p.n,3);townFx.push({x:TP.x,y:TP.y-50,s:`送 ${p.n} 一份點心`,life:1.8});NET.me.em={e:'heart',t:0};sfx('drop');save();closePeerMenu()}
+function gotGift(p){const s=soc();friendGain(p.id,p.n,3);if((s.giftIn||0)<5){s.giftIn=(s.giftIn||0)+1;const z=Math.round(100*(1+(SV.stage||0)));SV.zeny+=z;townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！金幣 +${z}`,life:2.6})}else townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！`,life:2.2});TP.heart=1.4;sfx('job');save();renderTownUI()}
+/* friends list */
+function friendsHTML(){const fr=Object.entries(SV.friends||{}).sort((a,b)=>b[1].p-a[1].p);if(!fr.length)return '<p class="note">還沒有朋友。在主城點別的狗，聞聞、摸摸、一起散步、丟球、午睡、合唱都會增加好感度。</p>';
+ return `<div class="frl">${fr.map(([id,f])=>{const on=NET.peers.has(id),L=flv(f.p),nx=FLV[L+1];return `<div class="fr"><div><b>${esc(f.n)}</b> ${on?'<span class="on">● 在線</span>':''}<small>${FLV[L][1]}　${'♥'.repeat(L)}${'♡'.repeat(4-L)}　${f.p}${nx?`/${nx[0]}`:''}</small></div><span>${netCan()?`<button class="btn sm ghost" data-visit="${id}" data-vn="${esc(f.n)}">拜訪家</button>`:''}${on&&!soc().gift[id]?`<button class="btn sm" data-gift="${id}">送點心</button>`:''}</span></div>`}).join('')}</div>`}
+/* visiting homes */
+let VISIT=null,MYVIS=null,homeKey='',homeTimer=null;
+const curHome=()=>VISIT?VISIT.h:homeData();
+function homePub(){const h=homeData();return{lv:h.lv,items:h.items.slice(0,80),wall:h.wall,floor:h.floor,sk:curSkin(),j:SV.job,w:SV.wear||{},pets:Object.keys(SV.pets||{}).filter(k=>PM[k]).slice(0,4)}}
+function homeSync(){if(!netCan()||!DogCloud.putHome)return;const k=JSON.stringify(homePub());if(k===homeKey)return;clearTimeout(homeTimer);homeTimer=setTimeout(()=>{const d=homePub(),kk=JSON.stringify(d);DogCloud.putHome(d).then(()=>{homeKey=kk}).catch(()=>{})},3000)}
+function cleanHome(d){d=d||{};const lv=Math.max(0,Math.min(HOUSE_LV.length-1,d.lv|0)),L=HOUSE_LV[lv],seen=new Set(),items=[];for(const it of (Array.isArray(d.items)?d.items:[]).slice(0,80)){const x=it.x|0,y=it.y|0,k=x+','+y;if(FM[it.f]&&x>=0&&y>=0&&x<L.w&&y<L.h&&!seen.has(k)){seen.add(k);items.push({f:it.f,x,y})}}
+ const w={};for(const k in (d.w||{}))if(CSM[d.w[k]]&&CSM[d.w[k]].slot===k)w[k]=d.w[k];return{lv,items,wall:WALLS.some(x=>x[0]===d.wall)?d.wall:'cream',floor:FLOORS.some(x=>x[0]===d.floor)?d.floor:'wood',sk:SKM[d.sk]?d.sk:BASE.shiba,j:JM[d.j]?d.j:'novice',w,pets:(Array.isArray(d.pets)?d.pets:[]).filter(k=>PM[k]).slice(0,4),inv:{},mat:{}}}
+async function visitHome(id,name){if(!netCan())return;closePeerMenu();closeEmoteBar();try{const r=await DogCloud.getHome(id);if(!r||!r.data){townFx.push({x:TP.x,y:TP.y-50,s:`${name} 還沒有布置家`,life:2});return}
+  VISIT={id,n:r.username||name,h:cleanHome(r.data)};inHouse=true;state='house';houseEdit=false;const L=HOUSE_LV[VISIT.h.lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}catch(e){townFx.push({x:TP.x,y:TP.y-50,s:e.message||'讀取失敗',life:2})}}
+async function leaveFootprint(k){if(!VISIT)return;closeEmoteBar();try{const r=await DogCloud.addVisit(VISIT.id,k);townFx.push({x:TP.x,y:TP.y-50,s:r==='dup'?'今天已經來過了，明天再來留腳印吧':'留下腳印了！',life:2.2});if(r!=='dup'){sfx('coin');const f=(SV.friends||{})[VISIT.id];friendGain(VISIT.id,VISIT.n,2)}}catch(e){townFx.push({x:TP.x,y:TP.y-50,s:e.message||'留腳印失敗',life:2})}}
+async function loadMyVisits(){MYVIS=null;if(!netCan()||!DogCloud.myVisits)return;try{MYVIS=await DogCloud.myVisits();renderTownUI()}catch(e){MYVIS=null}}
+function visitorsHTML(){if(!MYVIS)return '<p class="note">登入帳號後，可以看到誰來過你家。</p>';if(!MYVIS.length)return '<p class="note">最近 7 天還沒有訪客。邀請朋友來玩吧！</p>';
+ return `<div class="frl">${MYVIS.map(v=>`<div class="fr"><div><b>${esc(v.visitor_name||'狗狗')}</b><small>${esc(String(v.day))}　🐾 「${PHRASES[v.phrase]||''}」</small></div></div>`).join('')}</div>`}
 
 /* ---------- loop ---------- */
 function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.8,Math.min(1.15,Math.min(W,H)/480))}

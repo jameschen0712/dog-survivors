@@ -73,3 +73,61 @@ create policy "town: read" on realtime.messages
 create policy "town: write" on realtime.messages
   for insert to authenticated
   with check (realtime.topic() like 'town:%' and realtime.messages.extension in ('broadcast', 'presence'));
+-- 7) 拜訪好友的家：每位玩家公開一份「狗屋擺設」，登入的玩家都可以看
+create table if not exists public.homes (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  username   text,
+  data       jsonb not null check (pg_column_size(data) < 32768),
+  updated_at timestamptz not null default now()
+);
+alter table public.homes enable row level security;
+drop policy if exists "homes: read"       on public.homes;
+drop policy if exists "homes: insert own" on public.homes;
+drop policy if exists "homes: update own" on public.homes;
+create policy "homes: read" on public.homes for select to authenticated using (true);
+create policy "homes: insert own" on public.homes for insert to authenticated with check (auth.uid() = user_id);
+create policy "homes: update own" on public.homes for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+revoke all on public.homes from anon;
+grant select, insert, update on public.homes to authenticated;
+
+-- 名字一律由伺服器從 profiles 帶入，玩家改不了
+create or replace function public.homes_fill() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.username := (select username from public.profiles where user_id = new.user_id);
+  new.updated_at := now();
+  return new;
+end $$;
+drop trigger if exists homes_fill on public.homes;
+create trigger homes_fill before insert or update on public.homes for each row execute function public.homes_fill();
+
+-- 8) 訪客腳印：同一個訪客對同一個家一天只能留一次；只有主人看得到誰來過
+create table if not exists public.visits (
+  id           bigserial primary key,
+  host_id      uuid not null references auth.users(id) on delete cascade,
+  visitor_id   uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  visitor_name text,
+  phrase       smallint not null default 0 check (phrase between 0 and 31),
+  day          date not null default current_date,
+  created_at   timestamptz not null default now(),
+  unique (host_id, visitor_id, day)
+);
+alter table public.visits enable row level security;
+drop policy if exists "visits: host reads" on public.visits;
+drop policy if exists "visits: insert"     on public.visits;
+create policy "visits: host reads" on public.visits for select to authenticated using (auth.uid() = host_id);
+create policy "visits: insert" on public.visits for insert to authenticated with check (auth.uid() = visitor_id and host_id <> visitor_id);
+revoke all on public.visits from anon;
+grant select, insert on public.visits to authenticated;
+grant usage on sequence public.visits_id_seq to authenticated;
+
+create or replace function public.visits_fill() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.visitor_id := auth.uid();
+  new.visitor_name := (select username from public.profiles where user_id = auth.uid());
+  new.day := current_date;
+  return new;
+end $$;
+drop trigger if exists visits_fill on public.visits;
+create trigger visits_fill before insert on public.visits for each row execute function public.visits_fill();

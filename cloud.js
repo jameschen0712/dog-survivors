@@ -144,7 +144,7 @@
       const peers = () => { const st = ch.presenceState(), out = []; for (const k in st) { const m = st[k][st[k].length - 1]; if (k !== user.id && m) out.push(Object.assign({}, m, { id: k })); } return out; };
       let synced = false;
       ch.on('presence', { event: 'sync' }, () => { synced = true; if (h.onPeers) h.onPeers(peers()); });
-      for (const ev of ['mv', 'em', 'say', 'it']) ch.on('broadcast', { event: ev }, (m) => { if (h.onEvent) h.onEvent(ev, m.payload || {}); });
+      for (const ev of ['mv', 'em', 'say', 'it', 'ball', 'grab', 'inv', 'acc', 'unwalk', 'gift']) ch.on('broadcast', { event: ev }, (m) => { if (h.onEvent) h.onEvent(ev, m.payload || {}); });
       const status = await new Promise((res) => { let done = false; const t = setTimeout(() => { if (!done) { done = true; res('TIMED_OUT'); } }, 8000); ch.subscribe((s) => { if (done) { if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT' || s === 'CLOSED') { if (h.onState) h.onState('error'); } return; } if (s === 'SUBSCRIBED' || s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') { done = true; clearTimeout(t); res(s); } }); });
       if (status !== 'SUBSCRIBED') { try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } throw new Error(status === 'CHANNEL_ERROR' ? '主城連線被拒絕（伺服器設定還沒完成）' : '連不上主城伺服器'); }
       const t0 = Date.now(); while (!synced && Date.now() - t0 < 1500) await new Promise((r) => setTimeout(r, 100));
@@ -159,6 +159,32 @@
       };
     }
     throw new Error('主城人太多了，稍後再試');
+  };
+
+  // ---------- 狗屋公開資料與訪客腳印 ----------
+  api.putHome = async function (data) {
+    if (!enabled || !user) return;
+    const { error } = await sb.from('homes').upsert({ user_id: user.id, data });
+    if (error) throw new Error(zh(error));
+  };
+  api.getHome = async function (uid) {
+    needUser();
+    const { data, error } = await sb.from('homes').select('username, data, updated_at').eq('user_id', uid).maybeSingle();
+    if (error) throw new Error(zh(error));
+    return data;
+  };
+  api.addVisit = async function (hostId, phrase) {
+    needUser();
+    const { error } = await sb.from('visits').insert({ host_id: hostId, phrase: phrase | 0 });
+    if (error) { if (String(error.code) === '23505') return 'dup'; throw new Error(zh(error)); }
+    return 'ok';
+  };
+  api.myVisits = async function () {
+    needUser();
+    const since = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+    const { data, error } = await sb.from('visits').select('visitor_name, phrase, day, created_at').eq('host_id', user.id).gte('day', since).order('created_at', { ascending: false }).limit(50);
+    if (error) throw new Error(zh(error));
+    return data || [];
   };
 
   // 關掉分頁或切到背景時，把還沒上傳的存檔送出去
