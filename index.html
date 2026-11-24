@@ -1223,8 +1223,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.15.2';
+const VERSION='0.15.3';
 const NEWS=[
+ {v:'0.15.3',d:'11/24',t:'移動手感・新 NPC',items:[['調整','手機搖桿變靈敏：手指只要拖一點點就全速跑，手指拉太遠時搖桿會跟著手指走，轉向更快'],['新增','主城也能用搖桿走路：按住畫面拖曳就像戰鬥一樣移動；只點一下則是走到點的地方'],['調整','出戰 NPC 改成「守門犬・庫里」（巧克力奶油長毛臘腸），每日副本 NPC 改成「地城嚮導・巴塔」（奶油長毛臘腸）'],['新增','噴水池上多了一隻柯基「尿尿小童・DIDI」，點牠會跟你聊天']]},
  {v:'0.15.2',d:'11/24',t:'手機版優化',items:[['調整','手機上主城、選單、戰鬥都改成全螢幕，不會再被網頁標題擠到、也不用上下捲動才找得到按鈕'],['調整','手機直立時畫面稍微拉遠，看得到更多從旁邊衝過來的怪物'],['調整','戰鬥上方的金幣／裝備／卡片和魔王倒數不會再重疊；小地圖跟著往下移'],['修正','長按畫面不會再跳出選單或選取文字，連點按鈕不會放大畫面'],['新增','可以「加入主畫面」：用手機瀏覽器的分享選單加到主畫面，打開就是全螢幕的 App']]},
  {v:'0.15.1',d:'11/24',t:'操作改善',items:[['調整','走到 NPC 旁邊，下方按鈕會寫「跟 守門犬・阿布 說話（出戰）」，一看就知道要做什麼'],['新增','第一次進主城會跳出操作教學：點 NPC 就能使用功能'],['新增','按 Esc 可以關掉視窗：帳號、最新消息、抽卡結果、提示、轉職視窗、選單和社交面板'],['修正','連續按 Enter 會一直跳出雲端存檔視窗的問題'],['調整','轉職、天賦的提示改成告訴你要去找哪位 NPC']]},
  {v:'0.15.0',d:'11/24',t:'狗狗社交・拜訪好友的家',items:[['新增','一起散步：點別人的狗按「一起散步」，對方答應後兩隻狗會牽著繩子一起走'],['新增','丟球：在「社交」選「丟球」，球會飛出去，大家都可以衝去搶，搶到的狗會叼著跑'],['新增','一起午睡：選「趴下睡覺」，旁邊也有狗在睡就會一起睡，睡滿 20 秒每天可以拿一次獎勵'],['新增','汪汪合唱：幾隻狗在 3 秒內一起「嗷嗚～」就會合唱，3 隻以上每天可以拿一次獎勵'],['新增','送點心：每天可以送每位朋友一份點心，收到的狗會拿到金幣'],['新增','好感度：聞聞、摸摸、散步、丟球、午睡、合唱、送點心都會增加，從「路過的狗」一路升到「最佳拍檔」；在「社交 → 好友」可以看到好友列表和誰在線'],['新增','拜訪好友的家：點別人的狗或從好友列表按「拜訪家」，可以參觀牠布置的狗屋，主人會在家裡睡午覺'],['新增','留下腳印：去別人家可以選一句話留下腳印（每天一次），回自己家按「訪客」就能看到誰來過，門口也會出現腳印']]},
@@ -1828,7 +1829,8 @@ function placeJoy(){const j=$('joy');j.classList.remove('hide');j.style.left=joy
 function mouseAim(e){const r=cv.getBoundingClientRect(),dx=e.clientX-r.left-W/2,dy=e.clientY-r.top-H/2,d=Math.hypot(dx,dy);if(d<16){joy.x=joy.y=0;return}const k=Math.min(1,d/90)/d;joy.x=dx*k;joy.y=dy*k}
 cv.addEventListener('pointerdown',e=>{if(state!=='play')return;joy.on=true;joy.id=e.pointerId;joy.mouse=e.pointerType==='mouse';try{cv.setPointerCapture(e.pointerId)}catch(err){}
   if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();joy.ox=e.clientX-r.left;joy.oy=e.clientY-r.top;joy.x=joy.y=0;placeJoy()});
-cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();let dx=e.clientX-r.left-joy.ox,dy=e.clientY-r.top-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d}joy.x=dx/m;joy.y=dy/m;placeJoy()});
+function joyMove(px,py){let dx=px-joy.ox,dy=py-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){joy.ox+=dx*(1-m/d);joy.oy+=dy*(1-m/d);dx*=m/d;dy*=m/d}const mag=d<5?0:Math.min(1,d/20),dd=Math.hypot(dx,dy)||1;joy.x=dx/dd*mag;joy.y=dy/dd*mag;placeJoy()}
+cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id||state!=='play')return;if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();joyMove(e.clientX-r.left,e.clientY-r.top)});
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 cv.addEventListener('contextmenu',e=>e.preventDefault());cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
@@ -1840,9 +1842,9 @@ const TP={x:0,y:110,face:1,mv:false,go:null,tgt:null,near:null,idle:0,heart:0};
 let townT=0,inHouse=false,townPtr=null,houseEdit=false,houseSel=null;
 const panelTab=t=>()=>openPanel(t);
 const NPCS=[
- {id:'gate',n:'守門犬・阿布',r:'出戰',x:0,y:-372,skin:'shiba0',job:'knight',open:panelTab('go'),b:{k:'gate',w:190,h:120}},
+ {id:'gate',n:'守門犬・庫里',r:'出戰',x:0,y:-372,skin:'dachs1',job:'knight',open:panelTab('go'),b:{k:'gate',w:190,h:120}},
  {id:'tower',n:'塔守・小灰',r:'無限之塔',x:340,y:-352,skin:'husky0',job:'wizard',open:()=>openPanel('go','tower'),b:{k:'tower',w:90,h:170,wall:'#b8b2c8',roof:'#6a4ab8'}},
- {id:'cave',n:'地城嚮導・波波',r:'每日副本',x:-340,y:-352,skin:'lab1',job:'hunter',open:()=>openPanel('go','dung'),b:{k:'cave',w:150,h:96}},
+ {id:'cave',n:'地城嚮導・巴塔',r:'每日副本',x:-340,y:-352,skin:'dachs3',job:'hunter',open:()=>openPanel('go','dung'),b:{k:'cave',w:150,h:96}},
  {id:'jobm',n:'轉職教官・雷歐',r:'轉職・角色',x:-280,y:-170,skin:'golden0',job:'lknight',open:panelTab('char'),b:{k:'house',w:150,h:84,wall:'#f3e6c8',roof:'#c8443a',sign:'轉職所'}},
  {id:'smith',n:'鐵匠・大熊',r:'裝備',x:280,y:-170,skin:'border0',job:'smith',open:panelTab('eq'),b:{k:'house',w:150,h:84,wall:'#d8c8b0',roof:'#5a5a62',sign:'鐵匠鋪'}},
  {id:'elder',n:'長老・白鬍子',r:'天賦',x:-400,y:60,skin:'westie0',job:'sage',open:panelTab('tal'),b:{k:'house',w:136,h:80,wall:'#e8e0f0',roof:'#6a5ab8',sign:'長老之家'}},
@@ -1850,6 +1852,7 @@ const NPCS=[
  {id:'salon',n:'美容師・可可',r:'造型扭蛋',x:-290,y:270,skin:'poodle2',job:'dancer',open:panelTab('skin'),b:{k:'house',w:150,h:84,wall:'#fff0f4',roof:'#ff8ab0',sign:'狗狗美容院'}},
  {id:'cos',n:'設計師・咪咪',r:'時裝扭蛋',x:290,y:270,skin:'chi0',job:'bard',open:panelTab('cos'),b:{k:'house',w:150,h:84,wall:'#f0f6ff',roof:'#5a8ae0',sign:'時裝店'}},
  {id:'pet',n:'孵蛋婆婆',r:'寵物',x:0,y:420,skin:'dachs0',job:'priest',open:panelTab('pet'),b:{k:'tent',w:150,h:86}},
+ {id:'didi',n:'尿尿小童・DIDI',r:'噴水池吉祥物',x:0,y:-58,skin:'corgi0',job:'novice',open:()=>{const L=['噓～不要一直盯著我看啦！','這座噴水池的水……你懂的 (๑•̀ㅂ•́)و','汪！今天也要加油喔！','我已經站在這裡 87 年了','偷偷告訴你：公園的土堆每天都會長新的寶物'];townFx.push({x:0,y:-110,s:'DIDI：'+L[Math.floor(Math.random()*L.length)],life:2.8});TP.heart=1;sfx('lvl')}},
  {id:'board',n:'公告欄',r:'任務・成就',x:-118,y:-150,skin:null,open:panelTab('ach'),b:{k:'board',w:80,h:62}},
  {id:'shop',n:'雜貨商・小米',r:'商店',x:128,y:-146,skin:'corgi0',job:'merch',open:panelTab('shop'),b:{k:'stall',w:96,h:60}},
  {id:'news',n:'報童・豆豆',r:'最新消息',x:-110,y:160,skin:'chi2',job:'novice',open:()=>{newsSel=0;openNews()}},
@@ -1982,6 +1985,7 @@ function drawMyHouse(c,x,y,t){const lv=homeData().lv;shadow(c,x,y+4,80,12);
  c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';const nm=`${SKM[curSkin()].n}的家`;const sw=c.measureText(nm).width+16;rr(c,x-sw/2,y-150,sw,20,6,'#fff6e0');c.fillStyle='#6a3a1a';c.fillText(nm,x,y-135)}
 function drawFountain(c,t){ell(c,0,10,96,46,0,'#9a948a');ell(c,0,6,88,40,0,'#7fc8ef');c.globalAlpha=.5;for(let q=0;q<3;q++){const r=Math.max(.5,((t*20+q*25)%70+70)%70);c.strokeStyle='#fff';c.lineWidth=1;c.beginPath();c.ellipse(0,6,r,r*.45,0,0,TAU);c.stroke()}c.globalAlpha=1;rr(c,-10,-40,20,46,6,'#b8b2a8');ell(c,0,-40,26,9,0,'#b8b2a8');ell(c,0,-42,20,6,0,'#7fc8ef');
  for(let q=0;q<8;q++){const a=q/8*TAU,ph=(t*1.6+q*.37)%1;circ(c,Math.cos(a)*ph*26,-46+ph*44-Math.sin(ph*Math.PI)*28,2.2,'rgba(220,245,255,.9)')}}
+function drawPee(c,x,y,t){const sx=x-10,sy=y-2;c.save();c.globalAlpha=.95;for(let q=0;q<14;q++){const ph=((t*1.6+q/14)%1),px=sx-ph*34,py=sy+ph*ph*58-ph*12;circ(c,px,py,2.6-ph*.9,'#ffe45a')}c.restore();c.globalAlpha=.5;const r=3+((t*3)%1)*5;c.strokeStyle='#fff8c0';c.lineWidth=1;c.beginPath();c.ellipse(sx-30,sy+38,r,r*.4,0,0,TAU);c.stroke();c.globalAlpha=1}
 function drawTree(c,x,y,s){shadow(c,x,y+4,16*s,5*s);rr(c,x-4*s,y-18*s,8*s,22*s,2,'#7a4a2a');for(const [dx,dy,r,col] of [[0,-34,16,'#3f8a3a'],[-11,-24,12,'#4f9a3a'],[11,-24,12,'#4f9a3a'],[-4,-38,8,'#6ab04a']])circ(c,x+dx*s,y+dy*s,r*s,col)}
 
 /* town update & render */
@@ -1999,10 +2003,11 @@ function camOf(){if(inHouse)return [0,0];const vw=W/S/2,vh=H/S/2;return [Math.ma
 function houseBounds(){const L=HOUSE_LV[curHome().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
 function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;netTick(dt);
  let ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup'));
+ if(joy.on&&townPtr&&townPtr.mode==='joy'){ix=joy.x;iy=joy.y}
  if(ix||iy){TP.go=null;TP.tgt=null}
  let tx=null,ty=null;if(TP.go){tx=TP.go.x;ty=TP.go.y+(TP.go.n?TP.go.r||30:18)}else if(TP.tgt){tx=TP.tgt[0];ty=TP.tgt[1]}
  if(tx!==null&&!ix&&!iy){const dx=tx-TP.x,dy=ty-TP.y,d=Math.hypot(dx,dy);if(d<8){if(TP.go){const g=TP.go;TP.go=null;doAct(g)}TP.tgt=null}else{ix=dx/d;iy=dy/d}}
- const m=Math.hypot(ix,iy);TP.mv=m>0;if(m){const sp=(inHouse?140:190)*dt/m;TP.x+=ix*sp;TP.y+=iy*sp;if(ix)TP.face=ix>0?1:-1;TP.idle=0}else TP.idle+=dt;
+ const m=Math.hypot(ix,iy);TP.mv=m>0;if(m){const sp=(inHouse?140:190)*dt/Math.max(1,m);TP.x+=ix*sp;TP.y+=iy*sp;if(ix)TP.face=ix>0?1:-1;TP.idle=0}else TP.idle+=dt;
  if(inHouse){const hb=houseBounds();TP.x=Math.max(hb.x0+14,Math.min(hb.x1-14,TP.x));TP.y=Math.max(hb.y0+12,Math.min(hb.y1-8,TP.y));if(TP.y>hb.y1-12&&Math.abs(TP.x)<22&&iy>0&&!houseEdit)leaveHouse()}
  else{TP.x=Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,TP.x));TP.y=Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,TP.y));
    for(const dg of TDOGS){dg.heart=Math.max(0,dg.heart-dt);dg.w-=dt;if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
@@ -2029,7 +2034,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  for(const [x,y,col] of FLOWERS){if(Math.abs(x)<210&&Math.abs(y)<160)continue;circ(c,x,y,2.2,col);circ(c,x,y,1,'#ffe27a')}
  c.save();c.translate(0,-6);drawFountain(c,t);c.restore();
  // drawables sorted by y
- const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(1.15,1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore()}})}
+ const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
  if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,p.nap&&!p.mv);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
@@ -2077,11 +2082,11 @@ function townDown(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
  closePeerMenu();
  let hit=null;if(!inHouse){for(const a of townTargets()){const ay=a.y-(a.n&&a.n.b&&a.n.b.k!=='myhouse'?40:a.n&&a.n.b?10:12);if(Math.abs(wx-a.x)<(a.n&&a.n.b?Math.max(40,(a.n.b.w||120)*.45):26)&&Math.abs(wy-ay)<(a.n&&a.n.b?60:28)){hit=a;break}}}
  if(hit){TP.go=hit;TP.tgt=null;sfx('ui');return}
- TP.go=null;TP.tgt=[wx,wy];townPtr={id:e.pointerId};try{cv.setPointerCapture(e.pointerId)}catch(err){}}
+ townPtr={id:e.pointerId,sx:e.clientX-r.left,sy:e.clientY-r.top,mode:'wait',wx,wy};try{cv.setPointerCapture(e.pointerId)}catch(err){}}
 function townMove(e){if(state!=='town'&&state!=='house')return;const r=cv.getBoundingClientRect(),[wx,wy]=screenToWorld(e.clientX-r.left,e.clientY-r.top);
  if(inHouse&&houseEdit){const hb=houseBounds();townPtr=townPtr||{};townPtr.hover=[Math.floor((wx-hb.x0)/hb.T),Math.floor((wy-hb.y0)/hb.T)];return}
- if(townPtr&&townPtr.id===e.pointerId)TP.tgt=[wx,wy]}
-function townUp(e){if(townPtr&&townPtr.id===e.pointerId)townPtr=null}
+ if(townPtr&&townPtr.id===e.pointerId){const px=e.clientX-r.left,py=e.clientY-r.top;if(townPtr.mode==='wait'&&Math.hypot(px-townPtr.sx,py-townPtr.sy)>10){townPtr.mode='joy';joy.on=true;joy.id=e.pointerId;joy.ox=townPtr.sx;joy.oy=townPtr.sy;TP.go=null;TP.tgt=null}if(townPtr.mode==='joy')joyMove(px,py)}}
+function townUp(e){if(!townPtr||townPtr.id!==e.pointerId)return;if(townPtr.mode==='wait'&&townPtr.wx!==undefined){TP.go=null;TP.tgt=[townPtr.wx,townPtr.wy]}if(townPtr.mode==='joy'){joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')}townPtr=null}
 function townBtn(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.tw==='emote'){openEmoteBar('emote');return}if(d.tw==='foot'){openEmoteBar('foot');return}if(d.tw==='vis'){openEmoteBar('vis');return}closeEmoteBar();
  if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
