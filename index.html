@@ -66,7 +66,7 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .stats b{display:block;font:700 24px Fredoka,"Noto Sans TC",sans-serif}.stats span{font-size:13px;color:#6b5a40}
 .rw{text-align:left;background:#f3ead0;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:14px;display:grid;gap:4px;max-height:34vh;overflow:auto}
 .pbtn{position:absolute;top:14px;right:12px;width:40px;height:40px;border-radius:12px;border:0;background:rgba(16,38,26,.75);color:#fff;font:700 15px Fredoka,sans-serif;cursor:pointer}
-.dashb{position:absolute;bottom:62px;right:12px;z-index:6;width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.7);background:rgba(245,197,66,.85);color:#2a1a05;font:900 20px "Noto Sans TC",sans-serif;cursor:pointer;touch-action:none}.dashb:disabled{background:rgba(120,120,120,.6);color:#eee}
+.dashb{position:absolute;bottom:62px;right:12px;z-index:6;width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.7);background:rgba(245,197,66,.85);color:#2a1a05;font:900 20px "Noto Sans TC",sans-serif;cursor:pointer;touch-action:none}.dashb:disabled{background:conic-gradient(rgba(60,60,60,.75) calc(var(--cd,0)*360deg),rgba(245,197,66,.85) 0);color:#fff;font-size:17px;text-shadow:0 1px 2px #000}.dashb.ready{animation:dashok .35s ease-out}@keyframes dashok{0%{transform:scale(1.25);box-shadow:0 0 0 6px rgba(255,240,150,.8)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,240,150,0)}}
 .sbtn{position:absolute;bottom:12px;right:12px;z-index:6;width:40px;height:40px;border-radius:12px;border:0;background:rgba(16,38,26,.75);color:#fff;font:700 18px Fredoka,sans-serif;cursor:pointer}
 .vol{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;text-align:left;font-size:14px;margin:0 0 12px}.vol input{width:100%;accent-color:#2f7a3e}
 .joy{position:absolute;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);pointer-events:none}
@@ -754,19 +754,31 @@ const cosOwn=id=>(SV.cown||[]).includes(id);
 function cosSets(){return CSETS.filter(s=>CSLOT.every(([slot])=>cosOwn('cs_'+s[0]+'_'+slot))).map(s=>s[1])}
 function drawCos(c,L,id,t,layer){const o=CSM[id];if(!o)return;if(o.slot==='back'&&(layer==='behind')!==!!CBACK[o.d])return;const f=CD[o.d];if(f)f(c,L,o.a,o.b,t,o.kind)}
 
-function drawDog(c,skid,jid,x,y,t,face,mv,wear){
+function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   const sk=SKM[skid]||SKM.shiba0,j=JM[jid],[,ear,sn,tail,sz0,o]=B[sk.b],f=sk.f,f2=sk.f2,pat=sk.pat,sz=Math.sqrt(sz0);
   const light=lum(f)>.6,dk=shade(f,-.22),TAN='#b5682f',hc=pat==='tri'&&light?TAN:f;
   const ec=pat==='tri'?(light?shade(TAN,-.15):f):(pat==='mask'||pat==='patch'||pat==='merle')?f2:shade(hc,-.12);
-  const sw=mv?Math.sin(t*14):0,bob=mv?-Math.abs(sw)*1.6:Math.sin(t*3)*.6;
+  P=P||{};const pLeg=P.legs||'stand',pBody=P.body||0,pHead=P.head||0,pMouth=P.mouth||0,pEye=P.eyes||'';
+  const sw=P.wig!==undefined?P.wig:mv?Math.sin(t*14):0,bob=mv?-Math.abs(sw)*1.6:Math.sin(t*3)*.6*(pLeg==='lie'?.3:1);
   shadow(c,x,y+12*sz,15*sz,5*sz);
   c.save();c.translate(x,y);c.scale(face*sz,sz);
   if(j.tier>=4){c.globalAlpha=.2+.08*Math.sin(t*4);circ(c,0,-4,24,j.c);c.globalAlpha=1}
-  const lh=o.short?5:8,bl=o.long?16:12,by=12-lh-6+bob,hx=bl-1,hy=by-8,hr=8.5;
+  const lh=o.short?5:8,bl=o.long?16:12,by=12-lh-6+bob+(P.drop||0),hx=bl-1+(P.hdx||0),hy=by-8+(P.hy||0),hr=8.5;
+  if(P.flip){c.translate(0,by);c.rotate(P.flip);c.translate(0,-by)}
   const W2=wear||{},L={hx,hy,hr,by,bl,ex:hx+2.5,ey:hy-1.5,nkx:hx-3,nky:hy+7,nx:hx+8};
+  const pvx=-bl+4,pvy=by+4,rot=(px,py)=>{const dx=px-pvx,dy=py-pvy,cs=Math.cos(pBody),sn2=Math.sin(pBody);return [pvx+dx*cs-dy*sn2,pvy+dx*sn2+dy*cs]};
+  const legCol=i=>i%2?dk:f,paws=(lx,i)=>{if(pat==='tan'||(pat==='tri'&&!light))rr(c,lx-2,12-2.5,4.5,2.5,1,pat==='tan'?f2:'#b5682f')};
+  const frontLeg=(lx,i,topY)=>{const lift=i===3?(P.lift||0):0,len=12-topY;if(lift){c.save();c.translate(lx,topY+1);c.rotate(-lift*1.5);rr(c,-2,0,4.5,len,2,legCol(i));c.restore()}else{rr(c,lx-2,topY,4.5,len,2,legCol(i));paws(lx,i)}};
+  /* legs (drawn before the body so the body overlaps them) */
+  if(pLeg==='stand'||pLeg==='up'){[-bl+3,-bl+8,bl-9,bl-4].forEach((lx,i)=>{const ph=(i%2?1:-1)*sw*1.8;if(i>=2&&P.lift&&i===3){frontLeg(lx+ph,i,12-lh);return}rr(c,lx-2+ph,12-lh,4.5,lh,2,legCol(i));paws(lx+ph,i)})}
+  else if(pLeg==='sit'){ell(c,-bl+7,8,6.5,4.8,-.2,dk);ell(c,-bl+11,11.2,3.6,1.8,0,dk);for(const [lx,i] of [[bl-9,2],[bl-5,3]]){const [sx2,sy2]=rot(lx,by+3);frontLeg(sx2,i,Math.min(11,sy2))}}
+  else if(pLeg==='lie'){ell(c,-bl+4,11,3.6,1.8,0,dk);ell(c,bl+1,11,4.2,1.9,0,dk);ell(c,bl+4,11.4,4.2,1.9,0,f)}
+  else if(pLeg==='bow'){[-bl+3,-bl+8].forEach((lx,i)=>{rr(c,lx-2,12-lh-2,4.5,lh+2,2,legCol(i));paws(lx,i)});rr(c,bl-11,8.5,15,3.6,1.8,dk);rr(c,bl-9,9.2,15,3.6,1.8,f)}
+  /* body group (rotates around the hips) */
+  c.save();if(pBody){c.translate(pvx,pvy);c.rotate(pBody);c.translate(-pvx,-pvy)}
   if(W2.aura&&CSM[W2.aura]&&CSM[W2.aura].kind==='rainbow')drawCos(c,L,W2.aura,t,'behind');
   if(W2.back)drawCos(c,L,W2.back,t,'behind');
-  c.save();c.translate(-bl+1,by-3);c.rotate(Math.sin(t*(mv?16:5))*.3);c.lineCap='round';c.strokeStyle=f;c.fillStyle=f;
+  c.save();c.translate(-bl+1,by-3);c.rotate((P.tr||0)+Math.sin(t*(P.tw||(mv?16:5)))*(P.ta!==undefined?P.ta:.3));c.lineCap='round';c.strokeStyle=f;c.fillStyle=f;
   if(tail==='curl'){c.lineWidth=4;c.beginPath();c.arc(-2,-5,4.5,.2,TAU-.9);c.stroke()}
   else if(tail==='straight'){c.lineWidth=3.5;c.beginPath();c.moveTo(0,0);c.lineTo(-8,-8);c.stroke();if(pat==='tri')circ(c,-8,-8,2,'#fbf7ef')}
   else if(tail==='thin'){c.lineWidth=2.2;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(-8,-2,-12,-9);c.stroke()}
@@ -774,7 +786,6 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear){
   else if(tail==='pom'){c.lineWidth=2.5;c.beginPath();c.moveTo(0,0);c.lineTo(-5,-7);c.stroke();circ(c,-6,-9,4,f)}
   else if(tail==='short')ell(c,-2,-2,3.5,2.5,-.5,f);
   c.restore();
-  [-bl+3,-bl+8,bl-9,bl-4].forEach((lx,i)=>{const ph=(i%2?1:-1)*sw*1.8;rr(c,lx-2+ph,12-lh,4.5,lh,2,i%2?dk:f);if(pat==='tan'||(pat==='tri'&&!light))rr(c,lx-2+ph,12-2.5,4.5,2.5,1,pat==='tan'?f2:'#b5682f')});
   ell(c,0,by,bl,7.5,0,f);
   if(pat==='saddle')ell(c,-2,by-3.5,bl-3,4.5,0,f2);
   if(pat==='tri')ell(c,-2,by-3.5,bl-3,4.5,0,light?'#2a2220':f);
@@ -785,6 +796,8 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear){
   if(o.curly)for(let i=0;i<6;i++)circ(c,-bl+3+i*(bl*2-6)/5,by-6,3,shade(f,.1));
   if(j.tier>=2){c.beginPath();c.moveTo(bl-5,by-6);c.quadraticCurveTo(-2,by-9,-bl-1,by+3);c.lineTo(-bl+3,by+7);c.quadraticCurveTo(0,by+1,bl-7,by-1);c.closePath();c.fillStyle=shade(j.c,-.3);c.fill();if(j.tier>=3){c.strokeStyle='#f5c542';c.lineWidth=1.3;c.stroke()}}
   if(W2.back)drawCos(c,L,W2.back,t,'front');
+  /* head group (rotates around the neck) */
+  c.save();if(pHead){const nx0=hx-4,ny0=hy+6;c.translate(nx0,ny0);c.rotate(pHead);c.translate(-nx0,-ny0)}
   if(o.fluff)for(const [dx,dy] of [[-4,4],[0,6],[3,3],[-6,0]])circ(c,hx+dx,hy+dy,5,shade(f,.06));
   if(ear==='up'){tri(c,hx-1,hy-4,hx+2,hy-14,hx+5,hy-5,shade(ec,-.15));tri(c,hx-6,hy-4,hx-3,hy-15,hx+1,hy-6,ec);tri(c,hx-4.5,hy-6,hx-3,hy-12,hx-.5,hy-6,'#f2a7a0')}
   if(ear==='fold'){tri(c,hx-5,hy-5,hx-2,hy-12,hx+2,hy-6,ec);tri(c,hx-2,hy-12,hx+2,hy-6,hx+3.5,hy-9,shade(ec,-.18))}
@@ -796,27 +809,28 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear){
   if(pat==='merle')circ(c,hx-3,hy-3,3,f2);
   if(o.wrinkle){c.strokeStyle=shade(hc,-.3);c.lineWidth=1;for(let k=0;k<3;k++){c.beginPath();c.arc(hx+1,hy-3+k*2.2,4,Math.PI*1.15,Math.PI*1.85);c.stroke()}}
   const sl=3.5+sn*6,sx=hx+4+sl*.6,mc={mask:f2,chestmask:'#2a2420',chest:f2,tan:f2,tri:light?'#fbf7ef':f2}[pat]||shade(hc,.08);
-  ell(c,sx,hy+2.5,sl,4,0,mc);
+  if(pMouth>0){ell(c,sx-.5,hy+5.2+pMouth*1.6,sl*.75,1+pMouth*2.4,0,'#5a1e1e');ell(c,sx+.5,hy+6.2+pMouth*2.4,sl*.4,.8+pMouth*1.1,0,'#ff8a9a')}
+  ell(c,sx,hy+2.5-pMouth*.8,sl,4,0,mc);
   if(o.beard)tri(c,sx-sl,hy+3,sx+sl,hy+3,sx+2,hy+10,f2);
-  circ(c,sx+sl-1,hy+1.2,1.9,'#1a1414');
-  circ(c,hx+2.5,hy-1.5,1.8,'#1a1414');circ(c,hx+3.1,hy-2.2,.6,'#fff');
+  circ(c,sx+sl-1+(P.nose||0),hy+1.2-pMouth*.8,1.9,'#1a1414');
+  if(pEye==='closed'){c.strokeStyle='#1a1414';c.lineWidth=1.2;c.lineCap='round';c.beginPath();c.arc(hx+2.6,hy-2.4,1.8,.25*Math.PI,.75*Math.PI);c.stroke()}
+  else if(pEye==='happy'){c.strokeStyle='#1a1414';c.lineWidth=1.3;c.lineCap='round';c.beginPath();c.arc(hx+2.6,hy-.6,1.9,1.15*Math.PI,1.85*Math.PI);c.stroke()}
+  else{circ(c,hx+2.5,hy-1.5,1.8,'#1a1414');circ(c,hx+3.1,hy-2.2,.6,'#fff')}
   if(pat==='tan'||o.beard)rr(c,hx+1,hy-5.2,3.5,1.6,1,f2);
-  if(ear==='flop')ell(c,hx-4,hy+1,3.8,6.5,.3,ec);
-  if(ear==='long')ell(c,hx-4,hy+4,4.2,o.silky?11:9,.15,ec);
+  if(ear==='flop')ell(c,hx-4,hy+1,3.8,6.5,.3+(P.earFlap||0),ec);
+  if(ear==='long')ell(c,hx-4,hy+4,4.2,o.silky?11:9,.15+(P.earFlap||0),ec);
   L.nx=sx+sl-1;
   if(W2.neck)drawCos(c,L,W2.neck,t);
   const neckAcc=j.acc==='bandana'||j.acc==='scarf';if(W2.head&&CSM[W2.head]){if(neckAcc&&!W2.neck)ACC[j.acc](c,hx,hy,hr,j,t);drawCos(c,L,W2.head,t)}else if(!(neckAcc&&W2.neck&&CSM[W2.neck]))ACC[j.acc](c,hx,hy,hr,j,t);
   if(W2.face)drawCos(c,L,W2.face,t);
+  c.restore();c.restore();
   if(sk.fx){const cols=FXC[sk.fx];for(let i=0;i<5;i++){const a=t*1.4+i*TAU/5,px=Math.cos(a)*18,py=-6+Math.sin(a)*11,al=.55+.45*Math.sin(t*5+i);c.globalAlpha=al;const col=cols[i%cols.length];
     if(sk.fx==='sakura'||sk.fx==='candy')ell(c,px,py,3,1.8,a,col);else if(sk.fx==='frost'){c.strokeStyle=col;c.lineWidth=1;c.beginPath();for(let q=0;q<3;q++){const qa=q*Math.PI/3;c.moveTo(px-Math.cos(qa)*3,py-Math.sin(qa)*3);c.lineTo(px+Math.cos(qa)*3,py+Math.sin(qa)*3)}c.stroke()}else if(sk.fx==='fiesta')rr(c,px-1.5,py-1,3,2,.5,col);else{c.beginPath();for(let q=0;q<8;q++){const r=q%2?1:3.2,qa=q*Math.PI/4;c.lineTo(px+Math.cos(qa)*r,py+Math.sin(qa)*r)}c.closePath();c.fillStyle=col;c.fill()}}c.globalAlpha=1}
   if(W2.aura&&CSM[W2.aura]&&CSM[W2.aura].kind!=='rainbow')drawCos(c,L,W2.aura,t);
   c.restore();
 }
 
-function drawEnemy(c,e,t){
-  shadow(c,e.x,e.y+e.r*.9,e.r*.9,e.r*.35);
-  const s=e.r/12,bob=Math.sin(t*6+e.ph)*1.2;
-  const q=e.sq||0;c.save();c.translate(e.x,e.y+q*e.r*.5);c.scale(s*e.face*(1+q),s*(1-q*.7));
+function drawEnemyBody(c,e,t){const bob=Math.sin(t*6+e.ph)*1.2;
   switch(e.type){
     case 'sprout':c.translate(0,bob*.5);ell(c,-5,-10,7,3,-.6,'#4f9a3a');ell(c,5,-10,7,3,.6,'#4f9a3a');ell(c,0,2,11,10,0,'#7cc35a');ell(c,-4,-2,4,3,0,'rgba(255,255,255,.3)');eyes(c,1,2);break;
     case 'bat':{const fl=Math.sin(t*18+e.ph);for(const sd of [-1,1]){c.beginPath();c.moveTo(sd*4,-2);c.lineTo(sd*18,-8-fl*6);c.lineTo(sd*14,2);c.lineTo(sd*8,0);c.closePath();c.fillStyle='#2b2f55';c.fill()}
@@ -840,6 +854,14 @@ function drawEnemy(c,e,t){
     case 'thunderbird':{const fl=Math.sin(t*9)*4;tri(c,-2,-2,-22,-14-fl,-8,6,'#3a6ad0');tri(c,2,-2,22,-14-fl,8,6,'#3a6ad0');tri(c,-4,-1,-18,-10-fl,-8,4,'#ffe27a');tri(c,4,-1,18,-10-fl,8,4,'#ffe27a');ell(c,0,2,7,9,0,'#4a7ae0');circ(c,0,-7,5.5,'#4a7ae0');tri(c,-2,-12,0,-19,2,-12,'#ffe27a');tri(c,1,-11,4,-17,4,-10,'#ffe27a');tri(c,3,-7,8,-6,3,-5,'#f5a742');circ(c,1.5,-8,1.3,'#fff');tri(c,-3,10,0,16,3,10,'#ffe27a');break}
     case 'treant':{const lc=e.col||(G?STAGES[G.stage].col:'#3f8f4e');rr(c,-12,8,6,4,2,'#4f3520');rr(c,6,8,6,4,2,'#4f3520');rr(c,-9,-8,18,20,4,'#6b4a2e');circ(c,-8,-14,8,lc);circ(c,8,-14,8,lc);circ(c,0,-20,9,shade(lc,.15));circ(c,-3,-22,3,'rgba(255,255,255,.18)');circ(c,-3,0,2,'#ffdd55');circ(c,4,0,2,'#ffdd55');c.beginPath();c.arc(.5,6,3,0,Math.PI);c.fillStyle='#2a1a10';c.fill();break}
   }
+}
+const ECACHE=new Map(),EC_RES=2.2,EC_SZ=30,EC_FR=12;
+function enemySprite(type,fr,stage){const k=type+'|'+fr+'|'+stage;let cv2=ECACHE.get(k);if(cv2)return cv2;cv2=document.createElement('canvas');const n=Math.ceil(EC_SZ*2*EC_RES);cv2.width=cv2.height=n;const c2=cv2.getContext('2d');c2.translate(n/2,n/2);c2.scale(EC_RES,EC_RES);ell(c2,0,10.8,10.8,4.2,0,'rgba(0,0,0,.22)');drawEnemyBody(c2,{type,ph:0,face:1},fr/EC_FR*TAU/6);ECACHE.set(k,cv2);return cv2}
+function drawEnemy(c,e,t){
+  const cached=!e.boss&&!e.col;if(!cached)shadow(c,e.x,e.y+e.r*.9,e.r*.9,e.r*.35);
+  const s=e.r/12;
+  const q=e.sq||0;c.save();c.translate(e.x,e.y+q*e.r*.5);c.scale(s*e.face*(1+q),s*(1-q*.7));
+  if(cached){const ang=((t*6+e.ph)%TAU+TAU)%TAU,fr=Math.floor(ang/TAU*EC_FR)%EC_FR;c.drawImage(enemySprite(e.type,fr,G?G.stage:0),-EC_SZ,-EC_SZ,EC_SZ*2,EC_SZ*2)}else drawEnemyBody(c,e,t);
   c.restore();
   if(e.slow>0){c.globalAlpha=.25;circ(c,e.x,e.y,e.r,'#8ee8ff');c.globalAlpha=1}
   if(e.hit>0){c.globalAlpha=Math.min(1,e.hit*8)*.55;circ(c,e.x,e.y,e.r,'#fff');c.globalAlpha=1}
@@ -913,8 +935,8 @@ function pause(){if(state!=='play')return;state='pause';keys.clear();joy.on=fals
   show('pause')}
 function resume(){state='play';show(null);last=performance.now();try{frame.focus({preventScroll:true})}catch(e){}}
 function banner(s){G.banner={s,life:3}}
-function txt(x,y,s,c,big){if(G.TX.length>100)G.TX.shift();const l=big?.9:.7;G.TX.push({x,y,s:String(s),c,life:l,max:l,big})}
-function fx(o){if(G.FX.length>500)G.FX.shift();G.FX.push(o);return o}
+function txt(x,y,s,c,big){if(G.TX.length>(QL.lvl>0?30:60)){if(!big)return;G.TX.shift()}const l=big?.9:.7;G.TX.push({x,y,s:String(s),c,life:l,max:l,big})}
+function fx(o){const cap=QL.lvl>0?160:300;if(G.FX.length>cap){if(o.k==='pt'||o.k==='spark')return o;G.FX.shift()}G.FX.push(o);return o}
 function sparks(x,y,n,c,sp,life,g){sp=sp||160;life=life||.45;for(let i=0;i<n;i++){const a=R(0,TAU),v=R(sp*.3,sp);fx({k:'pt',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:R(1.5,3.5),c,life:life*R(.6,1),max:life,g:g||0})}}
 function heal(v){G.p.hp=Math.min(G.p.max,G.p.hp+v)}
 
@@ -1049,7 +1071,7 @@ function update(dt){
   const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m}
   p.mv=m>.15;
   p.slow=(p.slow||0)-dt;G.dashCd=(G.dashCd||0)-dt;if(G.dashT>0){G.dashT-=dt;p.x+=G.dashV[0]*620*dt;p.y+=G.dashV[1]*620*dt;if(Math.random()<.7)fx({k:'pt',x:p.x,y:p.y,vx:0,vy:0,s:6,c:'#fff6c0',life:.2,max:.2})}
-  {const db=$('dashb');const ready=(G.dashCd||0)<=0;if(db.disabled===ready)db.disabled=!ready;}
+  {const db=$('dashb'),cd=Math.max(0,G.dashCd||0),ready=cd<=0;if(db.disabled===ready)db.disabled=!ready;const txt=ready?'衝':cd.toFixed(1);if(db.textContent!==txt)db.textContent=txt;if(db.style.setProperty)db.style.setProperty('--cd',ready?'0':String(cd/3));if(G.dashWasCd&&ready){db.classList.remove('ready');void db.offsetWidth;db.classList.add('ready')}G.dashWasCd=!ready}
   if(p.mv){const sp=p.spd*G.st.spd*dt*(p.slow>0?.55:1);p.x+=ix*sp;p.y+=iy*sp;const n=Math.hypot(ix,iy);p.fx=ix/n;p.fy=iy/n;if(Math.abs(ix)>.1)p.face=Math.sign(ix)}
   p.inv-=dt;if(G.st.regen)heal(G.st.regen*dt);
   if(G.pet){const pt=G.pet;let tx=p.x-p.face*26,ty=p.y+8,fetching=false;
@@ -1223,8 +1245,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.15.4';
+const VERSION='0.16.0';
 const NEWS=[
+ {v:'0.16.0',d:'11/24',t:'真實動作・效能優化',items:[['調整','社交動作全部重做，改成像真的狗：坐下會把後腳收起來、趴下睡覺會把下巴靠在前腳上、打滾會翻肚子四腳朝天亂踢、汪一聲會張嘴、嗷嗚會抬頭對天長嚎、轉圈是在原地追自己的尾巴、比愛心改成狗狗的「伸懶腰邀玩」姿勢、搖尾巴會連屁股一起扭'],['調整','聞聞會先走到對方屁股後面再聞；摸摸頭會走到對方面前、坐下抬起前腳拍拍牠，被摸的狗會瞇眼搖尾巴'],['調整','坐下、趴下會一直維持，直到你移動為止'],['新增','衝刺按鈕會顯示冷卻倒數，還有一圈慢慢轉回來的進度，冷卻好時按鈕會閃一下'],['調整','怪物變多時大幅減少卡頓：怪物改用預先畫好的圖、畫面外的東西不畫、特效和傷害數字太多時自動精簡'],['新增','手機跑不動時會自動降低一點解析度保持順暢，順了再自動調回來']]},
  {v:'0.15.4',d:'11/24',t:'城裡的新朋友',items:[['調整','出戰和每日副本的 NPC 改回「守門犬・阿布」和「地城嚮導・波波」'],['新增','城裡多了兩隻到處亂逛的臘腸狗：「襪子獵人・庫里」（巧克力奶油長毛臘腸，嘴裡叼著骨頭）和「公主・巴塔」（奶油長毛臘腸，戴著小皇冠），走過去可以摸摸牠們']]},
  {v:'0.15.3',d:'11/24',t:'移動手感・新 NPC',items:[['調整','手機搖桿變靈敏：手指只要拖一點點就全速跑，手指拉太遠時搖桿會跟著手指走，轉向更快'],['新增','主城也能用搖桿走路：按住畫面拖曳就像戰鬥一樣移動；只點一下則是走到點的地方'],['調整','出戰 NPC 改成「守門犬・庫里」（巧克力奶油長毛臘腸），每日副本 NPC 改成「地城嚮導・巴塔」（奶油長毛臘腸）'],['新增','噴水池上多了一隻柯基「尿尿小童・DIDI」，點牠會跟你聊天']]},
  {v:'0.15.2',d:'11/24',t:'手機版優化',items:[['調整','手機上主城、選單、戰鬥都改成全螢幕，不會再被網頁標題擠到、也不用上下捲動才找得到按鈕'],['調整','手機直立時畫面稍微拉遠，看得到更多從旁邊衝過來的怪物'],['調整','戰鬥上方的金幣／裝備／卡片和魔王倒數不會再重疊；小地圖跟著往下移'],['修正','長按畫面不會再跳出選單或選取文字，連點按鈕不會放大畫面'],['新增','可以「加入主畫面」：用手機瀏覽器的分享選單加到主畫面，打開就是全螢幕的 App']]},
@@ -1587,8 +1610,9 @@ function render(){
       if(w.s.k==='sanct'){ctx.globalAlpha=.35;rr(ctx,p.x-4,p.y-Rr*.6,8,Rr*1.2,3,w.s.c);rr(ctx,p.x-Rr*.6,p.y-4,Rr*1.2,8,3,w.s.c)}
       for(let i=0;i<8;i++){const a=t*1.5+i*TAU/8;ctx.globalAlpha=.8;circ(ctx,p.x+Math.cos(a)*Rr,p.y+Math.sin(a)*Rr,3,w.s.c)}ctx.restore()}
     for(const z of G.Z)drawGroundZ(z,t);
-    for(const j of G.J)drawGem(j,t);
-    const L=G.E.slice().sort((a,b)=>a.y-b.y);let drawn=false;
+    const cxl=cx-W/S/2-60,cxr=cx+W/S/2+60,cyt=cy-H/S/2-80,cyb=cy+H/S/2+60,inV=(x,y)=>x>cxl&&x<cxr&&y>cyt&&y<cyb;
+    for(const j of G.J)if(inV(j.x,j.y))drawGem(j,t);
+    const L=G.E.filter(e=>e.boss||inV(e.x,e.y)).sort((a,b)=>a.y-b.y);let drawn=false;
     for(const e of L){if(!drawn&&e.y>p.y){drawPlayer();drawn=true}drawEnemy(ctx,e,t)}
     if(!drawn)drawPlayer();
     if(G.pet)drawPet(ctx,G.pet.id,G.pet.x,G.pet.y,t);
@@ -1597,14 +1621,14 @@ function render(){
       else if(x0.axe){ctx.save();ctx.translate(x,y);ctx.rotate(t*12);rr(ctx,-1.5,-11,3,22,1,'#8a5a2b');ctx.beginPath();ctx.moveTo(1,-11);ctx.quadraticCurveTo(13,-7,9,2);ctx.lineTo(1,-2);ctx.closePath();ctx.fillStyle=w.s.c;ctx.fill();ctx.restore()}
       else if(x0.drone){rr(ctx,x-8,y-4,16,8,3,'#5a6a7a');circ(ctx,x,y,2.5,'#ff5a5a');ctx.fillStyle='rgba(200,230,255,.6)';ell(ctx,x-9,y-6,6,1.5,Math.sin(t*40),'rgba(200,230,255,.7)');ell(ctx,x+9,y-6,6,1.5,-Math.sin(t*40),'rgba(200,230,255,.7)')}
       else{ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.4;circ(ctx,x,y,15,w.s.c);ctx.globalAlpha=1;if(x0.star){ctx.translate(x,y);ctx.rotate(t*3);ctx.beginPath();for(let q=0;q<10;q++){const r=q%2?4:10,aa=q*Math.PI/5;ctx.lineTo(Math.cos(aa)*r,Math.sin(aa)*r)}ctx.closePath();ctx.fillStyle=w.s.c;ctx.fill()}else{circ(ctx,x,y,8,w.s.c);circ(ctx,x-2,y-2,3.5,'#fff8e0')}ctx.restore()}}}
-    for(const b of G.P)drawProj(b);
+    for(const b of G.P)if(b.x>cxl-250&&b.x<cxr+250&&b.y>cyt-250&&b.y<cyb+250)drawProj(b);
     for(const b of G.B){const bc=b.web?'#e8e0ff':b.fire?'#ff6a2e':b.ice?'#bfefff':'#a0662e';circ(ctx,b.x,b.y,b.r+3,b.web?'rgba(200,180,255,.45)':b.fire?'rgba(255,160,60,.5)':b.ice?'rgba(160,220,255,.5)':'rgba(255,211,90,.5)');circ(ctx,b.x,b.y,b.r,bc);circ(ctx,b.x-2,b.y-2,2,'#fff')}
     if(G.boss&&G.boss.wind>0){ctx.globalAlpha=.4;ctx.strokeStyle='#ff3a3a';ctx.lineWidth=G.boss.r*1.4;const a=Math.atan2(G.p.y-G.boss.y,G.p.x-G.boss.x);ctx.beginPath();ctx.moveTo(G.boss.x,G.boss.y);ctx.lineTo(G.boss.x+Math.cos(a)*420,G.boss.y+Math.sin(a)*420);ctx.stroke();ctx.globalAlpha=1}
     for(const z of G.Z)drawAirZ(z,t);
-    for(const f of G.FX)if(f.k==='chunk'){ctx.globalAlpha=Math.min(1,f.life/f.max*1.5);rr(ctx,f.x-f.s/2,f.y-f.s/2,f.s,f.s,1,f.c);ctx.globalAlpha=1}
-    ctx.save();ctx.globalCompositeOperation='lighter';for(const f of G.FX)if(f.k!=='chunk')drawFX(f);ctx.restore();
+    for(const f of G.FX)if(f.k==='chunk'&&inV(f.x,f.y)){ctx.globalAlpha=Math.min(1,f.life/f.max*1.5);rr(ctx,f.x-f.s/2,f.y-f.s/2,f.s,f.s,1,f.c);ctx.globalAlpha=1}
+    ctx.save();ctx.globalCompositeOperation='lighter';for(const f of G.FX)if(f.k!=='chunk'&&(f.x===undefined||inV(f.x,f.y)||f.R>200))drawFX(f);ctx.restore();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.55)';
-    for(const t2 of G.TX){const pop=1+Math.max(0,t2.life-(t2.max-.12))*(t2.big?7:4);ctx.save();ctx.translate(t2.x,t2.y);ctx.scale(pop,pop);ctx.font=t2.big?'900 21px Fredoka, "Noto Sans TC", sans-serif':'700 15px Fredoka, sans-serif';ctx.globalAlpha=Math.min(1,t2.life*3);ctx.strokeText(t2.s,0,0);ctx.fillStyle=t2.c;ctx.fillText(t2.s,0,0);ctx.restore()}
+    for(const t2 of G.TX){if(!inV(t2.x,t2.y))continue;const pop=1+Math.max(0,t2.life-(t2.max-.12))*(t2.big?7:4);ctx.save();ctx.translate(t2.x,t2.y);ctx.scale(pop,pop);ctx.font=t2.big?'900 21px Fredoka, "Noto Sans TC", sans-serif':'700 15px Fredoka, sans-serif';ctx.globalAlpha=Math.min(1,t2.life*3);ctx.strokeText(t2.s,0,0);ctx.fillStyle=t2.c;ctx.fillText(t2.s,0,0);ctx.restore()}
     ctx.globalAlpha=1;
   }
   ctx.restore();
@@ -2038,7 +2062,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
- if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,p.nap&&!p.mv);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
+ if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit});if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
  drawBalls(c);
@@ -2053,10 +2077,10 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  if(TP.near&&!TP.near.exit){const a=TP.near;c.globalAlpha=.5+.3*Math.sin(t*6);c.strokeStyle='#fff6b0';c.lineWidth=3;c.beginPath();c.ellipse(a.x,a.y+(a.n?(a.r||0):0)+4,26,9,0,0,TAU);c.stroke();c.globalAlpha=1}
  if(TP.tgt){c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.ellipse(TP.tgt[0],TP.tgt[1],10,4,0,0,TAU);c.stroke();c.globalAlpha=1}
  c.restore()}
-function drawTownPlayer(c,t){drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2,NET.me.nap&&!inHouse);if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
+function drawTownPlayer(c,t){drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2,{nap:(NET.me.nap&&!inHouse)||(inHouse&&TP.idle>4),sit:NET.me.sit});if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
  if(SV.pet&&PM[SV.pet]){TP.px=(TP.px===undefined?TP.x:TP.px)+((TP.x-TP.face*26)-(TP.px===undefined?TP.x:TP.px))*.08;TP.py=(TP.py===undefined?TP.y:TP.py)+((TP.y+8)-(TP.py===undefined?TP.y:TP.py))*.08;drawPet(c,SV.pet,TP.px,TP.py,t)}
  if(TP.heart>0){c.globalAlpha=Math.min(1,TP.heart);heart(c,TP.x,TP.y-34-(1.2-TP.heart)*10,4,'#ff5a7a');c.globalAlpha=1}
- if(inHouse&&TP.idle>2.5){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',TP.x+12,TP.y-28-Math.sin(t)*3);c.globalAlpha=1}}
+}
 const petWander={};
 function renderHouse(c,t){const h=curHome(),hb=houseBounds(),T=hb.T,wall=(WALLS.find(w=>w[0]===h.wall)||WALLS[0])[2],floor=(FLOORS.find(f=>f[0]===h.floor)||FLOORS[0])[2];
  c.fillStyle='#2a1e18';c.fillRect(0,0,W,H);const sc=Math.min(S*1.25,(W-20)/(hb.x1-hb.x0+40),(H-150)/(hb.y1-hb.y0+110));c.save();c.translate(W/2,H/2+30);c.scale(sc,sc);
@@ -2067,7 +2091,7 @@ function renderHouse(c,t){const h=curHome(),hb=houseBounds(),T=hb.T,wall=(WALLS.
  if(houseEdit){c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;for(let gx=0;gx<=hb.L.w;gx++)lineP(c,[[hb.x0+gx*T,hb.y0],[hb.x0+gx*T,hb.y1]],'rgba(255,255,255,.35)',1);for(let gy=0;gy<=hb.L.h;gy++)lineP(c,[[hb.x0,hb.y0+gy*T],[hb.x1,hb.y0+gy*T]],'rgba(255,255,255,.35)',1)}
  const ds=[];for(const it of h.items){if(!FM[it.f])continue;const fx=hb.x0+(it.x+.5)*T,fy=hb.y0+(it.y+.5)*T;ds.push({y:fy-(it.f.startsWith('rug')?100:0),f:()=>drawFurn(c,it.f,fx,fy,t)})}
  const pets=VISIT?VISIT.h.pets:Object.keys(SV.pets||{}).filter(id=>PM[id]&&id!==SV.pet).slice(0,4);
- if(VISIT){const hx=hb.x0+T*1.2,hy=hb.y1-T*1.2;ds.push({y:hy,f:()=>{drawEmoteDog(c,VISIT.h.sk,VISIT.h.j,hx,hy,t,1,false,VISIT.h.w,null,1.2,true);c.font='700 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='#fff6b0';c.fillText(`${VISIT.n}（睡午覺中）`,hx,hy-34)}})}
+ if(VISIT){const hx=hb.x0+T*1.2,hy=hb.y1-T*1.2;ds.push({y:hy,f:()=>{drawEmoteDog(c,VISIT.h.sk,VISIT.h.j,hx,hy,t,1,false,VISIT.h.w,null,1.2,{nap:true});c.font='700 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='#fff6b0';c.fillText(`${VISIT.n}（睡午覺中）`,hx,hy-34)}})}
  if(!VISIT&&MYVIS&&MYVIS.length)for(let q=0;q<Math.min(8,MYVIS.length);q++){const px=-30+(q%4)*20+(q>3?10:0),py=hb.y1-14-(q>3?14:0);for(const [ox,oy,r] of [[0,0,3],[-3,-4,1.3],[0,-5,1.3],[3,-4,1.3]])circ(c,px+ox,py+oy,r,'rgba(120,80,50,.45)')}pets.forEach((id,i)=>{const w=petWander[id]=petWander[id]||{x:R(hb.x0+20,hb.x1-20),y:R(hb.y0+20,hb.y1-20),tx:0,ty:0,w:0};w.w-=1/60;if(w.w<=0){w.tx=R(hb.x0+20,hb.x1-20);w.ty=R(hb.y0+20,hb.y1-20);w.w=2+Math.random()*4}const dx=w.tx-w.x,dy=w.ty-w.y,d=Math.hypot(dx,dy);if(d>2){w.x+=dx/d*.6;w.y+=dy/d*.6}ds.push({y:w.y,f:()=>drawPet(c,id,w.x,w.y,t+i)})});
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
  if(houseEdit&&houseSel&&townPtr&&townPtr.hover){const [gx,gy]=townPtr.hover;c.globalAlpha=.55;drawFurn(c,houseSel,hb.x0+(gx+.5)*T,hb.y0+(gy+.5)*T,t);c.globalAlpha=1}
@@ -2104,8 +2128,8 @@ function cleanPeer(m){const w={};for(const k in (m.w||{}))if(CSM[m.w[k]]&&CSM[m.
 const clampX=v=>Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,+v||0)),clampY=v=>Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,+v||0));
 function netPeers(list){const seen=new Set();let fresh=false;for(const m of list){seen.add(m.id);let p=NET.peers.get(m.id);const c=cleanPeer(m);if(!p){fresh=true;p={id:m.id,x:clampX(m.x),y:clampY(m.y),tx:clampX(m.x),ty:clampY(m.y),face:1,mv:false,em:null,say:null,heart:0};NET.peers.set(m.id,p)}Object.assign(p,c)}for(const id of [...NET.peers.keys()])if(!seen.has(id))NET.peers.delete(id);if(NET.menu&&!NET.peers.has(NET.menu))closePeerMenu();if(fresh&&NET.ctl)NET.force=.3+Math.random()*1.2;netChip()}
 function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.n))return;
- if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if(p.nap&&Math.hypot(tx-p.x,ty-p.y)>10)p.nap=false;if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
- else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};if(d.e==='nap')p.nap=true;if(d.e==='howl'){p.howlT=townT;howlCheck()}}
+ if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if((p.nap||p.sit)&&Math.hypot(tx-p.x,ty-p.y)>10){p.nap=false;p.sit=false}if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
+ else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};if(d.e==='nap'){p.nap=true;p.sit=false}if(d.e==='sit'){p.sit=true;p.nap=false}if(d.e==='howl'){p.howlT=townT;howlCheck()}}
  else if(ev==='ball'){if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b))NET.balls.push({id:String(d.b).slice(0,60),owner:d.id,x0:clampX(d.x),y0:clampY(d.y),tx:clampX(d.tx),ty:clampY(d.ty),t:0,dur:.7,taken:null})}
  else if(ev==='grab'){const b=NET.balls.find(x=>x.id===d.b);if(b)ballTaken(b,d.id)}
  else if(ev==='inv'){if(d.to!==myId())return;if(SV.dnd||NET.walk){NET.ctl.send('acc',{to:d.id,k:'walk',ok:false});return}showInvite(d.id)}
@@ -2113,7 +2137,7 @@ function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[
  else if(ev==='unwalk'){if(d.to===myId()&&NET.walk){NET.walk=null;townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}}
  else if(ev==='gift'){if(d.to===myId())gotGift(p)}
  else if(ev==='say'&&PHRASES[d.k|0])p.say={k:d.k|0,t:0};
- else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};if(me){friendGain(p.id,p.n,1);TP.heart=1.4;townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.heart=1.4}}
+ else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};p.face=(me?TP.x:tg.x)>p.x?1:-1;if(me){NET.me.em={e:d.a==='pat'?'patted':'sniffed',t:0};NET.me.nap=false;friendGain(p.id,p.n,1);townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.em={e:d.a==='pat'?'patted':'sniffed',t:0}}}
 async function netConnect(){if(NET.busy)return;NET.busy=true;NET.status='connecting';netChip();
  try{NET.ctl=await DogCloud.joinTown(netMeta(),{onPeers:netPeers,onEvent:netEvent,onState:s=>{if(s==='error'){NET.status='error';NET.err='連線中斷，重新連線中…';NET.retry=5;netDrop()}}});NET.status='on';NET.err='';NET.lastDest=[TP.x,TP.y];NET.mk=netKey()}
  catch(e){NET.status='error';NET.err=e.message||String(e);NET.retry=30}
@@ -2124,6 +2148,7 @@ function netLife(dt){const want=SV.breed&&netCan()&&!document.hidden&&(state==='
  else if(NET.ctl){NET.away+=dt;if(NET.away>(document.hidden?2:20)){NET.status='off';netDrop()}}
  else if(!netCan()&&NET.status!=='guest'){NET.status='guest';netChip()}}
 function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;updateBalls(dt);if(!inHouse)napCheck(dt);
+ if(NET.pend){const pd=NET.pend,pp=NET.peers.get(pd.id);pd.t-=dt;if(!pp||pd.t<=0)NET.pend=null;else{const sp=interactSpot(pp,pd.a);if(Math.hypot(sp[0]-TP.x,sp[1]-TP.y)<=16){TP.tgt=null;netInteract(pd.id,pd.a,true)}else if(!TP.tgt)NET.pend=null;else TP.tgt=sp}}
  if(NET.inv){NET.inv.t-=dt;if(NET.inv.t<=0||!NET.peers.has(NET.inv.from)){NET.inv=null;$('invpop').classList.add('hide')}}
  if(NET.walk){const w=NET.walk,me=myId(),other=w.leader===me?w.follower:w.leader,o=NET.peers.get(other);if(!o||inHouse||!NET.ctl){NET.walk=null;townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}else{w.t+=dt;if(w.t>=60){w.t=0;friendGain(o.id,o.n,1)}
    if(w.follower===me){const kx=(keys.has('d')||keys.has('arrowright')||keys.has('a')||keys.has('arrowleft')||keys.has('w')||keys.has('arrowup')||keys.has('s')||keys.has('arrowdown'));if(kx)endWalk(true);else{const fx2=o.x-(o.face||1)*40,fy2=o.y+4;if(Math.hypot(fx2-TP.x,fy2-TP.y)>18){TP.tgt=[fx2,fy2];TP.go=null}}}}}
@@ -2134,10 +2159,11 @@ function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;updateBalls(dt);if(
  if(!NET.ctl||state!=='town')return;NET.sendT-=dt;if(NET.sendT>0)return;NET.sendT=.7;
  let dest;if(TP.go)dest=[TP.go.x,TP.go.y+(TP.go.n?(TP.go.r||30):18)];else if(TP.tgt)dest=TP.tgt;else if(TP.mv){const ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup')),m=Math.hypot(ix,iy)||1;dest=[TP.x+ix/m*140,TP.y+iy/m*140]}else dest=[TP.x,TP.y];
  dest=[Math.round(clampX(dest[0])),Math.round(clampY(dest[1]))];const L=NET.lastDest;if(!L||Math.hypot(dest[0]-L[0],dest[1]-L[1])>28||(!TP.mv&&Math.hypot(TP.x-L[0],TP.y-L[1])>10)){if(!TP.mv)dest=[Math.round(TP.x),Math.round(TP.y)];NET.lastDest=dest;NET.ctl.send('mv',{tx:dest[0],ty:dest[1]})}}
-function netEmote(e){if(e==='ball'){throwBall();return}if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};if(e==='nap'){NET.me.nap=true;NET.napDone=false}if(e==='howl'){NET.me.howlT=townT;setTimeout(howlCheck,60)}sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
+function netEmote(e){if(e==='ball'){throwBall();return}if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};if(e==='nap'){NET.me.nap=true;NET.me.sit=false;NET.napDone=false}if(e==='sit'){NET.me.sit=true;NET.me.nap=false}if(e==='howl'){NET.me.howlT=townT;setTimeout(howlCheck,60)}sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
 function netSay(k){if(NET.sayCd>0)return;NET.sayCd=3;NET.me.say={k,t:0};sfx('ui');if(NET.ctl)NET.ctl.send('say',{k});closeEmoteBar()}
-function netInteract(id,a){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}if(Math.hypot(p.x-TP.x,p.y-TP.y)>120){TP.tgt=[p.x-30*Math.sign(p.x-TP.x||1),p.y];TP.go=null;townFx.push({x:TP.x,y:TP.y-46,s:'先走近一點',life:1.2});return}
- NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};p.heart=1.4;sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
+function interactSpot(p,a){const pf=p.face||1;return a==='sniff'?[p.x-pf*26,p.y+1]:[p.x+pf*30,p.y]}
+function netInteract(id,a,arrived){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}const sp=interactSpot(p,a);if(!arrived&&Math.hypot(sp[0]-TP.x,sp[1]-TP.y)>16){NET.pend={id,a,t:6};TP.tgt=sp;TP.go=null;closePeerMenu();return}NET.pend=null;
+ NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};NET.me.sit=false;NET.me.nap=false;p.em={e:a==='pat'?'patted':'sniffed',t:0};sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
 function netChip(){const el=$('netchip');if(!el)return;const s=NET.status;el.classList.toggle('hide',!(state==='town'));
  el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?'登入帳號後，就能在主城看到其他玩家':s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
 function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n),fr=(SV.friends||{})[id],L=fr?flv(fr.p):0,walking=NET.walk&&(NET.walk.leader===id||NET.walk.follower===id);
@@ -2159,16 +2185,32 @@ function closeEmoteBar(){const el=$('emoteb');if(el)el.classList.add('hide')}
 function emoteClick(e){if(e.target.id==='dndChk'){SV.dnd=e.target.checked;save();netRetrack();return}if(e.target.id==='hidePeersChk'){SV.hidePeers=e.target.checked;save();return}
  const b=e.target.closest('button');if(!b)return;const d=b.dataset;if(d.etab){ebMode='';openEmoteBar(d.etab);return}if(d.visit){visitHome(d.visit,d.vn);return}if(d.gift){sendGift(d.gift);openEmoteBar('friends');return}if(d.foot!==undefined){leaveFootprint(+d.foot);return}if(d.em)netEmote(d.em);else if(d.say!==undefined)netSay(+d.say)}
 /* drawing a dog with emote animation */
-function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc,nap){c.save();c.translate(x,y);let f=face,ry=nap?.74:1,rot=0,dx=0;
- if(em){const k=em.t/1.4;if(em.e==='roll')rot=k*TAU*face;else if(em.e==='spin')f=Math.floor(em.t*10)%2?1:-1;else if(em.e==='sit')ry=.82;else if(em.e==='wag'||em.e==='pat')dx=Math.sin(em.t*30)*1.5;else if(em.e==='sniff')dx=Math.sin(em.t*8)*4}
- c.translate(dx,0);if(rot){c.translate(0,-6);c.rotate(rot);c.translate(0,6)}c.scale(sc,sc*ry);if(ry<1)c.translate(0,3);drawDog(c,sk,j,0,0,nap?t*.3:t,f,mv,wear);c.restore();
- if(nap){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',x+12,y-26-Math.sin(t)*3);c.globalAlpha=1}
- if(em){c.textAlign='center';const k=em.t/1.4,al=Math.min(1,(1.4-em.t)*3);c.globalAlpha=al;
-   if(em.e==='bark'){c.font='900 16px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText('汪！',x+face*22,y-30-k*8);c.fillStyle='#fff6b0';c.fillText('汪！',x+face*22,y-30-k*8)}
-   else if(em.e==='heart'||em.e==='pat'){for(let q=0;q<3;q++)heart(c,x-12+q*12,y-34-k*18-q*4,4,'#ff5a7a')}
-   else if(em.e==='wag'){c.font='900 14px Fredoka,sans-serif';c.fillStyle='#fff';c.fillText('♪',x-face*20,y-24-k*10)}
-   else if(em.e==='howl'){c.font='900 14px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText('嗷嗚～',x,y-34-k*10);c.fillStyle='#d8ecff';c.fillText('嗷嗚～',x,y-34-k*10)}
-   else if(em.e==='sniff'){c.font='900 13px "Noto Sans TC",sans-serif';c.fillStyle='#fff';c.fillText('嗅嗅',x+face*20,y-28-k*8)}
+function emotePose(st,em,mv){const P={};
+ if(!mv){if(st&&st.nap){P.legs='lie';P.drop=6;P.head=.32;P.hy=2.5;P.eyes='closed';P.tr=.9;P.ta=.04;P.tw=1.5}
+  else if(st&&st.sit){P.legs='sit';P.body=-.42;P.drop=1.5;P.tr=.95;P.ta=.12;P.tw=6}}
+ if(!em||mv)return P;const k=em.t,e=em.e,io=Math.min(1,k/.2)*Math.min(1,Math.max(0,(1.4-k)/.2));
+ if(e==='wag'){P.tw=34;P.ta=.7;P.eyes='happy';P.body=(P.body||0)+Math.sin(k*34)*.05*io;P.earFlap=Math.sin(k*20)*.15}
+ else if(e==='bark'){const pulse=Math.max(0,Math.sin(k*Math.PI*3.2));P.mouth=pulse;P.head=(P.head||0)-.22*pulse;P.drop=(P.drop||0)-pulse*2.2;P.earFlap=-pulse*.25;P.tw=18;P.ta=.4}
+ else if(e==='howl'){P.legs='sit';P.body=-.42;P.drop=1.5;P.head=-1.0*io;P.mouth=.7*io+Math.sin(k*9)*.08;P.eyes='closed';P.tr=.95;P.ta=.04}
+ else if(e==='heart'){P.legs='bow';P.body=.3*io;P.drop=1.2*io;P.tw=30;P.ta=.65;P.tr=-.6*io;P.eyes='happy';P.head=-.15*io}
+ else if(e==='roll'){if(k<.2){P.legs='lie';P.drop=6*k/.2}else if(k<1.2){const a=Math.min(1,(k-.2)/.18)*Math.min(1,(1.2-k)/.18);P.legs='up';P.flip=Math.PI*.92*a;P.drop=6;P.wig=Math.sin(k*26);P.eyes='happy';P.mouth=.35*a;P.ta=.5;P.tw=20}else{P.legs='lie';P.drop=6*(1.4-k)/.2}}
+ else if(e==='sniff'){P.head=.42*io;P.hy=2*io;P.nose=Math.sin(k*42)*.5;P.tw=26;P.ta=.55}
+ else if(e==='pat'){P.legs='sit';P.body=-.36*io;P.drop=1.2*io;P.lift=io*(.7+.3*Math.sin(k*16));P.eyes='happy';P.tw=16;P.ta=.3}
+ else if(e==='patted'){P.eyes='closed';P.head=.16*io;P.tw=30;P.ta=.65;P.drop=1*io}
+ else if(e==='sniffed'){P.tw=28;P.ta=.6;P.head=-.12*io;P.eyes='happy'}
+ return P}
+function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc,st){c.save();let f=face,ox=0,oy=0,run=mv;
+ if(em&&em.e==='spin'&&!mv){const a=em.t/1.4*TAU*1.6;ox=Math.cos(a)*12;oy=Math.sin(a)*5;f=-Math.sin(a)>=0?1:-1;run=true}
+ const P=emotePose(st,em,mv);if(em&&em.e==='spin'&&!mv){P.head=.35;P.tw=30;P.ta=.6}
+ c.translate(x+ox,y+oy);c.scale(sc,sc);drawDog(c,sk,j,0,0,t,f,run,wear,P);c.restore();
+ if(st&&st.nap&&!mv){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';for(let q=0;q<3;q++){const ph=(t*.5+q/3)%1;c.globalAlpha=Math.sin(ph*Math.PI);c.fillText('z',x+face*10+ph*10,y-18-ph*20)}c.globalAlpha=1}
+ if(em&&!mv){c.textAlign='center';const k=em.t/1.4,al=Math.min(1,(1.4-em.t)*3);c.globalAlpha=al;
+   if(em.e==='bark'){const pulse=Math.max(0,Math.sin(em.t*Math.PI*3.2));if(pulse>.3){c.font='900 15px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText('汪！',x+face*24,y-26);c.fillStyle='#fff6b0';c.fillText('汪！',x+face*24,y-26)}}
+   else if(em.e==='heart'){heart(c,x+face*6,y-34-k*16,4.5,'#ff5a7a')}
+   else if(em.e==='patted'){heart(c,x,y-36-k*14,4,'#ff5a7a');heart(c,x+10,y-30-k*20,3,'#ff8aa0')}
+   else if(em.e==='howl'&&em.t>.3){c.font='900 13px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.4)';c.strokeText('嗷嗚～',x+face*18,y-44-k*8);c.fillStyle='#d8ecff';c.fillText('嗷嗚～',x+face*18,y-44-k*8)}
+   else if(em.e==='sniff'){c.font='700 11px "Noto Sans TC",sans-serif';c.fillStyle='#fff';c.fillText('嗅嗅',x+face*26,y-6-k*6)}
+   else if(em.e==='wag'){c.font='900 13px Fredoka,sans-serif';c.fillStyle='#fff';c.fillText('♪',x-face*22,y-22-k*10)}
    c.globalAlpha=1}}
 function drawBubble(c,x,y,txt,al){c.globalAlpha=al;c.font='700 13px "Noto Sans TC",sans-serif';const w=c.measureText(txt).width+16;rr(c,x-w/2,y-22,w,22,10,'#ffffff');tri(c,x-5,y,x+5,y,x,y+6,'#ffffff');c.fillStyle='#3a2a1a';c.textAlign='center';c.fillText(txt,x,y-6);c.globalAlpha=1}
 
@@ -2197,7 +2239,7 @@ function updateBalls(dt){NET.ballCd=(NET.ballCd||0)-dt;for(let i=NET.balls.lengt
 function drawBalls(c){for(const b of NET.balls){let x,y,h;if(b.taken){const me=b.taken===(myId()||'me'),p=me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(b.taken);if(!p)continue;x=p.x+(p.face||1)*16;y=p.y-2;h=0}else{const k=Math.min(1,b.t/b.dur);x=b.x0+(b.tx-b.x0)*k;y=b.y0+(b.ty-b.y0)*k;h=Math.sin(k*Math.PI)*60*(1-Math.max(0,b.t-b.dur));if(k>=1){h=Math.abs(Math.sin((b.t-b.dur)*9))*6*Math.max(0,1-(b.t-b.dur))}}
   shadow(c,x,y+6,6,2.4);circ(c,x,y-h,5.5,'#ff5a5a');lineP(c,[[x-5.5,y-h],[x+5.5,y-h]],'#fff',1.2);if(!b.taken&&b.t>=b.dur){c.globalAlpha=.4+.3*Math.sin(townT*8);c.strokeStyle='#fff6b0';c.lineWidth=2;c.beginPath();c.ellipse(x,y+6,12,5,0,0,TAU);c.stroke();c.globalAlpha=1}}}
 /* nap & howl */
-function napCheck(dt){if(NET.me.nap&&TP.mv){NET.me.nap=false}if(!NET.me.nap){NET.napT=0;return}const near=[...NET.peers.values()].filter(p=>p.nap&&Math.hypot(p.x-TP.x,p.y-TP.y)<130);if(!near.length){NET.napT=Math.max(0,(NET.napT||0)-dt);return}NET.napT=(NET.napT||0)+dt;
+function napCheck(dt){if(TP.mv){NET.me.nap=false;NET.me.sit=false}if(!NET.me.nap){NET.napT=0;return}const near=[...NET.peers.values()].filter(p=>p.nap&&Math.hypot(p.x-TP.x,p.y-TP.y)<130);if(!near.length){NET.napT=Math.max(0,(NET.napT||0)-dt);return}NET.napT=(NET.napT||0)+dt;
   if(NET.napT>=20&&!NET.napDone){NET.napDone=true;for(const p of near)friendGain(p.id,p.n,2);if(!socReward('nap','一起睡了個好覺！'))townFx.push({x:TP.x,y:TP.y-60,s:'一起睡了個好覺～',life:2})}}
 function howlCheck(){const now=townT,me=NET.me.howlT||-99;if(now-me>3)return;const ps=[...NET.peers.values()].filter(p=>now-(p.howlT||-99)<3&&Math.hypot(p.x-TP.x,p.y-TP.y)<280);if(!ps.length)return;const n=ps.length+1;townFx.push({x:TP.x,y:TP.y-70,s:`汪汪合唱 ×${n}！`,life:2});for(const p of ps)friendGain(p.id,p.n,1);if(n>=3)socReward('howl','大合唱成功！')}
 /* gifts */
@@ -2221,9 +2263,12 @@ function visitorsHTML(){if(!MYVIS)return '<p class="note">登入帳號後，可�
  return `<div class="frl">${MYVIS.map(v=>`<div class="fr"><div><b>${esc(v.visitor_name||'狗狗')}</b><small>${esc(String(v.day))}　🐾 「${PHRASES[v.phrase]||''}」</small></div></div>`).join('')}</div>`}
 
 /* ---------- loop ---------- */
-function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
+const QL={lvl:0,avg:16,bad:0,good:0};
+function qualityTick(dt){if(state!=='play'){QL.bad=QL.good=0;return}const ms=dt*1000;QL.avg=QL.avg*.95+ms*.05;if(QL.avg>23){QL.bad+=dt;QL.good=0}else if(QL.avg<15){QL.good+=dt;QL.bad=0}else{QL.bad=Math.max(0,QL.bad-dt);QL.good=0}
+  if(QL.bad>1.2&&QL.lvl<3){QL.lvl++;QL.bad=0;QL.avg=16;resize()}else if(QL.good>8&&QL.lvl>0){QL.lvl--;QL.good=0;resize()}}
+function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1)*[1,.8,.65,.5][QL.lvl]);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
-function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.max(0,flash-dt);
+function loop(now){const rawDt=(now-last)/1000,dt=Math.min(.05,rawDt);last=now;if(rawDt<.25)qualityTick(rawDt);flash=Math.max(0,flash-dt);
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
   netLife(dt);{const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv){renderTownUI();netRetrack()}else{closeEmoteBar();closePeerMenu()}}if(tv&&$('netchip').classList.contains('hide')===(state==='town'))netChip()}
   if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
