@@ -19,7 +19,7 @@ body{margin:0;background:radial-gradient(1200px 500px at 50% -10%,#24502f,transp
 h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:var(--gold);text-shadow:0 3px 0 #0a1a10}
 .top p{margin:6px 0 0;color:var(--mute);font-size:14px}
 .cab{background:linear-gradient(#7a5535,#5a3c24);padding:10px;border-radius:22px;box-shadow:0 18px 40px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.18)}
-.frame{position:relative;height:min(74vh,660px);min-height:400px;border-radius:14px;overflow:hidden;background:#5a9a46;outline:none;box-shadow:inset 0 0 0 3px rgba(0,0,0,.35)}
+.frame{position:relative;height:min(calc(100svh - 40px),660px);min-height:380px;border-radius:14px;overflow:hidden;background:#5a9a46;outline:none;box-shadow:inset 0 0 0 3px rgba(0,0,0,.35)}
 #cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
 .ov{position:absolute;inset:0;display:grid;place-items:center;background:rgba(8,22,14,.62);padding:14px;overflow:auto}
 .hide{display:none!important}
@@ -65,6 +65,14 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
 .dc i{font-style:normal;font:700 12px "Noto Sans TC",sans-serif;color:#10261a;background:var(--gold);border-radius:20px;padding:0 8px}
 .dc strong{font-size:16px}.dc small{font-size:13px;color:var(--mute)}.dc em{font-style:normal;font-size:13px;color:#9be36b}
 @media(max-width:560px){.frame{height:70vh}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){body.playing{overflow:hidden}body.playing .cab{position:fixed;inset:0;z-index:50;border-radius:0;padding:0}body.playing .frame{height:100%;min-height:0;border-radius:0}}
+.num{flex:none;font:700 13px Fredoka,sans-serif;color:#8a7a5a;border:1.5px solid #d8c99a;border-radius:6px;padding:0 6px}
+.jb .num{justify-self:start}
+.jb .next{font-size:12px;color:#8a7a5a}
+.plist{display:grid;gap:6px;text-align:left;margin:0 0 14px;max-height:42vh;overflow:auto}
+.plist div{display:flex;gap:10px;align-items:center;font-size:14px}
+.plist b{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font:900 15px "Noto Sans TC",sans-serif;color:#1b1408}
+.plist small{display:block;color:#6b5a40;font-size:13px}
 @media(prefers-reduced-motion:reduce){.ch,.jb{transition:none}.ch:hover,.jb:hover{transform:none}}
 </style>
 </head>
@@ -76,18 +84,19 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <canvas id="cv"></canvas>
       <div id="joy" class="joy hide"><i></i></div>
       <button id="pbtn" class="pbtn hide" aria-label="暫停">II</button>
-      <div class="ov" id="menu"><div class="card"><canvas id="menuDog" width="400" height="300"></canvas><p class="cap" id="menuCap"></p><h2>從柴犬幼犬開始</h2><p class="lead">一路升級轉職，變成各種不同的狗狗。</p><p class="steps">Lv5 一轉 · Lv10 二轉 · Lv16 進階二轉 · Lv22 三轉</p><button class="btn" id="startBtn">開始冒險</button><p class="best" id="best"></p></div></div>
+      <div class="ov" id="menu"><div class="card"><canvas id="menuDog" width="400" height="300"></canvas><p class="cap">幼犬見習生 · 柴犬</p><h2>從柴犬幼犬開始</h2><p class="lead">一路升級轉職，變成各種不同的狗狗。</p><p class="steps">Lv5 一轉 · Lv10 二轉 · Lv16 進階二轉 · Lv22 三轉</p><button class="btn" id="startBtn">開始冒險</button><p class="best" id="best"></p></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p></div></div>
-      <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職時間！</h2><div id="jobs" class="jobs"></div><p class="hint">轉職會回滿生命，並學會新技能</p></div></div>
-      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">回到選單</button></div></div>
+      <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職時間！</h2><div id="jobs" class="jobs"></div><p class="hint">按數字鍵或點選。轉職會回滿生命，並學會新技能</p></div></div>
+      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">回到選單</button></div></div>
       <div class="ov hide" id="over"><div class="card"><h2 id="ovT"></h2><div class="stats" id="ovS"></div><button class="btn" id="again">再玩一次</button><button class="btn ghost" id="tomenu">回到選單</button></div></div>
     </div>
   </div>
   <section class="how">
     <h2>怎麼玩</h2>
     <ul>
-      <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵移動；手機按住畫面拖曳就是搖桿。</li>
-      <li>技能會自動施放，你只要走位閃怪、撿寶石升級。</li>
+      <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向鍵移動，也可以按住滑鼠讓狗狗跟著游標走；手機按住畫面任何地方拖曳就是搖桿。</li>
+      <li>技能會自動瞄準最近的敵人。暫停畫面可以看到目前所有技能的說明。</li>
+      <li>你只要走位閃怪、撿寶石升級；升級時按 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 或點選項。</li>
       <li>到 Lv5、10、16、22 會轉職，換成新的狗狗並學會招牌技能。</li>
       <li>每分鐘出現一隻金框菁英怪，7:00 古樹王登場，打倒它就獲勝。<kbd>P</kbd> 或 <kbd>Esc</kbd> 暫停。</li>
     </ul>
@@ -216,7 +225,7 @@ const JOBS=[
 ['gun4','傳奇槍神','chihuahua','gs',4,'gun3','meteor','火力全開','#ff5a3a','cowboy','小小的傳奇，名震整個荒野']];
 const JM={};for(const r of JOBS)JM[r[0]]={id:r[0],n:r[1],b:r[2],line:r[3],tier:r[4],p:r[5],k:r[6],sk:r[7],c:r[8],acc:r[9],why:r[10],x:r[11]||{}};
 const kids=id=>JOBS.filter(r=>r[5]===id).map(r=>r[0]);
-const JL=[1,5,10,16,22],TIERN=['見習','一轉','二轉','進階二轉','三轉'],TM=[.8,1,1.35,1.8,2.4];
+const JL=[1,5,10,16,22],TIERN=['見習','一轉','二轉','進階二轉','三轉'],TM=[1,1.1,1.4,1.85,2.4];
 const LINES=[['sw','劍士系','勇猛的工作犬與護衛犬'],['mg','魔法師系','最聰明的狗狗們'],['ar','弓手系','嗅覺與視覺敏銳的獵犬、宮廷犬'],['ac','侍僧系','溫柔的治療犬與武術家'],['me','商人系','勤奮的工作犬與實驗派'],['th','盜賊系','又快又調皮的小搗蛋'],['sn','超級見習生系','西高地白㹴：同一隻狗一路變強'],['gs','槍手系','吉娃娃：同一隻狗一路變強']];
 
 const dm=(b,m)=>Math.round(b*m);
@@ -250,7 +259,7 @@ const PD={
 const ET={
  sprout:{hp:9,spd:52,r:12,dmg:6,xp:1},bat:{hp:6,spd:92,r:10,dmg:5,xp:1},shroom:{hp:22,spd:44,r:14,dmg:8,xp:2},
  wisp:{hp:16,spd:74,r:12,dmg:8,xp:2},golem:{hp:70,spd:34,r:20,dmg:14,xp:4},knight:{hp:120,spd:58,r:18,dmg:16,xp:5}};
-const xpNeed=l=>Math.floor(4+l*3+l*l*.45);
+const xpNeed=l=>Math.floor(3+l*2.5+l*l*.45);
 const fmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 
 /* ground tile */
@@ -391,8 +400,8 @@ function newGame(){
     wep:{},pas:{},E:[],P:[],B:[],J:[],Z:[],FX:[],TX:[],spawn:1,eliteT:60,boss:null,bossDone:false,winT:0,shake:0,banner:null,ring2:0,ring4:0};
   G.wep.j_novice={l:1,cd:.3,a:0,tick:0,def:jobDef(JM.novice)};
   banner('撐過 7 分鐘，擊倒古樹王！');
-  state='play';show(null);$('pbtn').classList.remove('hide');last=performance.now();
-  try{frame.focus({preventScroll:true})}catch(e){}
+  state='play';show(null);$('pbtn').classList.remove('hide');last=performance.now();document.body.classList.add('playing');
+  try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
 }
 function applyJob(id,quiet){
   const j=JM[id];G.job=id;G.wep['j_'+id]={l:1,cd:.3,a:0,tick:0,def:jobDef(j)};
@@ -402,10 +411,12 @@ function applyJob(id,quiet){
 function startAs(id){
   const chain=[];let cur=id;while(cur){chain.unshift(cur);cur=JM[cur].p}
   newGame();for(const jid of chain.slice(1))applyJob(jid,true);
-  G.lvl=JL[JM[id].tier];G.need=xpNeed(G.lvl);banner(`以「${JM[id].n}」開局`);
+  G.lvl=JL[JM[id].tier];G.need=xpNeed(G.lvl);G.start=id;banner(`以「${JM[id].n}」開局`);
 }
-function toMenu(){G=null;state='menu';show('menu');$('pbtn').classList.add('hide');$('best').textContent=best?`最佳紀錄：存活 ${fmt(best)}`:''}
-function pause(){if(state!=='play')return;state='pause';show('pause');keys.clear()}
+function toMenu(){G=null;state='menu';document.body.classList.remove('playing');show('menu');$('pbtn').classList.add('hide');$('best').textContent=best?`最佳紀錄：存活 ${fmt(best)}`:''}
+function pause(){if(state!=='play')return;state='pause';keys.clear();joy.on=false;
+  $('plist').innerHTML=Object.values(G.wep).map(w=>`<div><b style="background:${w.def.c}">${w.def.g}</b><span><strong>${w.def.n}</strong> Lv ${w.l}<small>${KD[w.def.k](w.l,w.def.m,w.def.x)}</small></span></div>`).join('')+Object.keys(G.pas).map(k=>`<div><b style="background:${PD[k].c}">${PD[k].g}</b><span><strong>${PD[k].n}</strong> Lv ${G.pas[k]}<small>${PD[k].d()}</small></span></div>`).join('');
+  show('pause')}
 function resume(){state='play';show(null);last=performance.now();try{frame.focus({preventScroll:true})}catch(e){}}
 function end(win){
   if(state==='over')return;state='over';const t=Math.floor(G.t),j=JM[G.job];
@@ -422,7 +433,7 @@ function heal(v){G.p.hp=Math.min(G.p.max,G.p.hp+v)}
 function spawnEnemy(type,elite,x,y){
   const p=G.p,b=ET[type],hm=1+G.t/100*.55;
   if(x===undefined){const a=R(0,TAU),d=Math.hypot(W,H)/S/2+40;x=p.x+Math.cos(a)*d;y=p.y+Math.sin(a)*d}
-  const e={type,x,y,r:b.r*(elite?1.5:1),hp:b.hp*hm*(elite?10:1),spd:b.spd*(elite?.9:1),dmg:Math.round(b.dmg*(elite?1.5:1)*(1+G.t/400)),elite:!!elite,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:R(0,TAU)};
+  const e={type,x,y,r:b.r*(elite?1.5:1),hp:b.hp*hm*(elite?10:1),spd:b.spd*(elite?.9:1),dmg:Math.round(b.dmg*(elite?1.5:1)*(.6+.4*Math.min(1,G.t/150))*(1+G.t/400)),elite:!!elite,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:R(0,TAU)};
   e.max=e.hp;G.E.push(e);return e;
 }
 function pickType(t){
@@ -442,12 +453,12 @@ function kill(e){
   G.J.push({x:e.x,y:e.y,v:e.elite?12:ET[e.type].xp,m:false});
   if(e.elite||Math.random()<.012)G.J.push({x:e.x+10,y:e.y,v:0,heal:30,m:false});
 }
-function damageP(d){const p=G.p;if(p.inv>0||state!=='play')return;p.hp-=d;p.inv=.45;G.shake=.25;txt(p.x,p.y-28,'-'+d,'#ff6b6b');if(p.hp<=0){p.hp=0;end(false)}}
+function damageP(d){const p=G.p;if(p.inv>0||state!=='play')return;p.hp-=d;p.inv=.6;G.shake=.25;txt(p.x,p.y-28,'-'+d,'#ff6b6b');if(p.hp<=0){p.hp=0;end(false)}}
 function areaHit(x,y,Rr,dmg,kb,fn){near(x,y,Rr+M,e=>{if(e.dead)return;const dx=e.x-x,dy=e.y-y,d=Math.hypot(dx,dy);if(d<Rr+e.r){if(fn)fn(e);hurt(e,dmg,dx/(d||1),dy/(d||1),kb)}})}
 function explode(z){G.FX.push({k:'ring',x:z.x,y:z.y,R:z.R,life:.35,max:.35,c:z.c});burst(z.x,z.y,10,z.c);areaHit(z.x,z.y,z.R,z.dmg,120);G.shake=Math.max(G.shake,.1)}
 
 const FIRE={
-  slash(w,l,ar){const p=G.p,d=w.def,Rr=(62+10*l)*ar*(1+.06*(d.m-1)),dirs=[Math.atan2(p.fy,p.fx)];if(l>=5||d.x.both)dirs.push(dirs[0]+Math.PI);
+  slash(w,l,ar){const p=G.p,d=w.def,Rr=(62+10*l)*ar*(1+.06*(d.m-1)),tg=nearestN(p.x,p.y,1)[0],dirs=[tg&&Math.hypot(tg.x-p.x,tg.y-p.y)<Rr+160?Math.atan2(tg.y-p.y,tg.x-p.x):Math.atan2(p.fy,p.fx)];if(l>=5||d.x.both)dirs.push(dirs[0]+Math.PI);
     for(const a of dirs){G.FX.push({k:'arc',x:p.x,y:p.y,a,R:Rr,life:.2,max:.2,c:d.c});
       near(p.x,p.y,Rr+M,e=>{if(e.dead)return;const dx=e.x-p.x,dy=e.y-p.y,dd=Math.hypot(dx,dy);if(dd>Rr+e.r)return;
         const da=Math.abs(((Math.atan2(dy,dx)-a)%TAU+TAU*1.5)%TAU-Math.PI);if(da<1.15||dd<e.r+p.r+6)hurt(e,(12+6*l)*d.m,dx/(dd||1),dy/(dd||1),140)})}},
@@ -562,9 +573,9 @@ function openLevel(){
   if(G.jobPend){openJob();return}
   state='level';choicesNow=rollChoices();
   $('choices').innerHTML=choicesNow.map((o,i)=>{
-    if(o.t==='h')return `<button class="ch" data-i="${i}"><b style="background:#ff8a8a">骨</b><span><strong>大骨頭</strong><small>回復 40 生命</small></span></button>`;
-    if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
-    const D=o.d;return `<button class="ch" data-i="${i}"><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}${D.job?' · 招牌技能':''}</em><small>${KD[D.k](o.l,D.m,D.x)}</small></span></button>`}).join('');
+    if(o.t==='h')return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:#ff8a8a">骨</b><span><strong>大骨頭</strong><small>回復 40 生命</small></span></button>`;
+    if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
+    const D=o.d;return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}${D.job?' · 招牌技能':''}</em><small>${KD[D.k](o.l,D.m,D.x)}</small></span></button>`}).join('');
   show('lvlup');
 }
 function choose(i){
@@ -578,7 +589,7 @@ function choose(i){
 function openJob(){
   state='job';jobsNow=kids(G.job);const nt=JM[G.job].tier+1;
   $('jobT').textContent=`${TIERN[nt]}！選擇你的新職業`;
-  $('jobs').innerHTML=jobsNow.map((id,i)=>{const j=JM[id];return `<button class="jb" data-i="${i}"><canvas width="240" height="200" data-dog="${id}"></canvas><strong>${j.n}</strong><small>${B[j.b][0]} · ${j.why}</small><em>招牌技能：${j.sk}</em><span>${KD[j.k](1,TM[j.tier],j.x)}</span></button>`}).join('');
+  $('jobs').innerHTML=jobsNow.map((id,i)=>{const j=JM[id];const nx=kids(id).map(k=>JM[k].n).join('、');return `<button class="jb" data-i="${i}"><span class="num">${i+1}</span><canvas width="240" height="200" data-dog="${id}"></canvas><strong>${j.n}</strong><small>${B[j.b][0]} · ${j.why}</small><em>招牌技能：${j.sk}</em><span>${KD[j.k](1,TM[j.tier],j.x)}</span>${nx?`<span class="next">之後可轉：${nx}</span>`:''}</button>`}).join('');
   paintDogs($('jobs'));show('jobov');
 }
 function chooseJob(i){
@@ -665,34 +676,36 @@ const menuOrder=JOBS.map(r=>r[0]);
 
 /* input */
 $('startBtn').addEventListener('click',newGame);
-$('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;startAs(b.dataset.start);frame.scrollIntoView({behavior:'smooth',block:'center'})});
+$('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;startAs(b.dataset.start)});
 $('choices').addEventListener('click',e=>{const b=e.target.closest('.ch');if(b)choose(+b.dataset.i)});
 $('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(b)chooseJob(+b.dataset.i)});
 $('pbtn').addEventListener('click',pause);
 $('resume').addEventListener('click',resume);
 $('quit').addEventListener('click',toMenu);
-$('again').addEventListener('click',newGame);
+$('again').addEventListener('click',()=>{const s=G&&G.start;if(s)startAs(s);else newGame()});
 $('tomenu').addEventListener('click',toMenu);
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
   if(state==='play'&&['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
   if(k==='escape'||k==='p'){if(state==='play')pause();else if(state==='pause')resume();return}
-  if(k==='1'||k==='2'||k==='3'){if(state==='level'){choose(+k-1);return}if(state==='job'){chooseJob(+k-1);return}}
+  if(/^[1-9]$/.test(k)){if(state==='level'){choose(+k-1);return}if(state==='job'){chooseJob(+k-1);return}}
   keys.add(k)});
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
 addEventListener('blur',()=>{keys.clear();pause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 function placeJoy(){const j=$('joy');j.classList.remove('hide');j.style.left=joy.ox+'px';j.style.top=joy.oy+'px';j.firstElementChild.style.transform=`translate(${joy.x*46}px,${joy.y*46}px)`}
-cv.addEventListener('pointerdown',e=>{if(state!=='play')return;const r=cv.getBoundingClientRect();joy.on=true;joy.id=e.pointerId;joy.ox=e.clientX-r.left;joy.oy=e.clientY-r.top;joy.x=joy.y=0;try{cv.setPointerCapture(e.pointerId)}catch(err){}placeJoy()});
-cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;const r=cv.getBoundingClientRect();let dx=e.clientX-r.left-joy.ox,dy=e.clientY-r.top-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d}joy.x=dx/m;joy.y=dy/m;placeJoy()});
+function mouseAim(e){const r=cv.getBoundingClientRect(),dx=e.clientX-r.left-W/2,dy=e.clientY-r.top-H/2,d=Math.hypot(dx,dy);if(d<16){joy.x=joy.y=0;return}const k=Math.min(1,d/90)/d;joy.x=dx*k;joy.y=dy*k}
+cv.addEventListener('pointerdown',e=>{if(state!=='play')return;joy.on=true;joy.id=e.pointerId;joy.mouse=e.pointerType==='mouse';try{cv.setPointerCapture(e.pointerId)}catch(err){}
+  if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();joy.ox=e.clientX-r.left;joy.oy=e.clientY-r.top;joy.x=joy.y=0;placeJoy()});
+cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();let dx=e.clientX-r.left-joy.ox,dy=e.clientY-r.top-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d}joy.x=dx/m;joy.y=dy/m;placeJoy()});
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
 
 /* loop */
-function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.55,Math.min(1,Math.min(W,H)/560))}
+function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.8,Math.min(1.15,Math.min(W,H)/480))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(state==='play')update(dt);
-  else if(state==='menu'){menuT+=dt;menuSwap-=dt;if(menuSwap<=0){menuSwap=1.4;menuIdx=(menuIdx+1)%menuOrder.length;const j=JM[menuOrder[menuIdx]];$('menuCap').textContent=`${TIERN[j.tier]} · ${j.n} · ${B[j.b][0]}`}portrait($('menuDog'),menuOrder[menuIdx],menuT,true)}
+  else if(state==='menu'){menuT+=dt;portrait($('menuDog'),'novice',menuT,true)}
   render();requestAnimationFrame(loop)}
 resize();buildDex();toMenu();requestAnimationFrame(loop);
 }
