@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>汪汪倖存者</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@500;700;900&display=swap">
 <style>
@@ -99,6 +101,9 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:8px;margin:0 0 14px}
 textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;border:2px solid #e3d6b0;padding:8px;background:#fff;color:#2a2116}
 .note{font-size:13px;color:#7a6a50}
+.af{display:grid;gap:8px;margin:6px 0 4px}.af label{font-size:14px;font-weight:700}.af input{width:100%;font:16px "Noto Sans TC",sans-serif;padding:10px 12px;border-radius:10px;border:2px solid #e3d6b0;background:#fff;color:#2a2116}.af input:focus{outline:none;border-color:#2f7a3e}
+.atabs{display:flex;gap:6px;margin:0 0 8px}.atabs button{flex:1}
+.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}.cmp div{background:#fff;border:2px solid #e3d6b0;border-radius:12px;padding:10px;font-size:14px}
 .news{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:12px;max-height:56vh}
 .nlist{overflow:auto;display:grid;gap:4px;align-content:start;max-height:56vh}
 .nv{text-align:left;background:#fff;border:2px solid #e3d6b0;border-radius:10px;padding:6px 8px;cursor:pointer;font:700 13px Fredoka,"Noto Sans TC",sans-serif}
@@ -155,15 +160,16 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <button id="spdb" class="pbtn hide" style="right:58px" aria-label="切換速度">×1</button>
       <div class="hub hide" id="hub">
-        <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button></div>
+        <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button><button class="btn sm" id="acctBtn" style="margin:0">登入／註冊</button></div>
         <div class="tabs" id="tabs"></div>
         <div class="hbody" id="hbody"></div>
       </div>
-      <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。其他毛色可以在城鎮「造型」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button></div></div>
+      <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。其他毛色可以在城鎮「造型」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
       <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
+      <div class="ov hide" id="acctov" style="z-index:26"><div class="card"><h2 id="acctT">帳號與雲端存檔</h2><div id="acctB" style="text-align:left"></div><p class="note" id="acctMsg" role="status" aria-live="polite" style="min-height:1.4em;text-align:center"></p><button class="btn ghost" id="acctClose">關閉</button></div></div>
       <div class="ov hide" id="tipov" style="z-index:30"><div class="card"><h2 id="tipT"></h2><div id="tipB" style="text-align:left;font-size:15px;line-height:1.7;margin:0 0 12px"></div><button class="btn" id="tipOk">知道了</button></div></div>
       <div class="ov hide" id="over"><div class="card"><h2 id="ovT"></h2><div class="stats" id="ovS"></div><div class="rw" id="ovR"></div><button class="btn" id="toTown">回到城鎮</button></div></div>
     </div>
@@ -171,7 +177,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
   <section class="how">
     <h2>怎麼玩</h2>
     <ul>
-      <li>選一隻狗開始。每一局出戰都是肉鴿：從 Lv1 開始升級、選強化，撐到 5:00 打倒關卡魔王就通關。</li>
+      <li>選一隻狗開始。每一局出戰都是肉鴿：從 Lv1 開始升級、選強化，撐到 4:00 打倒關卡魔王就通關。</li>
       <li>偶爾會掉紅色的<b>磁鐵</b>（金框菁英怪比較常掉），撿到就把畫面上所有經驗寶石、金幣、肉骨頭一次吸過來。</li>
       <li>不管輸贏，這局拿到的 Base／Job 經驗、金幣和裝備都會帶回城鎮。在城鎮可以點天賦、換裝備、精煉、轉職。</li>
       <li>除了一般關卡，還有<b>無限之塔</b>（一路往上爬、每 10 層存檔）和<b>每日副本</b>（黃金／卡片／經驗，每天 3 次）。已通關的關卡可以開 <b>×2 速度</b>。</li>
@@ -189,11 +195,14 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
     <div id="dex"></div>
   </section>
 </main>
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<script src="cloud.js"></script>
 <script>
 {
 const $=id=>document.getElementById(id);
 const frame=$('frame'),cv=$('cv'),ctx=cv.getContext('2d');
-const TAU=Math.PI*2,R=(a,b)=>a+Math.random()*(b-a),M=70,CELL=80,BOSS_T=300;
+const TAU=Math.PI*2,R=(a,b)=>a+Math.random()*(b-a),M=70,CELL=80,BOSS_T=240;
 let W=800,H=500,DPR=1,S=1,state='hub',G=null,menuT=0,last=performance.now(),choicesNow=[],jobsNow=[],tab='go',breedMode='new',flash=0;
 const keys=new Set(),joy={on:false,id:null,ox:0,oy:0,x:0,y:0,mouse:false},grid=new Map();
 
@@ -380,7 +389,7 @@ const PETS=[['chick','小雞','#ffe27a',['mag',25],0],['bird','小藍鳥','#7fc8
 const PM={};for(const r of PETS)PM[r[0]]={id:r[0],n:r[1],c:r[2],bon:r[3],rar:r[4]};
 const PRAR=[{n:'普通',c:'#a8a8a8',w:55},{n:'稀有',c:'#3d8fe0',w:30},{n:'史詩',c:'#9a5ae0',w:12},{n:'傳說',c:'#f08a1a',w:3}];
 const petBon=id=>{const pt=PM[id],lv=(SV.pets||{})[id]||1;return[pt.bon[0],Math.round(pt.bon[1]*(1+.3*(lv-1))*10)/10]};
-const EGG_BONES=5,eggZeny=()=>Math.round(2500*(1+SV.stage*1.5));
+const PET_MAX=10,feedCost=id=>Math.round(4000*(((SV.pets||{})[id]||1))**2*(1+SV.stage*1.2)),EGG_BONES=5,eggZeny=()=>Math.round(2500*(1+SV.stage*1.5));
 function drawPet(c,id,x,y,t){const pt=PM[id],b=Math.sin(t*8)*1.5;c.save();c.translate(x,y);shadow(c,0,9,7,2.5);c.translate(0,b);
   if(id==='chick'){circ(c,0,0,7,'#ffe27a');circ(c,3,-5,4.5,'#ffe27a');tri(c,7,-5,10,-4,7,-3,'#f5a742');circ(c,4.5,-6,1,'#1a1414')}
   else if(id==='bird'){const f=Math.sin(t*20)*3;ell(c,-3,-2,5,3+f*.3,-.6,'#4a9ae0');ell(c,0,0,7,5.5,0,'#7fc8ff');circ(c,5,-3,4,'#7fc8ff');tri(c,8,-3,11,-2,8,-1,'#f5a742');circ(c,6,-4,1,'#1a1414')}
@@ -406,10 +415,11 @@ const achReady=()=>ACH.filter(a=>!(SV.ach||{})[a[0]]&&a[2]());
 
 /* ---------- save ---------- */
 const SAVE_KEY='dog-save-v1';
-function defSave(){return{v:1,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
+function defSave(){return{v:1,autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
 function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';for(const it of [...o.inv,...Object.values(o.eq)])if(it)fixItem(it);o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
 let SV=loadSave();
-function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}}
+function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}if(window.DogCloud)DogCloud.queue(SV)}
+const CLOUD=()=>window.DogCloud&&DogCloud.enabled;
 function fixItem(it){if(it.slots===undefined)it.slots=Math.min(3,[0,1,1,2,2][it.rar]||0);if(!it.cards)it.cards=[];return it}
 const curSkin=()=>(SV.skin&&SV.skin[SV.breed])||BASE[SV.breed||'shiba'];
 const owns=id=>SKM[id]&&(SKM[id].rar===0||SV.owned.includes(id));
@@ -441,12 +451,14 @@ function genItem(stage,minR){
   const slots=rar===0?(Math.random()<.3?1:0):rar===1?1:rar===2?(Math.random()<.5?2:1):2+(Math.random()<.35?1:0);
   return{id:SV.nid++,slot,rar,stage,main,aff,ref:0,n:`${MAT[stage]}${base}`,wt:JM[SV.job].line,ic,slots,cards:[]};
 }
-const mainVal=it=>Math.round(it.main*(1+.1*it.ref));
+const BAG=120;
+const mainVal=it=>Math.round(it.main*(1+.1*it.ref)*(1+.12*(it.star||0)));
 const mainTxt=it=>it.slot==='weapon'?`傷害 +${mainVal(it)}%`:it.slot==='armor'?`生命 +${mainVal(it)}`:`爆擊率 +${mainVal(it)}%`;
 const affTxt=it=>it.aff.map(([k,v])=>`${AFF[k][0]} ${k==='cd'?'-':'+'}${v}${AFF[k][1]}`).join('、');
+const starCost=it=>Math.round(600*((it.star||0)+1)**2*(1+it.stage*1.5)*(1+it.rar*.5));
 const refCost=it=>Math.round(80*(it.ref+1)**2*(1+it.stage*1.5));
 const sellVal=it=>Math.round(15*(1+it.stage*1.5)*(it.rar+1)**2*(1+it.ref*.5));
-function itemHTML(it,btns){ITEMREF[it.id]=it;return `<div class="it" style="border-left-color:${RAR[it.rar].c}"><canvas class="iic" width="88" height="88" data-it="${it.id}"></canvas><div class="nm"><strong style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${it.n}${it.ref?` +${it.ref}`:''}</strong><small>${SLOTN[it.slot]} · ${mainTxt(it)}${it.aff.length?' · '+affTxt(it):''}</small>${slotsHTML(it)}</div>${btns}</div>`}
+function itemHTML(it,btns){ITEMREF[it.id]=it;return `<div class="it" style="border-left-color:${RAR[it.rar].c}"><canvas class="iic" width="88" height="88" data-it="${it.id}"></canvas><div class="nm"><strong style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${it.n}${it.ref?` +${it.ref}`:''}${it.star?` <span style="color:#e0a000">${'★'.repeat(it.star)}</span>`:''}</strong><small>${SLOTN[it.slot]} · ${mainTxt(it)}${it.aff.length?' · '+affTxt(it):''}</small>${slotsHTML(it)}</div>${btns}</div>`}
 function slotsHTML(it){fixItem(it);if(!it.slots)return '<small class="cs">沒有卡槽</small>';let h='';for(let i=0;i<it.slots;i++){const c=CM[it.cards[i]];h+=c?`<span class="cslot on" title="${modTxt(c.mods)}">${c.n}</span>`:'<span class="cslot">空卡槽</span>'}return `<span class="cs">${h}</span>`}
 
 
@@ -493,7 +505,7 @@ function calcStats(){
   st.crit+=t('a7')*.01;st.dmg+=t('a8')*.005;st.zeny+=t('b6')*.05;st.exp+=t('b6')*.03;st.cd*=1-t('b7')*.015;st.area+=t('b8')*.005;st.hp+=t('c8')*5;
   for(const s of ['weapon','armor','acc']){const it=SV.eq[s];if(!it)continue;const mv=mainVal(it);
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
-    for(const [k,v] of it.aff)applyMod(st,k,v);for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
+    for(const [k,v] of it.aff)applyMod(st,k,v*(1+.12*(it.star||0)));for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   for(const [k,v] of Object.entries(collectionMods().m))applyMod(st,k,v);
   if(SV.pet&&PM[SV.pet]){const [k,v]=petBon(SV.pet);applyMod(st,k,v)}
   st.hp=Math.round(st.hp*(1+st.hpPct));return st;
@@ -653,7 +665,7 @@ function newRun(stage,trialJob,o){
   const lv0=1+st.bonusLv;
   for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;G.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}
   if(st.freePick)G.pend=1;
-  banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 5:00 打倒${STAGES[stage].boss}！`);
+  banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
   $('spdb').classList.toggle('hide',!(mode==='stage'&&(SV.cleared||0)>stage));$('spdb').textContent='×1';
   state='play';show(null);$('pbtn').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
   try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
@@ -792,6 +804,7 @@ function update(dt){
   if(G.t>=G.eliteT){G.eliteT+=G.eliteGap;spawnEnemy(pickType(TT),true)}
   if(G.mode!=='tower'){const P=STAGES[G.stage].pool;if(!G.ring2&&G.t>=110){G.ring2=1;ring(P[1],28)}if(!G.ring4&&G.t>=220){G.ring4=1;ring(P[2],32)}}
   if(G.mode==='tower'){G.ft+=dt;if(!G.boss&&G.ft>=40){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,sg=STAGES[G.stage],hp=4200*sg.hp*G.mul.hp*.16;const e={type:sg.bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:34,hp,max:hp,spd:46,dmg:Math.round(18*sg.dmg*G.mul.dmg),boss:true,guard:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};G.E.push(e);G.boss=e;banner(`第 ${G.floor} 層守衛出現了！`);sfx('bossin');playMusic('boss'+G.stage)}}
+  if(G.mode!=='tower'&&!G.warned&&G.t>=G.bossT-15){G.warned=1;banner(`${STAGES[G.stage].boss}即將出現！`);sfx('bossin')}
   if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp;
     const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};
     G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin')}
@@ -910,9 +923,9 @@ function end(win){
     const firstClear=G.mode==='stage'&&win&&!(SV.cleared>G.stage);let bones=1+(win?3:0)+(firstClear?10:0)+(SV.blv-b0)+rw.bones;SV.bones+=bones;
     SV.st=SV.st||{};const ST=SV.st;ST.kills=(ST.kills||0)+G.kills;ST.runs=(ST.runs||0)+1;if(win)ST.wins=(ST.wins||0)+1;ST.bosses=(ST.bosses||0)+(G.bossKills||0);if(G.mode==='dungeon')ST.dungeons=(ST.dungeons||0)+1;
     let towerNew=false;if(G.mode==='tower'){const cl=G.floor-1;if(cl>(SV.towerBest||0)){SV.towerBest=cl;towerNew=true}}
-    SV.zeny+=zn;for(const it of rw.items)if(SV.inv.length<80)SV.inv.push(it);for(const cid of rw.cards){SV.cards[cid]=(SV.cards[cid]||0)+1;SV.cardSeen=SV.cardSeen||{};SV.cardSeen[cid]=1}const autoN=SV.autoEq?autoEquip():0;
+    SV.zeny+=zn;for(const it of rw.items)if(SV.inv.length<BAG)SV.inv.push(it);for(const cid of rw.cards){SV.cards[cid]=(SV.cards[cid]||0)+1;SV.cardSeen=SV.cardSeen||{};SV.cardSeen[cid]=1}const autoN=SV.autoEq?autoEquip():0;let soldN=0,soldZ=0;if(SV.autoSell){SV.inv=SV.inv.filter(it=>{const eq=SV.eq[it.slot];if(it.rar<=1&&!(it.cards||[]).length&&!(it.star)&&eq&&itemScore(it)<=itemScore(eq)){soldN++;soldZ+=sellVal(it);return false}return true});SV.zeny+=soldZ}
     SV.runs++;if(win&&G.mode==='stage'){SV.stage=Math.max(SV.stage,Math.min(STAGES.length-1,G.stage+1));SV.cleared=Math.max(SV.cleared||0,G.stage+1)}
-    if(G.mode==='stage'&&(!SV.best[G.stage]||t>SV.best[G.stage]))SV.best[G.stage]=t;save();
+    if(G.mode==='stage'&&(!SV.best[G.stage]||t>SV.best[G.stage]))SV.best[G.stage]=t;save();if(CLOUD())DogCloud.flush(VERSION);
     if(G.mode==='tower')lines.push(`<div><b>這次通過了 ${G.floor-1} 層</b>${towerNew?'（新紀錄！）':''}　最高紀錄 ${SV.towerBest||0} 層</div>`);
     lines.push(`<div>Base 經驗 +${bx}${SV.blv>b0?` <b>→ Base Lv ${SV.blv}！</b>`:''}</div>`);
     lines.push(`<div>Job 經驗 +${jx}${SV.jlv>j0?` <b>→ Job Lv ${SV.jlv}！獲得 ${SV.jlv-j0} 天賦點</b>`:''}${SV.jlv>=JCAP[tier]?'（已達上限）':''}</div>`);
@@ -920,6 +933,7 @@ function end(win){
     lines.push(rw.items.length?`<div>獲得裝備：</div>`+rw.items.map(it=>`<div style="display:flex;gap:8px;align-items:center;color:${RAR[it.rar].c};font-weight:700">${(ITEMREF[it.id]=it,'')}<canvas class="iic" style="width:32px;height:32px" width="64" height="64" data-it="${it.id}"></canvas>${RAR[it.rar].n} ${it.n}</div>`).join(''):'<div>這局沒有撿到裝備（打倒金框菁英怪必掉）</div>');
     if(rw.cards.length)lines.push(`<div><b style="color:#c0407a">獲得卡片：${rw.cards.map(c=>CM[c].n).join('、')}</b>（到城鎮「裝備」頁插到有卡槽的裝備上）</div>`);
     if(autoN)lines.push(`<div>已自動換上 ${autoN} 件更好的裝備。</div>`);
+    if(soldN)lines.push(`<div>自動賣掉 ${soldN} 件比身上差的普通／精良裝備，得到 ${soldZ} 金幣。</div>`);
     if(canJob())lines.push('<div><b style="color:#2f7a3e">可以轉職了！回城鎮到「角色」頁轉職。</b></div>');
     if(win&&G.mode==='stage'&&G.stage+1<STAGES.length)lines.push(`<div><b>解鎖新關卡：${STAGES[G.stage+1].n}</b></div>`);
   }
@@ -938,8 +952,9 @@ function toTown(){G=null;state='hub';playMusic('town');document.body.classList.r
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.9.3';
+const VERSION='0.10.0';
 const NEWS=[
+ {v:'0.10.0',d:'11/24',t:'雲端帳號・平衡調整',items:[['新增','帳號＋密碼登入，進度自動存到雲端，換手機、換電腦都能接著玩'],['新增','可以綁定 Email，忘記密碼時收信重設'],['新增','雲端和裝置進度不同時，會讓你選要留哪一份'],['調整','關卡魔王改成 4:00 出現，出現前 15 秒會預告，畫面上方有倒數'],['新增','裝備升星（最多 ★5）：花金幣並消耗一件同部位裝備，每顆星能力 +12%'],['新增','寵物可以用金幣餵點心，一路養到 Lv10'],['調整','背包上限 80 → 120，每局結束可自動賣掉比身上差的普通、精良裝備']]},
  {v:'0.9.3',d:'11/24',t:'更新公告',items:[['新增','城鎮右上角的「最新消息」：每次更新都會列出新增、調整和修正的內容'],['新增','改版後第一次打開遊戲，會自動跳出這次的更新內容'],['新增','網頁下方的「更新紀錄」可以看到所有歷史版本']]},
  {v:'0.9.2',d:'11/24',t:'天賦精通・自動選技能',items:[['新增','三條天賦分支各多三格：獵王／爆裂、貪婪／技巧大師、鐵壁／生命汲取'],['新增','每條分支最後一格「精通」沒有上限，多出來的天賦點可以一直加'],['新增','「自動分配剩下的點數」按鈕'],['新增','成就頁「一鍵全部領取」'],['新增','升級時可以開「自動選技能」，暫停畫面隨時可以關掉']]},
  {v:'0.9.1',d:'11/24',t:'魔王專屬音樂',items:[['新增','五個魔王各有自己的主題曲：古樹王、巨蛛女王、熔岩巨人、雪原猛獁、雷鳥'],['調整','無限之塔守衛出現時，會播該區魔王的主題曲']]},
@@ -961,6 +976,60 @@ const newsItems=n=>n.items.map(([k,txt])=>`<li><b class="ntag" style="background
 let newsSel=0;
 function openNews(){$('newsList').innerHTML=NEWS.map((n,i)=>`<button class="nv${i===newsSel?' on':''}" data-nv="${i}">V${n.v}<small>${n.t}</small></button>`).join('');const n=NEWS[newsSel];$('newsBody').innerHTML=`<h3>${n.d} 更新公告・V${n.v}　${n.t}</h3><ul class="nl">${newsItems(n)}</ul>`;$('newsov').classList.remove('hide')}
 function buildChangelog(){$('changelog').innerHTML=NEWS.map(n=>`<details${n===NEWS[0]?' open':''}><summary>V${n.v}　${n.t}<span>${n.d}</span></summary><ul class="nl">${newsItems(n)}</ul></details>`).join('')}
+
+/* ---------- account & cloud sync ---------- */
+let acctMode='login';
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function acctMsg(t,ok){const m=$('acctMsg');m.textContent=t||'';m.style.color=ok?'#2f7a3e':'#b03a3a'}
+function acctBtnTxt(){const b=$('acctBtn');if(!b)return;if(!CLOUD()){b.textContent='雲端存檔';return}const st=DogCloud.status();b.textContent=st.loggedIn?`☁ ${st.username||'已登入'}${st.pending||st.syncing?'（同步中）':''}`:'登入／註冊'}
+function saveSummary(d){if(!d||!d.breed)return '沒有進度';const j=JM[d.job]?JM[d.job].n:'';return `${(SKM[(d.skin||{})[d.breed]]||SKM[BASE[d.breed]]||{n:''}).n}・${j}<br>Base Lv ${d.blv||1}・Job Lv ${d.jlv||1}<br>出戰 ${d.runs||0} 次・金幣 ${(d.zeny||0).toLocaleString()}<br><span class="note">最後更新：${d.seen?new Date(d.seen).toLocaleString():'不明'}</span>`}
+function adoptSave(d){SV=Object.assign(defSave(),d);if(SV.breed&&!B[SV.breed])SV.breed='shiba';for(const it of [...SV.inv,...Object.values(SV.eq)])if(it)fixItem(it);SV.owned=(SV.owned||[]).filter(id=>SKM[id]);try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}buildDex();if(SV.breed){renderHub();show('hub')}else openBreeds('new')}
+async function syncAfterLogin(){
+  let remote;try{remote=await DogCloud.load()}catch(e){acctMsg(e.message);return}
+  const local=SV,hasLocal=!!(local.breed&&(local.runs||local.blv>1));
+  if(!remote){if(local.breed){DogCloud.queue(SV);await DogCloud.flush(VERSION);acctMsg('已把這台裝置的進度上傳到雲端。',true)}renderAcct();return}
+  const r=remote.data||{};
+  if(!hasLocal){adoptSave(r);acctMsg('已讀取雲端存檔！',true);renderAcct();return}
+  const same=r.blv===local.blv&&r.bxp===local.bxp&&r.runs===local.runs&&r.zeny===local.zeny;
+  if(same){acctMsg('雲端和這台裝置的進度相同，已同步。',true);renderAcct();return}
+  $('acctT').textContent='要用哪一份存檔？';
+  $('acctB').innerHTML=`<p style="margin:0">雲端和這台裝置的進度不一樣，請選一份留下（另一份會被覆蓋）：</p><div class="cmp"><div><b>☁ 雲端存檔</b><br>${saveSummary(r)}</div><div><b>📱 這台裝置</b><br>${saveSummary(local)}</div></div><button class="btn" id="useCloud">用雲端存檔</button><button class="btn ghost" id="useLocal">用這台裝置的</button>`;
+  $('useCloud').onclick=()=>{adoptSave(r);acctMsg('已改用雲端存檔。',true);renderAcct()};
+  $('useLocal').onclick=async()=>{DogCloud.queue(SV);await DogCloud.flush(VERSION);acctMsg('已把這台裝置的進度上傳到雲端。',true);renderAcct()};
+}
+function renderAcct(){
+  const B2=$('acctB');$('acctT').textContent='帳號與雲端存檔';
+  if(!CLOUD()){B2.innerHTML='<p>雲端存檔還沒啟用。目前進度存在這台裝置的瀏覽器裡，可以在「角色」頁用存檔碼搬到其他裝置。</p>';return}
+  const st=DogCloud.status();
+  if(st.loggedIn){
+    B2.innerHTML=`<p style="margin:0 0 8px">已登入：<b>${esc(st.username||'玩家')}</b>${st.email?`（${esc(st.email)}）`:''}<br><span class="note">${st.syncing?'同步中…':st.lastSync?'上次同步：'+new Date(st.lastSync).toLocaleTimeString():'進度會在每局結束和城鎮操作後自動上傳'}</span>${st.error?`<br><span style="color:#b03a3a;font-size:13px">${esc(st.error)}</span>`:''}</p>
+      <button class="btn sm" id="syncNow">立即同步</button><button class="btn sm ghost" id="pullNow">從雲端重新讀取</button>
+      <form class="af" id="emailForm"><label for="emIn">綁定 Email（忘記密碼時可以收信重設，綁定後也能用 Email 登入）</label><input id="emIn" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(st.email)}"><button class="btn sm" type="submit">${st.email?'更換 Email':'綁定 Email'}</button></form>
+      <form class="af" id="pwForm"><label for="pwIn">更改密碼</label><input id="pwIn" type="password" autocomplete="new-password" placeholder="新密碼（至少 8 個字，含英文和數字）"><button class="btn sm" type="submit">更改密碼</button></form>
+      <button class="btn sm ghost" id="logoutBtn">登出</button>`;
+    $('syncNow').onclick=async()=>{DogCloud.queue(SV);await DogCloud.flush(VERSION);const s2=DogCloud.status();acctMsg(s2.error||'已同步！',!s2.error);renderAcct()};
+    $('pullNow').onclick=()=>{acctMsg('');syncAfterLogin()};
+    $('emailForm').onsubmit=async e=>{e.preventDefault();try{await DogCloud.bindEmail($('emIn').value.trim());acctMsg('已寄出驗證信，請到信箱點連結完成綁定。',true)}catch(err){acctMsg(err.message)}};
+    $('pwForm').onsubmit=async e=>{e.preventDefault();try{await DogCloud.changePassword($('pwIn').value);$('pwIn').value='';acctMsg('密碼已更新。',true)}catch(err){acctMsg(err.message)}};
+    $('logoutBtn').onclick=async()=>{await DogCloud.signOut();acctMsg('已登出，這台裝置上的進度仍然保留。',true);renderAcct();acctBtnTxt()};
+    return}
+  const reg=acctMode==='reg',fp=acctMode==='forgot';
+  B2.innerHTML=`<div class="atabs"><button class="btn sm${reg||fp?' ghost':''}" id="tabLogin">登入</button><button class="btn sm${reg?'':' ghost'}" id="tabReg">註冊</button></div>
+    ${fp?`<form class="af" id="fpForm"><label for="fpEm">輸入綁定的 Email，我們會寄重設密碼的信給你</label><input id="fpEm" type="email" autocomplete="email" required><button class="btn" type="submit">寄送重設信</button></form><p class="note">沒有綁定 Email 的帳號沒辦法自己重設密碼。</p>`
+    :`<form class="af" id="authForm"><label for="auU">${reg?'帳號（3～16 個英文字母、數字或底線）':'帳號或 Email'}</label><input id="auU" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="64" required>
+    <label for="auP">密碼${reg?'（至少 8 個字，含英文和數字）':''}</label><input id="auP" type="password" autocomplete="${reg?'new-password':'current-password'}" required>
+    ${reg?'<label for="auP2">再輸入一次密碼</label><input id="auP2" type="password" autocomplete="new-password" required>':''}
+    <button class="btn" type="submit">${reg?'註冊並登入':'登入'}</button></form>${reg?'<p class="note">註冊後，這台裝置目前的進度會自動上傳到你的帳號。密碼經過加密保存，連管理員都看不到。</p>':'<button class="btn sm ghost" id="forgotBtn">忘記密碼</button>'}`}`;
+  $('tabLogin').onclick=()=>{acctMode='login';acctMsg('');renderAcct()};
+  $('tabReg').onclick=()=>{acctMode='reg';acctMsg('');renderAcct()};
+  if($('forgotBtn'))$('forgotBtn').onclick=()=>{acctMode='forgot';acctMsg('');renderAcct()};
+  if($('fpForm'))$('fpForm').onsubmit=async e=>{e.preventDefault();try{await DogCloud.resetByEmail($('fpEm').value.trim());acctMsg('如果這個 Email 有綁定帳號，重設信已經寄出。',true)}catch(err){acctMsg(err.message)}};
+  if($('authForm'))$('authForm').onsubmit=async e=>{e.preventDefault();const u=$('auU').value.trim(),pw=$('auP').value,btn=e.target.querySelector('button[type=submit]');
+    if(reg&&pw!==$('auP2').value){acctMsg('兩次輸入的密碼不一樣');return}
+    btn.disabled=true;acctMsg(reg?'註冊中…':'登入中…',true);
+    try{if(reg)await DogCloud.signUp(u,pw);else await DogCloud.signIn(u,pw);acctMsg(reg?'註冊成功！':'登入成功！',true);renderAcct();acctBtnTxt();await syncAfterLogin()}catch(err){acctMsg(err.message)}finally{btn.disabled=false}};
+}
+function openAcct(){acctMsg('');renderAcct();$('acctov').classList.remove('hide')}
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
@@ -998,16 +1067,16 @@ function renderHub(){
     const inv=SV.inv.slice().sort((a,b)=>b.rar-a.rar||b.stage-a.stage);
     const canIns=it=>it.cards.length<it.slots&&Object.keys(SV.cards).some(c=>SV.cards[c]>0&&CM[c].slot===it.slot);
     const insBox=(()=>{const it=insFor&&[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);if(!it)return '';const cs=Object.keys(SV.cards).filter(c=>SV.cards[c]>0&&CM[c].slot===it.slot);return `<div class="box"><strong>把卡片插進「${it.n}」</strong><p class="note">插進去就拿不出來了（跟 RO 一樣），請想清楚再插。</p><div class="cards">${cs.map(c=>cardHTML(c,`<button class="btn sm" data-ins2="${c}">插入</button>`)).join('')||'<p class="note">沒有可以插這個部位的卡片。</p>'}</div><button class="btn sm ghost" data-insx="1">取消</button></div>`})();
-    H.innerHTML=`${insBox}<h3>身上的裝備　<button class="btn sm" id="autoEq">一鍵換上最好的</button></h3><label class="note" style="display:block;margin:-4px 0 10px"><input type="checkbox" id="autoEqChk" ${SV.autoEq?'checked':''}> 每局結束自動換上撿到的更好裝備</label><div class="slots">${['weapon','armor','acc'].map(s=>{const it=SV.eq[s];return it?itemHTML(it,`${canIns(it)?`<button class="btn sm" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-ref="${s}" ${SV.zeny<refCost(it)||it.ref>=10?'disabled':''}>精煉 ${it.ref>=10?'MAX':refCost(it)+' 金幣'}</button><button class="btn sm ghost" data-uneq="${s}">卸下</button>`):`<div class="it"><div class="nm"><strong>${SLOTN[s]}</strong><small>空的，打倒菁英怪或到商店開寶箱拿裝備</small></div></div>`}).join('')}</div>
-      <h3>背包（${SV.inv.length}/80）　<button class="btn sm ghost" id="sellLow">賣掉所有普通、精良</button></h3><div class="items">${inv.length?inv.map(it=>itemHTML(it,`${canIns(it)?`<button class="btn sm ghost" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-eq="${it.id}">裝備</button><button class="btn sm ghost" data-sell="${it.id}">賣 ${sellVal(it)}</button>`)).join(''):'<p class="note">背包是空的。</p>'}</div>`;
+    H.innerHTML=`${insBox}<h3>身上的裝備　<button class="btn sm" id="autoEq">一鍵換上最好的</button></h3><label class="note" style="display:block;margin:-4px 0 4px"><input type="checkbox" id="autoEqChk" ${SV.autoEq?'checked':''}> 每局結束自動換上撿到的更好裝備</label><label class="note" style="display:block;margin:0 0 10px"><input type="checkbox" id="autoSellChk" ${SV.autoSell?'checked':''}> 每局結束自動賣掉比身上差的普通、精良裝備（有插卡或升過星的不會賣）</label><div class="slots">${['weapon','armor','acc'].map(s=>{const it=SV.eq[s];return it?itemHTML(it,`${canIns(it)?`<button class="btn sm" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-ref="${s}" ${SV.zeny<refCost(it)||it.ref>=10?'disabled':''}>精煉 ${it.ref>=10?'MAX':refCost(it)+' 金幣'}</button><button class="btn sm" data-star="${s}" ${(it.star||0)>=5||SV.zeny<starCost(it)||!SV.inv.some(x=>x.slot===s)?'disabled':''}>升星 ${(it.star||0)>=5?'MAX':`★${(it.star||0)+1}・${starCost(it)} 金幣＋1 件${SLOTN[s]}`}</button><button class="btn sm ghost" data-uneq="${s}">卸下</button>`):`<div class="it"><div class="nm"><strong>${SLOTN[s]}</strong><small>空的，打倒菁英怪或到商店開寶箱拿裝備</small></div></div>`}).join('')}</div>
+      <h3>背包（${SV.inv.length}/${BAG}）　<button class="btn sm ghost" id="sellLow">賣掉所有普通、精良</button></h3><div class="items">${inv.length?inv.map(it=>itemHTML(it,`${canIns(it)?`<button class="btn sm ghost" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-eq="${it.id}">裝備</button><button class="btn sm ghost" data-sell="${it.id}">賣 ${sellVal(it)}</button>`)).join(''):'<p class="note">背包是空的。</p>'}</div>`;
   }else if(tab==='card'){
     const have=CARDS.filter(r=>SV.cards[r[0]]).length;
     H.innerHTML=`<h3>卡片圖鑑（收集 ${have}/${CARDS.length}）</h3><p class="note">打倒怪物有機率掉牠的卡片：一般怪 ${(CARD_RATE.normal*100).toFixed(2)}%、金框菁英怪 ${CARD_RATE.elite*100}%、魔王 ${CARD_RATE.boss*100}%（掉該關卡的魔王卡）。卡片要插在對應部位、而且有空卡槽的裝備上。</p><div class="cards">${CARDS.map(r=>cardHTML(r[0],'',true)).join('')}</div>`;
   }else if(tab==='pet'){
     const own=Object.keys(SV.pets||{});
-    H.innerHTML=`<h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5）。</span></h3>
+    H.innerHTML=`<h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5），也可以用金幣餵點心一路養到 Lv10。</span></h3>
       <div class="box"><strong>孵寵物蛋</strong><p class="note">機率：傳說 3%、史詩 12%、稀有 30%、普通 55%</p><button class="btn" data-egg="z" ${SV.zeny<eggZeny()?'disabled':''}>${eggZeny()} 金幣</button><button class="btn" data-egg="b" ${SV.bones<EGG_BONES?'disabled':''}>🦴 ${EGG_BONES}</button><div id="eggRes"></div></div>
-      <div class="cards">${PETS.map(r=>{const id=r[0],has=own.includes(id),lv=(SV.pets||{})[id]||0,on=SV.pet===id;return `<div class="cardi${has?'':' no'}"><canvas width="96" height="96" data-pet="${id}" style="width:48px;height:48px"></canvas><div><strong style="color:${PRAR[r[4]].c}">${r[1]}</strong>${has?`<em>Lv ${lv}</em>`:''}<small>${PRAR[r[4]].n} · ${modTxt([has?petBon(id):r[3]])}</small>${has?(on?'<small><b>出戰中</b></small><button class="btn sm ghost" data-petoff="1">收回</button>':`<button class="btn sm" data-peton="${id}">帶出門</button>`):'<small class="note">還沒孵到</small>'}</div></div>`}).join('')}</div>`;
+      <div class="cards">${PETS.map(r=>{const id=r[0],has=own.includes(id),lv=(SV.pets||{})[id]||0,on=SV.pet===id;return `<div class="cardi${has?'':' no'}"><canvas width="96" height="96" data-pet="${id}" style="width:48px;height:48px"></canvas><div><strong style="color:${PRAR[r[4]].c}">${r[1]}</strong>${has?`<em>Lv ${lv}</em>`:''}<small>${PRAR[r[4]].n} · ${modTxt([has?petBon(id):r[3]])}</small>${has?(on?'<small><b>出戰中</b></small><button class="btn sm ghost" data-petoff="1">收回</button>':`<button class="btn sm" data-peton="${id}">帶出門</button>`)+(lv<PET_MAX?`<button class="btn sm ghost" data-feed="${id}" ${SV.zeny<feedCost(id)?'disabled':''}>餵點心 ${feedCost(id)} 金幣</button>`:'<small class="note">已滿級</small>'):'<small class="note">還沒孵到</small>'}</div></div>`}).join('')}</div>`;
     for(const pc of H.querySelectorAll('canvas[data-pet]')){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,96,96);c.translate(48,52);c.scale(3,3);drawPet(c,pc.dataset.pet,0,0,0)}
   }else if(tab==='ach'){
     const rd=achReady();H.innerHTML=`<h3>成就　<span class="note">完成後點「領取」拿狗骨頭</span>　${rd.length?`<button class="btn sm" id="achAll">一鍵全部領取（🦴 ${rd.reduce((a,b)=>a+b[3],0)}）</button>`:''}</h3><div class="items">${ACH.map(a=>{const got=(SV.ach||{})[a[0]],ok=a[2]();return `<div class="it" style="border-left-color:${got?'#7fd08a':ok?'#f5c542':'#d8c99a'}"><div class="nm"><strong>${a[1]}</strong><small>獎勵 🦴 ${a[3]}</small></div>${got?'<small class="note">已領取</small>':ok?`<button class="btn sm" data-ach="${a[0]}">領取</button>`:'<small class="note">未完成</small>'}</div>`}).join('')}</div>`;
@@ -1044,6 +1113,7 @@ function pull(n){
 const BONE_COST=1000;
 function hubClick(e){
   if(e.target.id==='autoEqChk'){SV.autoEq=e.target.checked;save();return}
+  if(e.target.id==='autoSellChk'){SV.autoSell=e.target.checked;save();return}
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(b.id==='autoEq'){const n=autoEquip();save();renderHub();if(!n){const h=$('hbody').querySelector('h3');if(h)h.insertAdjacentHTML('beforeend','<span class="note">　身上已經是最好的了</span>')}return}
   if(d.ins){insFor=+d.ins;renderHub();$('hbody').scrollTop=0;return}
@@ -1053,6 +1123,7 @@ function hubClick(e){
   if(d.egg){const z=d.egg==='z';if(z?SV.zeny<eggZeny():SV.bones<EGG_BONES)return;if(z)SV.zeny-=eggZeny();else SV.bones-=EGG_BONES;let x=Math.random()*100,r=0;for(let i=3;i>=0;i--){const cum=PRAR.slice(i).reduce((a,b)=>a+b.w,0);if(x<cum){r=i;break}}
     const ps=PETS.filter(q=>q[4]===r),id=ps[Math.floor(Math.random()*ps.length)][0];SV.pets=SV.pets||{};const was=SV.pets[id]||0;SV.pets[id]=Math.min(5,was+1);if(!SV.pet)SV.pet=id;save();renderHub();sfx(r>=2?'job':'drop');
     $('eggRes').innerHTML=`<p><b style="color:${PRAR[r].c}">${PRAR[r].n}・${PM[id].n}</b> ${was?(was>=5?'（已滿級）':`升到 Lv ${SV.pets[id]}！`):'NEW！'}</p>`;return}
+  if(d.feed){const id=d.feed,c=feedCost(id);if((SV.pets[id]||0)<PET_MAX&&SV.zeny>=c){SV.zeny-=c;SV.pets[id]++;sfx('drop');save();renderHub()}return}
   if(d.peton){SV.pet=d.peton;save();renderHub();return}
   if(d.petoff){SV.pet=null;save();renderHub();return}
   if(b.id==='achAll'){SV.ach=SV.ach||{};let n=0;for(const a of achReady()){SV.ach[a[0]]=1;SV.bones+=a[3];n++}if(n)sfx('drop');save();renderHub();return}
@@ -1072,11 +1143,12 @@ function hubClick(e){
   if(b.id==='resetTal'){SV.tal={};save();renderHub();return}
   if(b.id==='talAuto'){let pts=SV.tpe-tSpent(),i=0,guard=0;while(pts>0&&guard++<5000){const bi=i%3,br=TB[bi];const n=br.nodes.slice(0,7).find((x,ni)=>(SV.tal[x[0]]||0)<x[2]&&brSpent(bi)>=TREQ[ni])||(brSpent(bi)>=TREQ[7]?br.nodes[7]:null);if(n){SV.tal[n[0]]=(SV.tal[n[0]]||0)+1;pts--}i++}save();renderHub();return}
   if(d.eq){const i=SV.inv.findIndex(x=>x.id===+d.eq);if(i<0)return;const it=SV.inv.splice(i,1)[0];if(SV.eq[it.slot])SV.inv.push(SV.eq[it.slot]);SV.eq[it.slot]=it;save();renderHub();return}
-  if(d.uneq){if(SV.inv.length>=80)return;SV.inv.push(SV.eq[d.uneq]);SV.eq[d.uneq]=null;save();renderHub();return}
+  if(d.uneq){if(SV.inv.length>=BAG)return;SV.inv.push(SV.eq[d.uneq]);SV.eq[d.uneq]=null;save();renderHub();return}
   if(d.sell){const i=SV.inv.findIndex(x=>x.id===+d.sell);if(i<0)return;SV.zeny+=sellVal(SV.inv[i]);SV.inv.splice(i,1);save();renderHub();return}
   if(b.id==='sellLow'){let z=0;SV.inv=SV.inv.filter(it=>{if(it.rar<=1){z+=sellVal(it);return false}return true});SV.zeny+=z;save();renderHub();return}
+  if(d.star){const it=SV.eq[d.star];if(!it||(it.star||0)>=5)return;const c=starCost(it);const cand=SV.inv.filter(x=>x.slot===d.star&&!(x.cards||[]).length).sort((a,b)=>itemScore(a)-itemScore(b))[0]||SV.inv.filter(x=>x.slot===d.star).sort((a,b)=>itemScore(a)-itemScore(b))[0];if(!cand||SV.zeny<c)return;SV.zeny-=c;SV.inv=SV.inv.filter(x=>x!==cand);it.star=(it.star||0)+1;sfx('job');save();renderHub();return}
   if(d.ref){const it=SV.eq[d.ref];const c=refCost(it);if(SV.zeny>=c&&it.ref<10){SV.zeny-=c;it.ref++;save();renderHub()}return}
-  if(d.buy!==undefined){const s=SV.stage,c=d.buy==='1'?Math.round(1800*(1+s*2.2)):Math.round(250*(1+s*1.8));if(SV.zeny<c||SV.inv.length>=80)return;SV.zeny-=c;const it=genItem(s,d.buy==='1'?2:0);SV.inv.push(it);save();renderHub();$('shopRes').innerHTML=`<p>開出了：</p>`+itemHTML(it,'');paintItems($('shopRes'));sfx('drop');return}
+  if(d.buy!==undefined){const s=SV.stage,c=d.buy==='1'?Math.round(1800*(1+s*2.2)):Math.round(250*(1+s*1.8));if(SV.zeny<c||SV.inv.length>=BAG)return;SV.zeny-=c;const it=genItem(s,d.buy==='1'?2:0);SV.inv.push(it);save();renderHub();$('shopRes').innerHTML=`<p>開出了：</p>`+itemHTML(it,'');paintItems($('shopRes'));sfx('drop');return}
 }
 function openJob(){
   jobsNow=kids(SV.job);const nt=JM[SV.job].tier+1;
@@ -1214,6 +1286,7 @@ function hud(){
   T('Lv '+G.lvl,14,16,'left','700 18px Fredoka, sans-serif');
   T(`${j.n} · ${G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,14,40,'left','700 13px "Noto Sans TC", sans-serif');
   if(G.mode==='tower'&&!G.boss)T(`守衛出現 ${Math.max(0,Math.ceil(40-G.ft))} 秒`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
+  if(G.mode!=='tower'&&!G.boss&&!G.bossDone)T(`魔王出現 ${fmt(Math.max(0,G.bossT-G.t))}`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   T(fmt(G.t),W/2,14,'center','700 26px Fredoka, sans-serif');
   T('擊倒 '+G.kills,W-62,18,'right','700 16px "Noto Sans TC", sans-serif');
   if(!G.trial)T(`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}  卡片 ${G.rw.cards.length}`,W-62,40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
@@ -1363,6 +1436,7 @@ $('sbtn').addEventListener('click',()=>{auInit();AU.vol.on=!AU.vol.on;auApply()}
 frame.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;AU.vol[k]=+e.target.value;AU.vol.on=true;auApply()});
 $('breeds').addEventListener('click',e=>{const b=e.target.closest('.br');if(b)pickBreed(b.dataset.b)});
 $('breedCancel').addEventListener('click',()=>show('hub'));
+$('breedLogin').addEventListener('click',openAcct);
 $('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(b)chooseJob(+b.dataset.i)});
 $('jobCancel').addEventListener('click',()=>show('hub'));
 $('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;if(!SV.breed){SV.breed='shiba';save()}if(state==='hub')newRun(0,b.dataset.trial)});
@@ -1376,6 +1450,8 @@ $('quit').addEventListener('click',()=>{if(!G)return;G.retreat=1;state='play';en
 $('toTown').addEventListener('click',toTown);
 $('tipOk').addEventListener('click',closeTip);
 $('newsBtn').addEventListener('click',()=>{newsSel=0;openNews()});
+$('acctBtn').addEventListener('click',openAcct);
+$('acctClose').addEventListener('click',()=>$('acctov').classList.add('hide'));
 $('newsClose').addEventListener('click',()=>$('newsov').classList.add('hide'));
 $('newsList').addEventListener('click',e=>{const b=e.target.closest('.nv');if(b){newsSel=+b.dataset.nv;openNews()}});
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
@@ -1403,6 +1479,8 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.ma
   render();requestAnimationFrame(loop)}
 resize();buildDex();
 buildChangelog();
+if(window.DogCloud){DogCloud.onChange(acctBtnTxt);DogCloud.init().then(()=>{acctBtnTxt();if(DogCloud.status().loggedIn)syncAfterLogin().then(()=>{if(!$('acctov').classList.contains('hide'))renderAcct()})}).catch(()=>{})}
+acctBtnTxt();
 if(SV.breed){renderHub();show('hub');idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}}else{SV.newsSeen=VERSION;openBreeds('new')}
 requestAnimationFrame(loop);
 }

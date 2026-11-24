@@ -1,0 +1,136 @@
+// cloud.js：遊戲跟伺服器溝通的程式全部集中在這個檔案。
+// 之後要從 Supabase 搬到別的平台，只需要改寫這個檔案，遊戲本體（index.html）不用動。
+// 對外只提供 window.DogCloud 這個物件。
+(function () {
+  'use strict';
+  const cfg = window.DOG_CLOUD || {};
+  const enabled = !!(cfg.url && cfg.anonKey && window.supabase && window.supabase.createClient);
+  // 只用「帳號＋密碼」註冊的玩家，系統內部用這個不存在的網域當作登入用 Email（不會寄信）
+  const DOMAIN = 'players.dog-survivors.invalid';
+  const SYNC_DELAY = 15000; // 存檔後最多等 15 秒上傳一次，避免太頻繁
+
+  let sb = null, user = null, timer = null, pending = null, lastSync = 0, syncing = false, lastErr = '';
+  const listeners = [];
+  if (enabled) {
+    sb = window.supabase.createClient(cfg.url, cfg.anonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+  }
+
+  const toEmail = (u) => `${u.toLowerCase()}@${DOMAIN}`;
+  const realEmail = (u) => (u && u.email && !u.email.endsWith('@' + DOMAIN)) ? u.email : '';
+  const nameOf = (u) => (u && u.user_metadata && u.user_metadata.username) || '';
+
+  function emit() { const s = api.status(); for (const f of listeners) { try { f(s); } catch (e) { /* ignore */ } } }
+  function zh(e) {
+    const m = String((e && e.message) || e || '').toLowerCase();
+    if (m.includes('invalid login')) return '帳號或密碼錯誤';
+    if (m.includes('already registered') || m.includes('already been registered') || m.includes('duplicate')) return '這個帳號已經有人用了';
+    if (m.includes('database error saving new user')) return '這個帳號已經有人用了，或格式不正確';
+    if ((e && e.status === 429) || m.includes('rate limit') || m.includes('too many')) return '嘗試太多次，請稍等幾分鐘再試';
+    if (m.includes('weak') || m.includes('password should')) return '密碼太簡單，請至少 8 個字並混合英文和數字';
+    if (m.includes('email not confirmed')) return 'Email 還沒驗證，請先到信箱點驗證連結';
+    if (m.includes('failed to fetch') || m.includes('network')) return '連不上伺服器，請檢查網路';
+    return '發生錯誤：' + ((e && e.message) || e);
+  }
+  function need() { if (!enabled) throw new Error('雲端存檔還沒啟用'); }
+  function needUser() { need(); if (!user) throw new Error('請先登入'); }
+
+  const api = {
+    enabled,
+    status() {
+      return { enabled, loggedIn: !!user, username: nameOf(user), email: realEmail(user), lastSync, syncing, pending: !!pending, error: lastErr };
+    },
+    onChange(f) { listeners.push(f); },
+    validName(u) { return /^[a-z0-9_]{3,16}$/i.test(u || ''); },
+    validPass(p) { return typeof p === 'string' && p.length >= 8 && /[a-z]/i.test(p) && /[0-9]/.test(p); },
+
+    async init() {
+      if (!enabled) return;
+      const { data } = await sb.auth.getSession();
+      user = data.session ? data.session.user : null;
+      sb.auth.onAuthStateChange((_evt, session) => { user = session ? session.user : null; emit(); });
+      emit();
+    },
+
+    async signUp(username, password) {
+      need();
+      if (!api.validName(username)) throw new Error('帳號只能用 3～16 個英文字母、數字或底線');
+      if (!api.validPass(password)) throw new Error('密碼至少 8 個字，而且要同時有英文和數字');
+      const { data, error } = await sb.auth.signUp({
+        email: toEmail(username), password,
+        options: { data: { username: username.toLowerCase() } }
+      });
+      if (error) throw new Error(zh(error));
+      if (!data.session) throw new Error('註冊成功，但伺服器要求 Email 驗證，請管理員關閉「Confirm email」');
+      user = data.user; emit(); return user;
+    },
+
+    async signIn(id, password) {
+      need();
+      id = (id || '').trim();
+      const email = id.includes('@') ? id : toEmail(id);
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw new Error(zh(error));
+      user = data.user; emit(); return user;
+    },
+
+    async signOut() {
+      if (!enabled) return;
+      await api.flush();
+      await sb.auth.signOut();
+      user = null; emit();
+    },
+
+    // 綁定 Email：之後忘記密碼可以收信重設；綁定後也能用 Email 登入
+    async bindEmail(email) {
+      needUser();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email || '')) throw new Error('Email 格式不正確');
+      const { error } = await sb.auth.updateUser({ email }, { emailRedirectTo: location.origin + location.pathname });
+      if (error) throw new Error(zh(error));
+    },
+    async changePassword(password) {
+      needUser();
+      if (!api.validPass(password)) throw new Error('密碼至少 8 個字，而且要同時有英文和數字');
+      const { error } = await sb.auth.updateUser({ password });
+      if (error) throw new Error(zh(error));
+    },
+    async resetByEmail(email) {
+      need();
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if (error) throw new Error(zh(error));
+    },
+
+    // 讀取雲端存檔：沒有存檔時回傳 null
+    async load() {
+      needUser();
+      const { data, error } = await sb.from('saves').select('data, updated_at').eq('user_id', user.id).maybeSingle();
+      if (error) throw new Error(zh(error));
+      return data ? { data: data.data, updatedAt: data.updated_at } : null;
+    },
+
+    // 排隊上傳（會合併成一次）；立刻上傳請用 flush()
+    queue(save) {
+      if (!enabled || !user) return;
+      pending = save;
+      if (!timer) timer = setTimeout(() => { api.flush(); }, SYNC_DELAY);
+    },
+    async flush(version) {
+      clearTimeout(timer); timer = null;
+      if (!enabled || !user || !pending || syncing) return;
+      const data = pending; pending = null; syncing = true; emit();
+      try {
+        const { error } = await sb.from('saves').upsert({ user_id: user.id, data, game_version: version || null });
+        if (error) throw error;
+        lastSync = Date.now(); lastErr = '';
+      } catch (e) {
+        lastErr = zh(e); if (!pending) pending = data;
+        if (!timer) timer = setTimeout(() => { api.flush(); }, SYNC_DELAY * 2);
+      } finally { syncing = false; emit(); }
+    }
+  };
+
+  // 關掉分頁或切到背景時，把還沒上傳的存檔送出去
+  document.addEventListener('visibilitychange', () => { if (document.hidden) api.flush(); });
+  window.DogCloud = api;
+})();
