@@ -448,16 +448,19 @@ function drawPet(c,id,x,y,t){const pt=PM[id],b=Math.sin(t*8)*1.5;c.save();c.tran
   else if(id==='fox'){ell(c,-8,0,6,3,.4,'#ff9a4a');circ(c,-12,-2,2,'#fff');ell(c,0,2,7,5,0,'#ff9a4a');circ(c,5,-3,4.5,'#ff9a4a');tri(c,2,-6,3,-11,6,-6,'#ff9a4a');tri(c,5,-6,7,-11,8,-5,'#ff9a4a');ell(c,8,-2,2.5,1.8,0,'#fff');circ(c,10,-2.5,1,'#1a1414');circ(c,6,-4,1,'#1a1414')}
   else if(id==='owlet'){ell(c,0,0,7,8,0,'#a8865a');circ(c,-2.5,-2,2.8,'#fff');circ(c,2.5,-2,2.8,'#fff');circ(c,-2.2,-2,1.4,'#1a1414');circ(c,2.8,-2,1.4,'#1a1414');tri(c,-1,0,1,0,0,2,'#f5a742')}
   else if(id==='penguin2'){ell(c,0,1,6,8,0,'#2a3040');ell(c,1,3,4,5.5,0,'#fff');circ(c,1,-5,4.5,'#2a3040');circ(c,2.5,-6,1,'#fff');tri(c,5,-5,8,-4,5,-3,'#f5a742')}
-  else if(id.startsWith('cat_')){const K={cat_silver:{b:'#e9ecf1',s:'#aab1bc',e:'#4fb276'},cat_calico:{b:'#fbf8f2',s:'#e8954a',e:'#e8a02a'},cat_grey:{b:'#8f98a6',s:'#7a8392',e:'#f0902a'}}[id],sw=Math.sin(t*3)*.35;
-    c.save();c.translate(-8,0);c.rotate(-.5+sw);ell(c,0,-4,2.6,5.5,0,K.b);if(id==='cat_calico')ell(c,0,-7,2.3,2.4,0,'#2e2a28');if(id==='cat_silver')for(const ty of [-6,-3])ell(c,0,ty,2.5,.6,0,K.s);c.restore();
-    rr(c,-6,5,3,4,1.5,K.b);rr(c,3,5,3,4,1.5,K.b);ell(c,-1,2,8,5.6,0,K.b);
-    if(id==='cat_calico'){ell(c,-4,0,3.6,3,0,'#e8954a');ell(c,1,3,2.6,2,0,'#2e2a28')}if(id==='cat_silver')for(const sx of [-5,-2,1])ell(c,sx,0,.7,3,0,K.s);if(id==='cat_grey')ell(c,-1,4,5,2,0,'#9ca5b2');
-    tri(c,1.5,-7.5,3,-12,6,-8.5,K.b);tri(c,6.5,-9,8.6,-12.4,10,-8,K.b);tri(c,2.6,-8.2,3.3,-10.6,5,-8.6,'#f2b0b8');tri(c,7.2,-9,8.4,-11,9.2,-8.4,'#f2b0b8');
-    circ(c,5.5,-4.5,5.6,K.b);ell(c,7.4,-2.4,3.4,2.4,0,K.b);
-    if(id==='cat_calico'){ell(c,3,-7,3,2.4,-.3,'#e8954a');tri(c,6.5,-9,8.6,-12.4,10,-8,'#2e2a28')}
-    if(id==='cat_silver'){lineP(c,[[4,-8.6],[4.8,-7.4],[5.6,-8.8],[6.4,-7.4],[7.2,-8.6]],K.s,.7)}
-    const bl=(Math.floor(t*.7)%5===0&&(t*.7)%1<.12);if(bl){lineP(c,[[5.4,-4.8],[7,-4.8]],'#2a2220',.8);lineP(c,[[8.2,-4.8],[9.6,-4.8]],'#2a2220',.8)}else{for(const ex of [6.2,9]){circ(c,ex,-4.8,1.35,K.e);circ(c,ex+.15,-4.8,.65,'#1a1414');circ(c,ex-.35,-5.3,.3,'#fff')}}
-    tri(c,7.4,-3,8.6,-3,8,-2.2,'#f28a9a');lineP(c,[[8,-2.2],[7.4,-1.4]],'#2a2220',.4);lineP(c,[[8,-2.2],[8.6,-1.4]],'#2a2220',.4);
+  else if(id.startsWith('cat_')){const K={cat_silver:{b:'#cfd0d5',d:'#a3a4ab',l:'#ecedef',e:'#6ab88a',n:'#c09090',ear:'#bfc0c6'},cat_calico:{b:'#fbf8f2',d:'#6c6f78',l:'#ffffff',e:'#d9a040',n:'#e8a0a8',ear:'#fbf8f2'},cat_grey:{b:'#6e717b',d:'#62656e',l:'#7a7d87',e:'#e8a030',n:'#1e1e22',ear:'#686b75'}}[id],sw=Math.sin(t*3)*.35,G2='#6c6f78',PE='#e6b088';
+    c.save();c.translate(-8,1);c.rotate(-.5+sw);ell(c,0,-4,2.9,5.8,0,id==='cat_calico'?G2:id==='cat_silver'?K.d:K.b);c.restore();
+    rr(c,-6,5,3.3,4,1.6,K.b);rr(c,3,5,3.3,4,1.6,K.b);ell(c,-1,2,8.5,5.9,0,K.b);ell(c,.5,3.8,6,2.6,0,K.l);
+    if(id==='cat_silver'){c.globalAlpha=.75;ell(c,-2.5,-1.2,6.5,3,0,K.d);c.globalAlpha=1}
+    if(id==='cat_calico'){ell(c,-3.2,-.6,5,3.5,-.15,G2);ell(c,-6.2,2.6,2.6,2,0,PE);ell(c,1.6,-.2,2.6,1.8,.2,PE)}
+    const ear=(x0,y0,x1,y1,x2,y2,col)=>{c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(x1-.8,y1-.2,x1,y1);c.quadraticCurveTo(x1+.9,y1+.2,x2,y2);c.closePath();c.fillStyle=col;c.fill()};
+    ear(1.6,-7.4,3,-10.8,6,-8.8,id==='cat_calico'?G2:K.ear);ear(6.4,-9.2,8.8,-11.4,10.2,-7.8,id==='cat_calico'?PE:K.ear);tri(c,2.6,-8.1,3.3,-9.9,5,-8.6,'#e8b0b6');tri(c,7.2,-9,8.5,-10.4,9.4,-8.1,'#e8b0b6');
+    circ(c,5.5,-4.3,6,K.b);ell(c,7.7,-2.2,3.7,2.7,0,id==='cat_grey'?K.b:K.l);ell(c,3.2,-2.6,2.6,2.2,0,id==='cat_grey'?K.b:K.l);
+    if(id==='cat_silver'){c.globalAlpha=.7;ell(c,5,-8.3,4.6,2.1,0,K.d);c.globalAlpha=.45;ell(c,5.4,-6,1.2,2,0,K.d);c.globalAlpha=1}
+    if(id==='cat_calico'){ell(c,4.2,-8,4.8,2.6,-.1,G2);ell(c,8.4,-7.4,2.6,2,.3,PE);ell(c,2.4,-5.2,1.8,1.8,0,PE)}
+    const bl=(Math.floor(t*.7)%5===0&&(t*.7)%1<.12)||id==='cat_silver'&&(Math.floor(t*.35)%3===0);if(bl){for(const ex of [6.2,9])lineP(c,[[ex-.9,-4.8],[ex+.9,-4.6]],'#2a2220',.7)}else{for(const ex of [6.2,9]){circ(c,ex,-4.8,1.4,K.e);ell(c,ex+.15,-4.8,.5,1.1,0,'#1a1414');circ(c,ex-.35,-5.3,.32,'#fff')}}
+    tri(c,7.3,-3.1,8.7,-3.1,8,-2.2,K.n);lineP(c,[[8,-2.2],[7.4,-1.4]],'#2a2220',.4);lineP(c,[[8,-2.2],[8.6,-1.4]],'#2a2220',.4);
+    if(id==='cat_grey'){c.beginPath();c.moveTo(2.2,.6);c.quadraticCurveTo(6.4,5.6,10.6,.4);c.lineTo(9.8,-.6);c.quadraticCurveTo(6.4,2,3,-.4);c.closePath();c.fillStyle='#8ed07a';c.fill();for(const sx of [3.6,5.2,6.8,8.4])lineP(c,[[sx,.6],[sx+.3,2.6]],'#ffffff',.5);circ(c,6.6,2.2,.55,'#fff');circ(c,6.6,3.4,.55,'#fff')}
     if(id==='cat_silver'){rr(c,3,.2,6,1.2,.6,'#e04a4a');circ(c,6,2.2,1.5,'#f5c542');circ(c,6,2.2,.7,'#d8a020')}}
   else{const f=Math.sin(t*14)*3;tri(c,-2,-2,-12,-9-f,-6,2,'#c83a2a');tri(c,2,-2,10,-10-f,5,2,'#c83a2a');ell(c,0,2,7,5,0,'#ff5a3a');circ(c,6,-3,4.5,'#ff5a3a');tri(c,4,-7,5,-11,7,-7,'#ffe27a');circ(c,7.5,-4,1,'#1a1414');ell(c,-7,4,4,1.6,.5,'#ff5a3a')}
   c.restore()}
@@ -1273,8 +1276,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.17.0';
+const VERSION='0.17.1';
 const NEWS=[
+ {v:'0.17.1',d:'11/24',t:'貓咪重畫',items:[['調整','照著真貓重畫三隻英短：錢錢改成銀色漸層的毛（背上和頭頂顏色比較深），常常瞇著眼睛打瞌睡；阿咪的黑色花紋改成灰色，配上淡橘色斑；小卡改成深灰藍色、黑鼻子，還戴上綠色條紋小圍兜'],['調整','三隻的耳朵都改成英短那種小小圓圓的']]},
  {v:'0.17.0',d:'11/24',t:'流派・自由換職業',items:[['新增','流派：每個職業都可以選打法，「均衡」「近戰」「遠程」「範圍」「會心」五種，每條職業線有自己的名字（例如劍士線：狂戰流、劍氣流、聖域流、一擊必殺流）'],['新增','選了流派後，那一類招式傷害更高、冷卻更短，升級時也比較常出現，開局還會多送一招；近戰流更耐打、遠程流跑更快、範圍流範圍更大、會心流爆擊更強'],['新增','自由換職業：轉職過後，任何職業線裡你到過的轉數以內的職業都可以在「角色」分頁隨時免費換過去（例如到過二轉，就能在所有職業線的一轉、二轉之間自由切換）；每一轉的 Job Lv 會分別記住，換回來不會掉'],['調整','出戰畫面和戰鬥左上角會顯示目前的流派'],['新增','社交動作都有音效了：汪汪叫、嗷嗚長嚎、搖尾巴、嗅嗅、拍拍、打滾、轉圈、坐下、打呼、丟球、送點心、收到邀請；別的狗做動作時，離你越近聲音越大']]},
  {v:'0.16.2',d:'11/24',t:'手機發燙改善',items:[['新增','省電模式（手機預設開啟）：戰鬥維持 30 FPS、解析度稍微降低，手機比較不會發燙；可以在暫停選單關掉'],['調整','高更新率手機（120Hz）不會再用 120 FPS 狂跑，戰鬥最多 60 FPS；主城最多 30～45 FPS；打開選單、暫停、看結算時幾乎不重畫'],['調整','手機上同一時間最多 260 隻怪（電腦 380 隻），畫面不會塞爆'],['調整','地上寶石太多時，附近的寶石會自動合成一顆比較大的（經驗不會少）；寶石改用預先畫好的圖']]},
  {v:'0.16.1',d:'11/24',t:'貓咪寵物',items:[['新增','三隻英國短毛貓寵物：傳說「錢錢」（銀白英短，戴著金幣鈴鐺，金幣 +18%）、史詩「阿咪」（三花英短，爆擊率 +6%）、稀有「小卡」（灰色英短，生命 +30）；孵寵物蛋就有機會抽到'],['修正','時裝預覽會用你現在穿的整套搭配，再換上要看的那一件；不會再出現換了頭飾、看其他部位時還是顯示舊樣子的問題']]},
