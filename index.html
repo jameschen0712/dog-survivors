@@ -158,6 +158,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
     <h2>怎麼玩</h2>
     <ul>
       <li>選一隻狗開始。每一局出戰都是肉鴿：從 Lv1 開始升級、選強化，撐到 5:00 打倒關卡魔王就通關。</li>
+      <li>偶爾會掉紅色的<b>磁鐵</b>（金框菁英怪比較常掉），撿到就把畫面上所有經驗寶石、金幣、肉骨頭一次吸過來。</li>
       <li>不管輸贏，這局拿到的 Base／Job 經驗、金幣和裝備都會帶回城鎮。在城鎮可以點天賦、換裝備、精煉、轉職。</li>
       <li>Job Lv 10 可以一轉，30 可以二轉，40 可以進階二轉和三轉。每個職業只會用自己職業線的招式。</li>
       <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>／方向鍵移動，或按住滑鼠讓狗跟著游標走；手機按住畫面拖曳就是搖桿。<kbd>P</kbd>／<kbd>Esc</kbd> 暫停。</li>
@@ -611,6 +612,7 @@ function kill(e){
   if(e.boss){G.bossDone=true;G.boss=null;G.winT=1.6;banner(`${sg.boss}倒下了！`);flash=.6;return}
   G.J.push({x:e.x,y:e.y,v:e.elite?12:ET[e.type].xp,m:false});
   if(e.elite||Math.random()<.012)G.J.push({x:e.x+10,y:e.y,v:0,heal:30,m:false});
+  if((e.elite&&Math.random()<.35)||Math.random()<.0035||(G.J.length>260&&!G.J.some(j=>j.mag)&&Math.random()<.02))G.J.push({x:e.x-10,y:e.y,v:0,mag:1,m:false});
 }
 const EC={sprout:'#7cc35a',bat:'#5a60a0',shroom:'#4aa3a0',wisp:'#7a5ab8',golem:'#a3a59a',knight:'#9a7048',treant:'#6b4a2e'};
 function damageP(d){const p=G.p;if(p.inv>0||state!=='play')return;d=Math.max(1,Math.round(d*(1-G.st.dr)));p.hp-=d;p.inv=.6;G.shake=.25;sfx('hurt');txt(p.x,p.y-28,'-'+d,'#ff6b6b');
@@ -755,9 +757,9 @@ function update(dt){
   for(const b of G.B){b.life-=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.x-p.x,b.y-p.y)<p.r+b.r){b.life=0;damageP(b.dmg)}}
   G.B=G.B.filter(b=>b.life>0);
   for(const j of G.J){const dx=p.x-j.x,dy=p.y-j.y,d=Math.hypot(dx,dy)||1;
-    if(!j.m&&d<G.st.mag)j.m=true;
-    if(j.m){const sp=Math.max(260,520-d);j.x+=dx/d*sp*dt;j.y+=dy/d*sp*dt}
-    if(d<p.r+8){j.got=true;if(j.coin){G.rw.zeny+=j.coin;sfx('coin',0,.06)}else if(j.heal){heal(j.heal);txt(p.x,p.y-30,'+'+j.heal,'#7fe3a0')}else{G.xp+=j.v;AU.gc=G.t-AU.gt<.4?Math.min(12,AU.gc+1):0;AU.gt=G.t;sfx('gem',AU.gc,.02)}}
+    if(!j.m&&d<G.st.mag*(j.mag?.5:1))j.m=true;
+    if(j.m){const sp=Math.max(260,520-d,d*2.2);j.x+=dx/d*sp*dt;j.y+=dy/d*sp*dt}
+    if(d<p.r+8){j.got=true;if(j.mag){let n=0;for(const o of G.J)if(!o.mag&&!o.got){o.m=true;n++}txt(p.x,p.y-36,'磁鐵！全部吸過來','#ff6b8a',true);sfx('drop');fx({k:'ring',x:p.x,y:p.y,R:Math.max(W,H)/S*.6,c:'#ff6b8a',life:.5,max:.5})}else if(j.coin){G.rw.zeny+=j.coin;sfx('coin',0,.06)}else if(j.heal){heal(j.heal);txt(p.x,p.y-30,'+'+j.heal,'#7fe3a0')}else{G.xp+=j.v;AU.gc=G.t-AU.gt<.4?Math.min(12,AU.gc+1):0;AU.gt=G.t;sfx('gem',AU.gc,.02)}}
     else if(d>2600)j.got=true}
   G.J=G.J.filter(j=>!j.got);
   for(const f of G.FX){f.life-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=(f.vy||0)*dt;if(f.k!=='shard'){f.vx*=.92;f.vy*=.92}if(f.g)f.vy+=f.g*dt;if(f.k==='coinp')f.vy+=500*dt}else if(f.vy!==undefined)f.y+=f.vy*dt}
@@ -932,6 +934,7 @@ function pickBreed(k){SV.breed=k;save();if(breedMode==='new'){tab='go'}renderHub
 function drawGem(j,t){const c=ctx,y=j.y+Math.sin(t*4+j.x)*2,pulse=.5+.5*Math.sin(t*6+j.x);
   shadow(c,j.x,j.y+8,6,2.2);
   if(j.heal){c.save();c.translate(j.x,y);c.rotate(-.5);c.globalAlpha=.35+.25*pulse;circ(c,0,0,13,'#ffffff');c.globalAlpha=1;for(const sx of [-6,6])for(const sy of [-2.5,2.5])circ(c,sx,sy,3.6,'#3a2a1c');rr(c,-7,-3,14,6,3,'#3a2a1c');rr(c,-6,-2,12,4,2,'#fbf2dc');for(const sx of [-6,6])for(const sy of [-2.5,2.5])circ(c,sx,sy,2.6,'#fbf2dc');c.restore();return}
+  if(j.mag){c.save();c.translate(j.x,y);c.globalAlpha=.35+.35*pulse;circ(c,0,0,16,'#ff9ab0');c.globalAlpha=1;c.rotate(Math.sin(t*3)*.2);c.lineCap='butt';c.beginPath();c.arc(0,-1,7,Math.PI,0);c.strokeStyle='#2a1e12';c.lineWidth=7;c.stroke();c.beginPath();c.moveTo(-7,-1);c.lineTo(-7,7);c.moveTo(7,-1);c.lineTo(7,7);c.stroke();c.beginPath();c.arc(0,-1,7,Math.PI,0);c.strokeStyle='#e8384a';c.lineWidth=4.5;c.stroke();c.beginPath();c.moveTo(-7,-1);c.lineTo(-7,4);c.moveTo(7,-1);c.lineTo(7,4);c.stroke();c.strokeStyle='#e8eef2';c.beginPath();c.moveTo(-7,4);c.lineTo(-7,7.5);c.moveTo(7,4);c.lineTo(7,7.5);c.stroke();c.restore();return}
   if(j.coin){c.save();c.translate(j.x,y);c.globalAlpha=.3+.3*pulse;circ(c,0,0,12,'#fff3a0');c.globalAlpha=1;const sq=Math.abs(Math.cos(t*5+j.x));ell(c,0,0,7.5*sq+1.5,7.5,0,'#5a3a08');ell(c,0,0,6*sq+1,6,0,'#f5c542');ell(c,0,0,3.2*sq+.5,3.2,0,'#ffe58a');c.restore();return}
   const s=j.v>=5?9:j.v>=2?7.5:6,col=j.v>=5?'#ff6a3a':j.v>=2?'#c27bff':'#3fd0ff';
   c.globalAlpha=.25+.3*pulse;circ(c,j.x,y,s*2,col);c.globalAlpha=1;
