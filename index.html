@@ -55,6 +55,8 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .stats b{display:block;font:700 24px Fredoka,"Noto Sans TC",sans-serif}.stats span{font-size:13px;color:#6b5a40}
 .rw{text-align:left;background:#f3ead0;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:14px;display:grid;gap:4px;max-height:34vh;overflow:auto}
 .pbtn{position:absolute;top:14px;right:12px;width:40px;height:40px;border-radius:12px;border:0;background:rgba(16,38,26,.75);color:#fff;font:700 15px Fredoka,sans-serif;cursor:pointer}
+.sbtn{position:absolute;bottom:12px;right:12px;z-index:6;width:40px;height:40px;border-radius:12px;border:0;background:rgba(16,38,26,.75);color:#fff;font:700 18px Fredoka,sans-serif;cursor:pointer}
+.vol{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;text-align:left;font-size:14px;margin:0 0 12px}.vol input{width:100%;accent-color:#2f7a3e}
 .joy{position:absolute;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);pointer-events:none}
 .joy i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:50%;background:rgba(255,255,255,.55)}
 .plist{display:grid;gap:6px;text-align:left;margin:0 0 14px;max-height:42vh;overflow:auto}
@@ -124,6 +126,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <canvas id="cv"></canvas>
       <div id="joy" class="joy hide"><i></i></div>
       <button id="pbtn" class="pbtn hide" aria-label="暫停">II</button>
+      <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <div class="hub hide" id="hub">
         <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div></div>
         <div class="tabs" id="tabs"></div>
@@ -132,7 +135,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button></div></div>
       <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p></div></div>
-      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
+      <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="over"><div class="card"><h2 id="ovT"></h2><div class="stats" id="ovS"></div><div class="rw" id="ovR"></div><button class="btn" id="toTown">回到城鎮</button></div></div>
     </div>
   </div>
@@ -506,7 +509,7 @@ function newRun(stage,trialJob){
   for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;G.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}
   if(st.freePick)G.pend=1;
   banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:`${STAGES[stage].n}：撐到 5:00 打倒${STAGES[stage].boss}！`);
-  state='play';show(null);$('pbtn').classList.remove('hide');last=performance.now();document.body.classList.add('playing');
+  state='play';show(null);$('pbtn').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
   try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
 }
 const xpNeed=l=>Math.floor(3+l*2.5+l*l*.45);
@@ -533,19 +536,19 @@ function hurt(e,d,kx,ky,kb,col){
   if(!e||e.dead)return;d*=G.st.dmg;let crit=false;if(Math.random()<G.st.crit){d*=G.st.critD;crit=true}
   e.hp-=d;e.hit=.12;
   if(!e.boss&&kb){const k=kb/(e.elite?3:1);e.kx+=kx*k;e.ky+=ky*k}
-  txt(e.x+R(-6,6),e.y-e.r-4,Math.round(d),crit?'#ffd35a':'#fff',crit||d>150);
+  txt(e.x+R(-6,6),e.y-e.r-4,Math.round(d),crit?'#ffd35a':'#fff',crit||d>150);sfx(crit?'crit':'hit',0,.05);
   if(e.hp<=0)kill(e);
 }
 function kill(e){
   e.dead=true;G.kills++;sparks(e.x,e.y,e.boss?40:7,e.boss?'#9be36b':'#e8f5c8');
   const sg=STAGES[G.stage],xp=e.boss?200:e.elite?20:ET[e.type].xp;
   G.rw.bxp+=xp*3*sg.rw*G.st.exp;G.rw.jxp+=xp*3*sg.rw*G.st.exp;G.rw.zeny+=Math.round((e.boss?600:e.elite?60:R(1,4))*sg.rw*G.st.zeny);
-  if(!G.trial){if(e.boss){G.rw.items.push(genItem(G.stage,2),genItem(G.stage,1))}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true)}else if(Math.random()<.004)G.rw.items.push(genItem(G.stage,0))}
+  if(!G.trial){if(e.boss){G.rw.items.push(genItem(G.stage,2),genItem(G.stage,1))}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004)G.rw.items.push(genItem(G.stage,0))}
   if(e.boss){G.bossDone=true;G.boss=null;G.winT=1.6;banner(`${sg.boss}倒下了！`);flash=.6;return}
   G.J.push({x:e.x,y:e.y,v:e.elite?12:ET[e.type].xp,m:false});
   if(e.elite||Math.random()<.012)G.J.push({x:e.x+10,y:e.y,v:0,heal:30,m:false});
 }
-function damageP(d){const p=G.p;if(p.inv>0||state!=='play')return;d=Math.max(1,Math.round(d*(1-G.st.dr)));p.hp-=d;p.inv=.6;G.shake=.25;txt(p.x,p.y-28,'-'+d,'#ff6b6b');
+function damageP(d){const p=G.p;if(p.inv>0||state!=='play')return;d=Math.max(1,Math.round(d*(1-G.st.dr)));p.hp-=d;p.inv=.6;G.shake=.25;sfx('hurt');txt(p.x,p.y-28,'-'+d,'#ff6b6b');
   if(p.hp<=0){if(G.revive>0){G.revive--;p.hp=p.max*.5;p.inv=2;banner('不屈！原地復活');sparks(p.x,p.y,40,'#fff27a',220,.8);areaHit(p.x,p.y,180,200,300);return}p.hp=0;end(false)}}
 function areaHit(x,y,Rr,dmg,kb,fn){near(x,y,Rr+M,e=>{if(e.dead)return;const dx=e.x-x,dy=e.y-y,d=Math.hypot(dx,dy);if(d<Rr+e.r){if(fn)fn(e);hurt(e,dmg,dx/(d||1),dy/(d||1),kb)}})}
 function lineHit(x,y,a,L,w,dmg,kb,fn){const ux=Math.cos(a),uy=Math.sin(a);near(x+ux*L/2,y+uy*L/2,L/2+w+M,e=>{if(e.dead)return;const dx=e.x-x,dy=e.y-y,t=dx*ux+dy*uy;if(t<-e.r||t>L+e.r)return;const pd=Math.abs(dx*uy-dy*ux);if(pd<w+e.r){if(fn)fn(e);hurt(e,dmg,ux,uy,kb)}})}
@@ -625,7 +628,7 @@ function update(dt){
   if(!G.ring4&&G.t>=220){G.ring4=1;ring('shroom',32)}
   if(!G.boss&&!G.bossDone&&G.t>=BOSS_T){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp;
     const e={type:'treant',x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};
-    G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`)}
+    G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss');sfx('bossin')}
   if(G.winT>0){G.winT-=dt;if(G.winT<=0){end(true);return}}
 
   buildGrid();
@@ -635,7 +638,7 @@ function update(dt){
       for(let i=0;i<n;i++){const [ox,oy,a]=orbPos(w,i);near(ox,oy,M,e=>{if(e.dead||e.orbT>0)return;if(Math.hypot(e.x-ox,e.y-oy)<e.r+11){e.orbT=.4;hurt(e,skDmg(s,l,1),Math.cos(a),Math.sin(a),60);sparks(ox,oy,3,s.c,120)}})}
       continue}
     if(k==='aura'||k==='sanct'){w.tick-=dt;w.a+=dt;if(w.tick<=0){w.tick=.5;areaHit(p.x,p.y,auraR(w),skDmg(s,l,1),25);if(k==='sanct')heal(.6+.4*l)}continue}
-    w.cd-=dt;if(w.cd>0)continue;w.cd=Math.max(.15,MECH[k].cd*(1-.06*(l-1)))*G.st.cd;FIRE[k](w,l,ar);
+    w.cd-=dt;if(w.cd>0)continue;w.cd=Math.max(.15,MECH[k].cd*(1-.06*(l-1)))*G.st.cd;FIRE[k](w,l,ar);skillSfx(s);
   }
   for(const b of G.P){b.life-=dt;
     if(b.tg){if(b.tg.dead)b.tg=null;else{const a=Math.atan2(b.tg.y-b.y,b.tg.x-b.x),sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx),da=((a-cur)%TAU+TAU*1.5)%TAU-Math.PI,na=cur+Math.max(-5*dt,Math.min(5*dt,da));b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}}
@@ -645,7 +648,7 @@ function update(dt){
     if(b.life>0)near(b.x,b.y,b.r+M,e=>{if(b.life<=0||e.dead||b.hits.has(e))return;if(Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){const sp=Math.hypot(b.vx,b.vy)||1;b.hits.add(e);
       if(b.k==='ball'){b.life=0;return}
       hurt(e,b.dmg,b.vx/sp,b.vy/sp,b.k==='wave'?120:70);fx({k:'impact',x:e.x,y:e.y,c:b.c,R:14,life:.14,max:.14});if(b.pr--<=0)b.life=0}});
-    if(b.k==='ball'&&b.life<=0){fx({k:'ring',x:b.x,y:b.y,R:b.R,c:b.c,life:.4,max:.4,fill:1});sparks(b.x,b.y,18,b.c,260);areaHit(b.x,b.y,b.R,b.dmg,150);if(b.s.x.zap)for(let i=0;i<3;i++)lightning(b.x,b.y,b.x+R(-b.R,b.R),b.y+R(-b.R,b.R),b.c,3);G.shake=Math.max(G.shake,.1)}
+    if(b.k==='ball'&&b.life<=0){sfx(b.s.x.zap?'zap':'fire',0,.06);fx({k:'ring',x:b.x,y:b.y,R:b.R,c:b.c,life:.4,max:.4,fill:1});sparks(b.x,b.y,18,b.c,260);areaHit(b.x,b.y,b.R,b.dmg,150);if(b.s.x.zap)for(let i=0;i<3;i++)lightning(b.x,b.y,b.x+R(-b.R,b.R),b.y+R(-b.R,b.R),b.c,3);G.shake=Math.max(G.shake,.1)}
   }
   G.P=G.P.filter(b=>b.life>0);
   const Zs=G.Z;G.Z=[];
@@ -655,17 +658,17 @@ function update(dt){
       if(s.x.zap)lightning(z.x,z.y-300,z.x,z.y,z.c,4);sparks(z.x,z.y,8,z.c,200,.4,s.x.rock?400:0);
       areaHit(z.x,z.y,z.R,z.dmg,40,s.x.slow?e=>{e.slow=1.5}:null);continue}}
     else if(z.k==='storm'){z.tick-=dt;if(z.tick<=0){z.tick=.3;areaHit(z.x,z.y,z.R,z.dmg,0,z.s.x.slow?e=>{e.slow=.6}:null)}if(z.life<=0)continue}
-    else if(z.k==='lov'){z.tick-=dt;if(z.tick<=0){z.tick=.16;const a=R(0,TAU),r=Math.sqrt(Math.random())*z.R,x=z.x+Math.cos(a)*r,y=z.y+Math.sin(a)*r;lightning(x+R(-30,30),y-320,x,y,z.c,5);fx({k:'impact',x,y,c:z.c,R:26,life:.18,max:.18});areaHit(x,y,z.R*.4,z.dmg,30)}if(z.life<=0)continue}
-    else if(z.k==='met'){if(z.life<=0){fx({k:'ring',x:z.x,y:z.y,R:z.R,c:z.c,life:.5,max:.5,fill:1});sparks(z.x,z.y,26,z.c,300,.6);sparks(z.x,z.y,12,'#5a3a2a',220,.6,300);areaHit(z.x,z.y,z.R,z.dmg,200);G.shake=Math.max(G.shake,.2);flash=Math.max(flash,.12);continue}}
+    else if(z.k==='lov'){z.tick-=dt;if(z.tick<=0){z.tick=.16;const a=R(0,TAU),r=Math.sqrt(Math.random())*z.R,x=z.x+Math.cos(a)*r,y=z.y+Math.sin(a)*r;lightning(x+R(-30,30),y-320,x,y,z.c,5);sfx('zap',0,.1);fx({k:'impact',x,y,c:z.c,R:26,life:.18,max:.18});areaHit(x,y,z.R*.4,z.dmg,30)}if(z.life<=0)continue}
+    else if(z.k==='met'){if(z.life<=0){fx({k:'ring',x:z.x,y:z.y,R:z.R,c:z.c,life:.5,max:.5,fill:1});sparks(z.x,z.y,26,z.c,300,.6);sparks(z.x,z.y,12,'#5a3a2a',220,.6,300);areaHit(z.x,z.y,z.R,z.dmg,200);sfx('boom',0,.08);G.shake=Math.max(G.shake,.2);flash=Math.max(flash,.12);continue}}
     else if(z.k==='shower'){if(!z.done&&z.life<.2){z.done=true;areaHit(z.x,z.y,z.R,z.dmg,40);for(let i=0;i<8;i++)fx({k:'impact',x:z.x+R(-z.R,z.R)*.7,y:z.y+R(-z.R,z.R)*.7,c:z.c,R:12,life:.15,max:.15})}if(z.life<=0)continue}
-    else if(z.k==='trap'){z.arm-=dt;if(z.arm<=0){let hit=false;near(z.x,z.y,M,e=>{if(!hit&&!e.dead&&Math.hypot(e.x-z.x,e.y-z.y)<e.r+16)hit=true});if(hit){fx({k:'ring',x:z.x,y:z.y,R:z.R,c:z.c,life:.4,max:.4,fill:1});sparks(z.x,z.y,20,z.plant?'#7fe3a0':z.c,260);areaHit(z.x,z.y,z.R,z.dmg,160);continue}}if(z.life<=0)continue}
+    else if(z.k==='trap'){z.arm-=dt;if(z.arm<=0){let hit=false;near(z.x,z.y,M,e=>{if(!hit&&!e.dead&&Math.hypot(e.x-z.x,e.y-z.y)<e.r+16)hit=true});if(hit){sfx('boom',0,.08);fx({k:'ring',x:z.x,y:z.y,R:z.R,c:z.c,life:.4,max:.4,fill:1});sparks(z.x,z.y,20,z.plant?'#7fe3a0':z.c,260);areaHit(z.x,z.y,z.R,z.dmg,160);continue}}if(z.life<=0)continue}
     else if(z.k==='pud'){z.tick-=dt;if(z.tick<=0){z.tick=.4;areaHit(z.x,z.y,z.R,z.dmg,0)}if(z.life<=0)continue}
     else if(z.k==='toss'){if(z.life<=0){G.Z.push({k:'pud',x:z.x,y:z.y,R:z.R,dmg:z.dmg,life:3,max:3,tick:0,c:z.c,paint:z.paint});sparks(z.x,z.y,14,z.c,180);continue}}
     else if(z.k==='falcon'){if(z.life<=0){const t=z.t;if(!t.dead){hurt(t,z.dmg,0,-1,80);fx({k:'impact',x:t.x,y:t.y,c:z.c,R:26,life:.2,max:.2});sparks(t.x,t.y,10,'#fff',220);if(z.big)areaHit(t.x,t.y,60,z.dmg*.6,80)}continue}}
     else if(z.k==='pillar'){if(z.life<=0){fx({k:'beam',x:z.x,y:z.y,w:z.R*1.1,c:z.c,life:.45,max:.45});for(let i=0;i<8;i++)fx({k:'plus',x:z.x+R(-12,12),y:z.y,vy:-R(60,140),c:z.fire?'#ffcf4a':'#fff6c0',life:.6,max:.6});areaHit(z.x,z.y,z.R,z.dmg,60);continue}}
     else if(z.k==='coin'){if(z.life<=0){fx({k:'ring',x:z.x,y:z.y,R:z.R,c:'#f5c542',life:.35,max:.35,fill:1});for(let i=0;i<16;i++){const a=R(0,TAU),v=R(80,260);fx({k:'coinp',x:z.x,y:z.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,life:.6,max:.6})}areaHit(z.x,z.y,z.R,z.dmg,140);txt(z.x,z.y-30,'＄','#ffd35a',true);continue}}
     else if(z.k==='asura'){const pp=G.p;if(Math.random()<.8){const a=R(0,TAU),r=R(40,70);fx({k:'pt',x:pp.x+Math.cos(a)*r,y:pp.y+Math.sin(a)*r,vx:-Math.cos(a)*r*3,vy:-Math.sin(a)*r*3,s:3,c:z.c,life:.3,max:.3})}
-      if(z.life<=0){const[a]=aim(500);fx({k:'thrust',x:pp.x,y:pp.y,a,L:z.L,w:z.w,c:z.c,life:.5,max:.5,huge:1});lineHit(pp.x,pp.y,a,z.L,z.w,z.dmg,320);flash=Math.max(flash,.35);G.shake=Math.max(G.shake,.35);txt(pp.x,pp.y-40,'阿修羅！','#9fe0ff',true);continue}}
+      if(z.life<=0){sfx('boom');const[a]=aim(500);fx({k:'thrust',x:pp.x,y:pp.y,a,L:z.L,w:z.w,c:z.c,life:.5,max:.5,huge:1});lineHit(pp.x,pp.y,a,z.L,z.w,z.dmg,320);flash=Math.max(flash,.35);G.shake=Math.max(G.shake,.35);txt(pp.x,pp.y-40,'阿修羅！','#9fe0ff',true);continue}}
     else if(z.k==='breath'){const pp=G.p;for(let i=0;i<3;i++){const a=z.a+R(-.35,.35),v=R(280,420);fx({k:'pt',x:pp.x+Math.cos(z.a)*14,y:pp.y-4+Math.sin(z.a)*14,vx:Math.cos(a)*v,vy:Math.sin(a)*v,s:R(4,8),c:i?z.c:'#ffe27a',life:z.L/350,max:z.L/350,flame:1})}
       z.tick-=dt;if(z.tick<=0){z.tick=.1;near(pp.x,pp.y,z.L+M,e=>{if(e.dead)return;const dx=e.x-pp.x,dy=e.y-pp.y,d=Math.hypot(dx,dy);if(d>z.L+e.r)return;const da=Math.abs(((Math.atan2(dy,dx)-z.a)%TAU+TAU*1.5)%TAU-Math.PI);if(da<.45)hurt(e,z.dmg,dx/(d||1),dy/(d||1),30)})}if(z.life<=0)continue}
     else if(z.life<=0)continue;
@@ -689,7 +692,7 @@ function update(dt){
   for(const j of G.J){const dx=p.x-j.x,dy=p.y-j.y,d=Math.hypot(dx,dy)||1;
     if(!j.m&&d<G.st.mag)j.m=true;
     if(j.m){const sp=Math.max(260,520-d);j.x+=dx/d*sp*dt;j.y+=dy/d*sp*dt}
-    if(d<p.r+8){j.got=true;if(j.heal){heal(j.heal);txt(p.x,p.y-30,'+'+j.heal,'#7fe3a0')}else G.xp+=j.v}
+    if(d<p.r+8){j.got=true;if(j.heal){heal(j.heal);txt(p.x,p.y-30,'+'+j.heal,'#7fe3a0')}else{G.xp+=j.v;AU.gc=G.t-AU.gt<.4?Math.min(12,AU.gc+1):0;AU.gt=G.t;sfx('gem',AU.gc,.02)}}
     else if(d>2600)j.got=true}
   G.J=G.J.filter(j=>!j.got);
   for(const f of G.FX){f.life-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=(f.vy||0)*dt;if(f.k!=='shard'){f.vx*=.92;f.vy*=.92}if(f.g)f.vy+=f.g*dt;if(f.k==='coinp')f.vy+=500*dt}else if(f.vy!==undefined)f.y+=f.vy*dt}
@@ -708,7 +711,7 @@ function rollChoices(){
   const out=pool.slice(0,3);if(!out.length)out.push({t:'h'});return out;
 }
 function openLevel(){
-  keys.clear();state='level';choicesNow=rollChoices();
+  keys.clear();state='level';choicesNow=rollChoices();sfx('lvl');
   $('choices').innerHTML=choicesNow.map((o,i)=>{
     if(o.t==='h')return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:#ff8a8a">骨</b><span><strong>大骨頭</strong><small>回復 40 生命</small></span></button>`;
     if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
@@ -725,7 +728,7 @@ function choose(i){
 
 /* ---------- run end & rewards ---------- */
 function end(win){
-  if(state==='over')return;state='over';const t=Math.floor(G.t),sg=STAGES[G.stage],rw=G.rw;
+  if(state==='over')return;state='over';const t=Math.floor(G.t),sg=STAGES[G.stage],rw=G.rw;stopMusic();sfx(win?'win':'lose');
   $('ovT').textContent=win?`通關！${sg.boss}倒下了`:G.retreat?'撤退回城鎮':'你倒下了';
   $('ovS').innerHTML=`<div><b>${fmt(t)}</b><span>存活時間</span></div><div><b>${G.lvl}</b><span>本局等級</span></div><div><b>${G.kills}</b><span>擊倒數</span></div>`;
   let lines=[];
@@ -747,7 +750,7 @@ function end(win){
   $('ovR').innerHTML=lines.join('');
   show('over');$('pbtn').classList.add('hide');
 }
-function toTown(){G=null;state='hub';document.body.classList.remove('playing');renderHub();show('hub')}
+function toTown(){G=null;state='hub';playMusic('town');document.body.classList.remove('playing');renderHub();show('hub')}
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
@@ -770,6 +773,7 @@ function renderHub(){
       <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(st.crit*100)}%</b></div><div><span>爆擊傷害</span><b>${Math.round(st.critD*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
       <div class="box"><strong>轉職</strong>${jobBox}</div>
       <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b>（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
+      <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
       <div class="box"><strong>換一隻狗</strong><p class="note">等級、職業、裝備都會保留，只換外表。</p><button class="btn sm ghost" id="chgDog">換狗</button></div>
       <div class="box"><strong>存檔</strong><p class="note">存檔放在這個瀏覽器。換裝置時，複製存檔碼到新裝置貼上。</p><button class="btn sm" id="expSave">複製存檔碼</button><textarea id="impTxt" placeholder="在這裡貼上存檔碼"></textarea><button class="btn sm ghost" id="impSave">讀取存檔碼</button><button class="btn sm ghost" id="delSave">刪除存檔重新開始</button><p class="note" id="saveMsg"></p></div>`;
   }else if(tab==='tal'){
@@ -783,7 +787,7 @@ function renderHub(){
     const s=SV.stage,c1=Math.round(250*(1+s*1.8)),c2=Math.round(1800*(1+s*2.2));
     H.innerHTML=`<h3>商店</h3><div class="slots"><div class="box"><strong>冒險寶箱</strong><p class="note">隨機一件「${MAT[s]}」等級的裝備，任何品質都可能。</p><button class="btn" data-buy="0" ${SV.zeny<c1?'disabled':''}>${c1} 金幣</button></div><div class="box"><strong>黃金寶箱</strong><p class="note">至少「稀有」品質，有機會開出史詩、傳說。</p><button class="btn" data-buy="1" ${SV.zeny<c2?'disabled':''}>${c2} 金幣</button></div></div><div id="shopRes"></div>`;
   }
-  portrait($('hubDog'),SV.breed,SV.job,0,false);
+  portrait($('hubDog'),SV.breed,SV.job,0,false);auApply();
 }
 function hubClick(e){
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
@@ -810,7 +814,7 @@ function openJob(){
   for(const pc of $('jobs').querySelectorAll('canvas[data-dog]'))portrait(pc,SV.breed,pc.dataset.dog);
   show('jobov');
 }
-function chooseJob(i){const id=jobsNow[i];if(!id)return;SV.job=id;SV.jlv=1;SV.jxp=0;save();tab='char';renderHub();show('hub')}
+function chooseJob(i){const id=jobsNow[i];if(!id)return;sfx('job');SV.job=id;SV.jlv=1;SV.jxp=0;save();tab='char';renderHub();show('hub')}
 function openBreeds(mode){
   breedMode=mode;$('breedCancel').classList.toggle('hide',mode!=='change');
   $('breeds').innerHTML=Object.keys(B).map(k=>`<button class="br" data-b="${k}"><canvas width="192" height="144" data-br="${k}"></canvas><strong>${B[k][0]}</strong><small>適合：${REC[k]||'都可以'}</small></button>`).join('');
@@ -948,8 +952,91 @@ function buildDex(){
   function card(id){const j=JM[id];return `<button class="dc" data-trial="${id}"><canvas width="220" height="168" data-dog="${id}"></canvas><i>${TIERN[j.tier]}</i><strong>${j.n}</strong><small>${j.sk.map(s=>s.n).join('・')}</small></button>`}
 }
 
+
+/* ---------- audio (all synthesized, original) ---------- */
+const AU={ctx:null,vol:{m:.5,s:.6,on:true},cur:null,want:'town',T:null,mel:null,step:0,seqT:0,timer:null,files:{},el:null,last:{},gc:0,gt:0};
+try{Object.assign(AU.vol,JSON.parse(localStorage.getItem('dog-audio')||'{}'))}catch(e){}
+function auInit(){
+  if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return}
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  try{AU.ctx=new AC()}catch(e){return}
+  const c=AU.ctx;AU.master=c.createGain();AU.master.connect(c.destination);AU.mg=c.createGain();AU.sg=c.createGain();AU.mg.connect(AU.master);AU.sg.connect(AU.master);
+  const b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;AU.noise=b;
+  auApply();if(AU.want)playMusic(AU.want,true);
+}
+function auApply(){
+  if(AU.ctx){AU.master.gain.value=AU.vol.on?1:0;AU.mg.gain.value=AU.vol.m*.35;AU.sg.gain.value=AU.vol.s*.5}
+  if(AU.el)AU.el.volume=AU.vol.on?AU.vol.m:0;
+  try{localStorage.setItem('dog-audio',JSON.stringify(AU.vol))}catch(e){}
+  const b=$('sbtn');if(b){b.textContent=AU.vol.on?'♪':'×';b.setAttribute('aria-label',AU.vol.on?'關閉聲音':'開啟聲音')}
+  for(const el of document.querySelectorAll('[data-vol]'))el.value=AU.vol[el.dataset.vol];
+}
+function tone(f,t,d,type,v,dest,sl){const c=AU.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(20,sl),t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0005,t+d);o.connect(g);g.connect(dest||AU.sg);o.start(t);o.stop(t+d+.03)}
+function noise(t,d,v,ft,f,dest,f2){const c=AU.ctx,s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();s.buffer=AU.noise;fl.type=ft;fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0005,t+d);s.connect(fl);fl.connect(g);g.connect(dest||AU.sg);s.start(t,Math.random()*.5);s.stop(t+d+.03)}
+const SFX={
+ ui:t=>tone(880,t,.06,'square',.1),
+ hit:t=>noise(t,.05,.16,'highpass',2500),
+ crit:t=>{noise(t,.08,.22,'bandpass',3000);tone(1400,t,.08,'square',.07,null,700)},
+ swing:t=>noise(t,.16,.28,'bandpass',700,null,3600),
+ fire:t=>{noise(t,.35,.32,'lowpass',1400,null,200);tone(130,t,.28,'sawtooth',.1,null,50)},
+ boom:t=>{noise(t,.5,.45,'lowpass',900,null,60);tone(90,t,.45,'sine',.45,null,35)},
+ zap:t=>{for(let i=0;i<5;i++)tone(400+Math.random()*1400,t+i*.025,.04,'square',.07)},
+ ice:t=>{for(let i=0;i<4;i++)tone(1800+i*320,t+i*.03,.25,'sine',.07)},
+ holy:t=>{[784,988,1175].forEach((f,i)=>tone(f,t+i*.04,.4,'triangle',.09))},
+ heal:t=>{[523,659,784,1047].forEach((f,i)=>tone(f,t+i*.06,.3,'sine',.11))},
+ arrow:t=>noise(t,.08,.2,'highpass',4200,null,1500),
+ shoot:t=>{noise(t,.07,.32,'bandpass',1800,null,400);tone(220,t,.05,'square',.08,null,80)},
+ coin:t=>{tone(988,t,.08,'square',.1);tone(1319,t+.07,.18,'square',.1)},
+ punch:t=>{tone(140,t,.1,'sine',.38,null,60);noise(t,.05,.22,'lowpass',1500)},
+ magic:t=>tone(600,t,.18,'triangle',.11,null,1300),
+ gem:(t,p)=>tone(1200*Math.pow(2,(p||0)/12),t,.06,'sine',.09),
+ hurt:t=>{tone(180,t,.18,'square',.16,null,70);noise(t,.1,.18,'lowpass',800)},
+ lvl:t=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,t+i*.07,.25,'square',.08))},
+ drop:t=>{[784,1175,1568].forEach((f,i)=>tone(f,t+i*.08,.3,'triangle',.11))},
+ job:t=>{[392,523,659,784,1047].forEach((f,i)=>tone(f,t+i*.1,.5,'square',.08));tone(1568,t+.5,.8,'triangle',.11)},
+ win:t=>{[523,659,784,659,784,1047].forEach((f,i)=>tone(f,t+i*.12,.32,'square',.09))},
+ lose:t=>{[392,370,349,330].forEach((f,i)=>tone(f,t+i*.18,.35,'triangle',.13))},
+ bossin:t=>{tone(55,t,1.6,'sawtooth',.22,null,50);tone(110,t+.2,1.2,'square',.07)}};
+function sfx(n,p,gap){if(!AU.ctx||!AU.vol.on||AU.vol.s<=0||AU.ctx.state!=='running')return;const now=AU.ctx.currentTime;gap=gap||.03;if(AU.last[n]&&now-AU.last[n]<gap)return;AU.last[n]=now;try{SFX[n](now+.005,p)}catch(e){}}
+const SKS={bash:'swing',burst:'boom',wave:'swing',pierce:'swing',rain:'fire',ball:'magic',storm:'ice',lov:'zap',meteor:'magic',arrow:'arrow',shower:'arrow',trap:'ui',falcon:'swing',heal:'heal',holy:'holy',combo:'punch',asura:'magic',flurry:'swing',coin:'coin',flask:'ui',boomer:'swing',nova:'ice',cross:'holy',breath:'fire',bolt:'magic'};
+function skillSfx(sk){let n=SKS[sk.k];if(sk.x.bullet)n='shoot';if(sk.k==='rain')n=sk.x.zap?'zap':sk.x.slow?'ice':sk.x.rock?'punch':'fire';if(sk.k==='nova'&&!sk.x.slow)n='boom';if(n)sfx(n,0,.07)}
+/* music: original procedural tunes */
+const NOTE=n=>440*Math.pow(2,(n-69)/12);
+const TRACKS={
+ town:{bpm:92,root:60,scale:[0,2,4,5,7,9,11],prog:[0,5,3,4],seed:3,lead:'triangle',drums:0,bell:1},
+ s0:{bpm:120,root:65,scale:[0,2,4,5,7,9,11],prog:[0,3,4,0],seed:7,lead:'square',drums:1},
+ s1:{bpm:104,root:62,scale:[0,2,3,5,7,9,10],prog:[0,6,3,4],seed:11,lead:'triangle',drums:1},
+ s2:{bpm:132,root:64,scale:[0,1,3,5,7,8,10],prog:[0,1,6,5],seed:5,lead:'sawtooth',drums:2},
+ s3:{bpm:96,root:57,scale:[0,2,3,5,7,8,10],prog:[0,5,2,6],seed:9,lead:'triangle',drums:1,bell:1},
+ s4:{bpm:112,root:67,scale:[0,2,4,6,7,9,11],prog:[0,1,4,3],seed:13,lead:'square',drums:1,bell:1},
+ boss:{bpm:150,root:60,scale:[0,2,3,5,7,8,10],prog:[0,5,6,4],seed:17,lead:'sawtooth',drums:2}};
+function genSong(T){let s=T.seed;const rnd=()=>(s=(s*16807)%2147483647)/2147483647,mel=[];
+  for(let v=0;v<2;v++)for(let b=0;b<4;b++){const d=T.prog[b];let cur=d+2*Math.floor(rnd()*3);for(let i=0;i<8;i++){const r=rnd();if(i%2&&r<.3){mel.push(null);continue}if(i===0||r<.45)cur=d+2*Math.floor(rnd()*3)+(rnd()<.3?7:0);else cur+=rnd()<.5?1:-1;mel.push(cur)}}
+  return mel}
+function deg(T,d,oct){const n=T.scale.length,o=Math.floor(d/n),i=((d%n)+n)%n;return T.root+T.scale[i]+12*(o+(oct||0))}
+function playMusic(name,force){AU.want=name;if(!AU.ctx)return;if(AU.cur===name&&!force)return;AU.cur=name;
+  if(AU.el){AU.el.pause();AU.el=null}
+  const f=AU.files[name];if(f){AU.el=f;AU.T=null;f.currentTime=0;f.loop=true;f.volume=AU.vol.on?AU.vol.m:0;f.play().catch(()=>{});return}
+  const T=TRACKS[name];AU.T=T||null;if(!T)return;AU.mel=genSong(T);AU.step=0;AU.seqT=AU.ctx.currentTime+.12;
+  if(!AU.timer)AU.timer=setInterval(sched,25)}
+function stopMusic(){AU.cur=null;AU.want=null;AU.T=null;if(AU.el){AU.el.pause();AU.el=null}}
+function sched(){if(!AU.ctx||!AU.T||AU.ctx.state!=='running')return;const T=AU.T,c=AU.ctx,dt=60/T.bpm/2,mg=AU.mg;
+  if(AU.seqT<c.currentTime)AU.seqT=c.currentTime+.05;
+  while(AU.seqT<c.currentTime+.15){const st=AU.step,bar=Math.floor(st/8)%4,i=st%8,d=T.prog[bar],t=AU.seqT,m=AU.mel[st%AU.mel.length];
+    if(m!==null)tone(NOTE(deg(T,m,0)),t,dt*1.6,T.lead,T.lead==='sawtooth'?.09:.14,mg);
+    if(T.bell&&i%4===2&&m!==null)tone(NOTE(deg(T,m,1)),t,dt*3,'sine',.05,mg);
+    if(i%2===0)tone(NOTE(deg(T,d,-2)+(i===4?7:0)),t,dt*1.8,'triangle',.22,mg);
+    if(i===0)for(const k of [0,2,4])tone(NOTE(deg(T,d+k,-1)),t,dt*7,'sine',.035,mg);
+    if(T.drums){if(i%4===0)tone(150,t,.12,'sine',.45,mg,45);if(i%4===2)noise(t,.1,T.drums>1?.2:.13,'bandpass',1800,mg);noise(t,.03,.05,'highpass',7000,mg);if(T.drums>1&&i%2)noise(t,.03,.045,'highpass',9000,mg)}
+    AU.step++;AU.seqT+=dt}}
+/* optional: licensed music files placed in ./audio/<track>.mp3 override the synth */
+for(const name of Object.keys(TRACKS)){try{const a=new Audio();a.preload='auto';a.addEventListener('canplaythrough',()=>{AU.files[name]=a;if(AU.cur===name)playMusic(name,true)},{once:true});a.addEventListener('error',()=>{},{once:true});a.src='audio/'+name+'.mp3'}catch(e){}}
+addEventListener('pointerdown',auInit,true);addEventListener('keydown',auInit,true);
+
 /* ---------- input ---------- */
-$('hub').addEventListener('click',hubClick);
+$('hub').addEventListener('click',e=>{if(e.target.closest('button'))sfx('ui');hubClick(e)});
+$('sbtn').addEventListener('click',()=>{auInit();AU.vol.on=!AU.vol.on;auApply()});
+frame.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;AU.vol[k]=+e.target.value;AU.vol.on=true;auApply()});
 $('breeds').addEventListener('click',e=>{const b=e.target.closest('.br');if(b)pickBreed(b.dataset.b)});
 $('breedCancel').addEventListener('click',()=>show('hub'));
 $('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(b)chooseJob(+b.dataset.i)});
