@@ -39,6 +39,10 @@ create policy "saves: update own" on public.saves
 -- 未登入的訪客完全不能碰這兩張表
 revoke all on public.profiles from anon;
 revoke all on public.saves    from anon;
+-- 只開放登入玩家需要的權限（新版 Supabase 預設不自動開放）
+grant usage on schema public to authenticated;
+grant select on public.profiles to authenticated;
+grant select, insert, update on public.saves to authenticated;
 
 -- 4) 存檔時自動更新時間
 create or replace function public.touch_updated_at() returns trigger
