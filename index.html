@@ -1223,8 +1223,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.15.3';
+const VERSION='0.15.4';
 const NEWS=[
+ {v:'0.15.4',d:'11/24',t:'城裡的新朋友',items:[['調整','出戰和每日副本的 NPC 改回「守門犬・阿布」和「地城嚮導・波波」'],['新增','城裡多了兩隻到處亂逛的臘腸狗：「襪子獵人・庫里」（巧克力奶油長毛臘腸，嘴裡叼著骨頭）和「公主・巴塔」（奶油長毛臘腸，戴著小皇冠），走過去可以摸摸牠們']]},
  {v:'0.15.3',d:'11/24',t:'移動手感・新 NPC',items:[['調整','手機搖桿變靈敏：手指只要拖一點點就全速跑，手指拉太遠時搖桿會跟著手指走，轉向更快'],['新增','主城也能用搖桿走路：按住畫面拖曳就像戰鬥一樣移動；只點一下則是走到點的地方'],['調整','出戰 NPC 改成「守門犬・庫里」（巧克力奶油長毛臘腸），每日副本 NPC 改成「地城嚮導・巴塔」（奶油長毛臘腸）'],['新增','噴水池上多了一隻柯基「尿尿小童・DIDI」，點牠會跟你聊天']]},
  {v:'0.15.2',d:'11/24',t:'手機版優化',items:[['調整','手機上主城、選單、戰鬥都改成全螢幕，不會再被網頁標題擠到、也不用上下捲動才找得到按鈕'],['調整','手機直立時畫面稍微拉遠，看得到更多從旁邊衝過來的怪物'],['調整','戰鬥上方的金幣／裝備／卡片和魔王倒數不會再重疊；小地圖跟著往下移'],['修正','長按畫面不會再跳出選單或選取文字，連點按鈕不會放大畫面'],['新增','可以「加入主畫面」：用手機瀏覽器的分享選單加到主畫面，打開就是全螢幕的 App']]},
  {v:'0.15.1',d:'11/24',t:'操作改善',items:[['調整','走到 NPC 旁邊，下方按鈕會寫「跟 守門犬・阿布 說話（出戰）」，一看就知道要做什麼'],['新增','第一次進主城會跳出操作教學：點 NPC 就能使用功能'],['新增','按 Esc 可以關掉視窗：帳號、最新消息、抽卡結果、提示、轉職視窗、選單和社交面板'],['修正','連續按 Enter 會一直跳出雲端存檔視窗的問題'],['調整','轉職、天賦的提示改成告訴你要去找哪位 NPC']]},
@@ -1842,9 +1843,9 @@ const TP={x:0,y:110,face:1,mv:false,go:null,tgt:null,near:null,idle:0,heart:0};
 let townT=0,inHouse=false,townPtr=null,houseEdit=false,houseSel=null;
 const panelTab=t=>()=>openPanel(t);
 const NPCS=[
- {id:'gate',n:'守門犬・庫里',r:'出戰',x:0,y:-372,skin:'dachs1',job:'knight',open:panelTab('go'),b:{k:'gate',w:190,h:120}},
+ {id:'gate',n:'守門犬・阿布',r:'出戰',x:0,y:-372,skin:'shiba0',job:'knight',open:panelTab('go'),b:{k:'gate',w:190,h:120}},
  {id:'tower',n:'塔守・小灰',r:'無限之塔',x:340,y:-352,skin:'husky0',job:'wizard',open:()=>openPanel('go','tower'),b:{k:'tower',w:90,h:170,wall:'#b8b2c8',roof:'#6a4ab8'}},
- {id:'cave',n:'地城嚮導・巴塔',r:'每日副本',x:-340,y:-352,skin:'dachs3',job:'hunter',open:()=>openPanel('go','dung'),b:{k:'cave',w:150,h:96}},
+ {id:'cave',n:'地城嚮導・波波',r:'每日副本',x:-340,y:-352,skin:'lab1',job:'hunter',open:()=>openPanel('go','dung'),b:{k:'cave',w:150,h:96}},
  {id:'jobm',n:'轉職教官・雷歐',r:'轉職・角色',x:-280,y:-170,skin:'golden0',job:'lknight',open:panelTab('char'),b:{k:'house',w:150,h:84,wall:'#f3e6c8',roof:'#c8443a',sign:'轉職所'}},
  {id:'smith',n:'鐵匠・大熊',r:'裝備',x:280,y:-170,skin:'border0',job:'smith',open:panelTab('eq'),b:{k:'house',w:150,h:84,wall:'#d8c8b0',roof:'#5a5a62',sign:'鐵匠鋪'}},
  {id:'elder',n:'長老・白鬍子',r:'天賦',x:-400,y:60,skin:'westie0',job:'sage',open:panelTab('tal'),b:{k:'house',w:136,h:80,wall:'#e8e0f0',roof:'#6a5ab8',sign:'長老之家'}},
@@ -1864,7 +1865,7 @@ const DIGS=[[-700,-120],[-820,120],[-610,250],[-880,-260]];
 const TREES=(()=>{let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<70;i++){const side=i%4;let x,y;if(side===0){x=TOWN.x0+20+r()*1900;y=TOWN.y0+10+r()*70}else if(side===1){x=TOWN.x0+20+r()*1900;y=TOWN.y1-50+r()*60}else if(side===2){x=TOWN.x0+10+r()*60;y=TOWN.y0+r()*1150}else{x=TOWN.x1-60+r()*60;y=TOWN.y0+r()*1150}o.push([x,y,.8+r()*.5])}
   for(const p of [[-560,-300],[-900,0],[-560,330],[-760,-380],[-940,330],[860,-360],[880,300],[480,-420],[-480,-470],[150,470],[-160,470]])o.push([p[0],p[1],1.1]);return o})();
 const FLOWERS=(()=>{let s=29;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<90;i++)o.push([TOWN.x0+r()*1960,TOWN.y0+r()*1200,['#ffb3cc','#fff27a','#ffffff','#b3d9ff'][i%4]]);return o})();
-const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-260+i*75,y:i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂'][i]}));
+const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2','dachs1','dachs3'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-300+i*65,y:i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂','襪子獵人・庫里','公主・巴塔'][i],wear:[{},{},{},{},{},{},{},{},{face:'cx_34'},{head:'cs_magical_head'}][i]}));
 const ENTERX=720,ENTERY=34;
 
 /* home data */
@@ -2036,7 +2037,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  // drawables sorted by y
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
- for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
+ for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
  if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,p.nap&&!p.mv);if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
