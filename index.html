@@ -422,7 +422,7 @@ function applyMod(st,k,v){if(k==='atk')st.dmg+=v/100;else if(k==='cd')st.cd*=1-v
 const CARD_RATE={normal:.0015,elite:.06,boss:.35};
 
 /* ---------- pets ---------- */
-const PETS=[['chick','小雞','#ffe27a',['mag',25],0],['bird','小藍鳥','#7fc8ff',['cd',4],0],['turtle','小烏龜','#6ab070',['dr',4],0],['bunny','小白兔','#ffffff',['spd',5],1],['fox','小狐狸','#ff9a4a',['crit',5],1],['owlet','小貓頭鷹','#a8865a',['exp',12],1],['penguin2','小企鵝','#2a3040',['area',6],2],['wyvern','小飛龍','#ff5a3a',['atk',8],3]];
+const PETS=[['chick','小雞','#ffe27a',['mag',25],0],['bird','小藍鳥','#7fc8ff',['cd',4],0],['turtle','小烏龜','#6ab070',['dr',4],0],['bunny','小白兔','#ffffff',['spd',5],1],['fox','小狐狸','#ff9a4a',['crit',5],1],['owlet','小貓頭鷹','#a8865a',['exp',12],1],['penguin2','小企鵝','#2a3040',['area',6],2],['wyvern','小飛龍','#ff5a3a',['atk',8],3],['cat_silver','錢錢','#dfe3ea',['zeny',18],3],['cat_calico','阿咪','#e8954a',['crit',6],2],['cat_grey','小卡','#8f98a6',['hp',30],1]];
 const PM={};for(const r of PETS)PM[r[0]]={id:r[0],n:r[1],c:r[2],bon:r[3],rar:r[4]};
 const PRAR=[{n:'普通',c:'#a8a8a8',w:55},{n:'稀有',c:'#3d8fe0',w:30},{n:'史詩',c:'#9a5ae0',w:12},{n:'傳說',c:'#f08a1a',w:3}];
 const petBon=id=>{const pt=PM[id],lv=(SV.pets||{})[id]||1;return[pt.bon[0],Math.round(pt.bon[1]*(1+.3*(lv-1))*10)/10]};
@@ -435,6 +435,17 @@ function drawPet(c,id,x,y,t){const pt=PM[id],b=Math.sin(t*8)*1.5;c.save();c.tran
   else if(id==='fox'){ell(c,-8,0,6,3,.4,'#ff9a4a');circ(c,-12,-2,2,'#fff');ell(c,0,2,7,5,0,'#ff9a4a');circ(c,5,-3,4.5,'#ff9a4a');tri(c,2,-6,3,-11,6,-6,'#ff9a4a');tri(c,5,-6,7,-11,8,-5,'#ff9a4a');ell(c,8,-2,2.5,1.8,0,'#fff');circ(c,10,-2.5,1,'#1a1414');circ(c,6,-4,1,'#1a1414')}
   else if(id==='owlet'){ell(c,0,0,7,8,0,'#a8865a');circ(c,-2.5,-2,2.8,'#fff');circ(c,2.5,-2,2.8,'#fff');circ(c,-2.2,-2,1.4,'#1a1414');circ(c,2.8,-2,1.4,'#1a1414');tri(c,-1,0,1,0,0,2,'#f5a742')}
   else if(id==='penguin2'){ell(c,0,1,6,8,0,'#2a3040');ell(c,1,3,4,5.5,0,'#fff');circ(c,1,-5,4.5,'#2a3040');circ(c,2.5,-6,1,'#fff');tri(c,5,-5,8,-4,5,-3,'#f5a742')}
+  else if(id.startsWith('cat_')){const K={cat_silver:{b:'#e9ecf1',s:'#aab1bc',e:'#4fb276'},cat_calico:{b:'#fbf8f2',s:'#e8954a',e:'#e8a02a'},cat_grey:{b:'#8f98a6',s:'#7a8392',e:'#f0902a'}}[id],sw=Math.sin(t*3)*.35;
+    c.save();c.translate(-8,0);c.rotate(-.5+sw);ell(c,0,-4,2.6,5.5,0,K.b);if(id==='cat_calico')ell(c,0,-7,2.3,2.4,0,'#2e2a28');if(id==='cat_silver')for(const ty of [-6,-3])ell(c,0,ty,2.5,.6,0,K.s);c.restore();
+    rr(c,-6,5,3,4,1.5,K.b);rr(c,3,5,3,4,1.5,K.b);ell(c,-1,2,8,5.6,0,K.b);
+    if(id==='cat_calico'){ell(c,-4,0,3.6,3,0,'#e8954a');ell(c,1,3,2.6,2,0,'#2e2a28')}if(id==='cat_silver')for(const sx of [-5,-2,1])ell(c,sx,0,.7,3,0,K.s);if(id==='cat_grey')ell(c,-1,4,5,2,0,'#9ca5b2');
+    tri(c,1.5,-7.5,3,-12,6,-8.5,K.b);tri(c,6.5,-9,8.6,-12.4,10,-8,K.b);tri(c,2.6,-8.2,3.3,-10.6,5,-8.6,'#f2b0b8');tri(c,7.2,-9,8.4,-11,9.2,-8.4,'#f2b0b8');
+    circ(c,5.5,-4.5,5.6,K.b);ell(c,7.4,-2.4,3.4,2.4,0,K.b);
+    if(id==='cat_calico'){ell(c,3,-7,3,2.4,-.3,'#e8954a');tri(c,6.5,-9,8.6,-12.4,10,-8,'#2e2a28')}
+    if(id==='cat_silver'){lineP(c,[[4,-8.6],[4.8,-7.4],[5.6,-8.8],[6.4,-7.4],[7.2,-8.6]],K.s,.7)}
+    const bl=(Math.floor(t*.7)%5===0&&(t*.7)%1<.12);if(bl){lineP(c,[[5.4,-4.8],[7,-4.8]],'#2a2220',.8);lineP(c,[[8.2,-4.8],[9.6,-4.8]],'#2a2220',.8)}else{for(const ex of [6.2,9]){circ(c,ex,-4.8,1.35,K.e);circ(c,ex+.15,-4.8,.65,'#1a1414');circ(c,ex-.35,-5.3,.3,'#fff')}}
+    tri(c,7.4,-3,8.6,-3,8,-2.2,'#f28a9a');lineP(c,[[8,-2.2],[7.4,-1.4]],'#2a2220',.4);lineP(c,[[8,-2.2],[8.6,-1.4]],'#2a2220',.4);
+    if(id==='cat_silver'){rr(c,3,.2,6,1.2,.6,'#e04a4a');circ(c,6,2.2,1.5,'#f5c542');circ(c,6,2.2,.7,'#d8a020')}}
   else{const f=Math.sin(t*14)*3;tri(c,-2,-2,-12,-9-f,-6,2,'#c83a2a');tri(c,2,-2,10,-10-f,5,2,'#c83a2a');ell(c,0,2,7,5,0,'#ff5a3a');circ(c,6,-3,4.5,'#ff5a3a');tri(c,4,-7,5,-11,7,-7,'#ffe27a');circ(c,7.5,-4,1,'#1a1414');ell(c,-7,4,4,1.6,.5,'#ff5a3a')}
   c.restore()}
 
@@ -1245,8 +1256,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.16.0';
+const VERSION='0.16.1';
 const NEWS=[
+ {v:'0.16.1',d:'11/24',t:'貓咪寵物',items:[['新增','三隻英國短毛貓寵物：傳說「錢錢」（銀白英短，戴著金幣鈴鐺，金幣 +18%）、史詩「阿咪」（三花英短，爆擊率 +6%）、稀有「小卡」（灰色英短，生命 +30）；孵寵物蛋就有機會抽到'],['修正','時裝預覽會用你現在穿的整套搭配，再換上要看的那一件；不會再出現換了頭飾、看其他部位時還是顯示舊樣子的問題']]},
  {v:'0.16.0',d:'11/24',t:'真實動作・效能優化',items:[['調整','社交動作全部重做，改成像真的狗：坐下會把後腳收起來、趴下睡覺會把下巴靠在前腳上、打滾會翻肚子四腳朝天亂踢、汪一聲會張嘴、嗷嗚會抬頭對天長嚎、轉圈是在原地追自己的尾巴、比愛心改成狗狗的「伸懶腰邀玩」姿勢、搖尾巴會連屁股一起扭'],['調整','聞聞會先走到對方屁股後面再聞；摸摸頭會走到對方面前、坐下抬起前腳拍拍牠，被摸的狗會瞇眼搖尾巴'],['調整','坐下、趴下會一直維持，直到你移動為止'],['新增','衝刺按鈕會顯示冷卻倒數，還有一圈慢慢轉回來的進度，冷卻好時按鈕會閃一下'],['調整','怪物變多時大幅減少卡頓：怪物改用預先畫好的圖、畫面外的東西不畫、特效和傷害數字太多時自動精簡'],['新增','手機跑不動時會自動降低一點解析度保持順暢，順了再自動調回來']]},
  {v:'0.15.4',d:'11/24',t:'城裡的新朋友',items:[['調整','出戰和每日副本的 NPC 改回「守門犬・阿布」和「地城嚮導・波波」'],['新增','城裡多了兩隻到處亂逛的臘腸狗：「襪子獵人・庫里」（巧克力奶油長毛臘腸，嘴裡叼著骨頭）和「公主・巴塔」（奶油長毛臘腸，戴著小皇冠），走過去可以摸摸牠們']]},
  {v:'0.15.3',d:'11/24',t:'移動手感・新 NPC',items:[['調整','手機搖桿變靈敏：手指只要拖一點點就全速跑，手指拉太遠時搖桿會跟著手指走，轉向更快'],['新增','主城也能用搖桿走路：按住畫面拖曳就像戰鬥一樣移動；只點一下則是走到點的地方'],['調整','出戰 NPC 改成「守門犬・庫里」（巧克力奶油長毛臘腸），每日副本 NPC 改成「地城嚮導・巴塔」（奶油長毛臘腸）'],['新增','噴水池上多了一隻柯基「尿尿小童・DIDI」，點牠會跟你聊天']]},
@@ -1407,7 +1419,7 @@ function renderHub(){
       <div class="box"><strong>已收集 ${own.length}/${COS.length}　完成套裝 ${cs.length}/${CSETS.length}</strong><p class="note" style="margin:4px 0 0">${cs.length?'已集滿：'+cs.join('、'):'集滿同一套的五件（頭飾、臉部、頸部、背部、特效）就有套裝加成。'}</p></div>
       <div class="secs">${[['all','全部'],...(lastPull.cos.length?[['new','剛抽到']]:[]),...CSLOT,['own','只看已擁有']].map(([k,n])=>`<button class="btn sm ${cosSec===k?'':'ghost'}" data-csec="${k}">${n}</button>`).join('')}</div>
       ${CSLOT.filter(([slot])=>cosSec==='all'||cosSec==='own'||cosSec==='new'||cosSec===slot).map(([slot,sn])=>`<div class="skrow"><h4>${sn}　<span class="note">${COS.filter(o=>o.slot===slot&&cosOwn(o.id)).length}/${COS.filter(o=>o.slot===slot).length}</span></h4><div class="skins">${COS.filter(o=>o.slot===slot&&(cosSec!=='own'||cosOwn(o.id))&&(cosSec!=='new'||lastPull.cos.includes(o.id))).sort((a,b)=>cosOwn(b.id)-cosOwn(a.id)||b.rar-a.rar).map(o=>{const has=cosOwn(o.id),on=w[slot]===o.id;return `<button class="sk2${on?' on':''}${has?'':' no'}" data-cwear="${o.id}" ${has?'':'disabled'}><canvas width="160" height="120" data-cs="${o.id}"></canvas><i style="background:${SRAR[o.rar].c}">${SRAR[o.rar].n}</i><small>${has?o.n:'未取得'}${has&&(SV.cstar||{})[o.id]?` ${'★'.repeat(SV.cstar[o.id])}`:''}</small><small class="note">${on?'<b>穿著中（點一下脫掉）</b>':modTxt([cosBonus(o.id)])}</small></button>`}).join('')}</div></div>`).join('')}`;
-    const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
+    const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{...(SV.wear||{}),[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
   }else if(tab==='home'){
     const h=homeData(),L=HOUSE_LV[h.lv],nx=HOUSE_LV[h.lv+1],cnt=id=>(h.inv[id]||0)+h.items.filter(it=>it.f===id).length;
     H.innerHTML=`<h3>我的狗屋　<span class="note">舒適度 ${homeComfort()}：出戰經驗 +${comfortExp().toFixed(1)}%、離線收入 +${Math.round(comfortIdle()*100)}%</span></h3>
@@ -1445,7 +1457,7 @@ function cosPull(n){
     res.push({id,dup,star})}
   save();renderHub();const best=Math.max(...res.map(o=>CSM[o.id].rar));sfx(best>=3?'job':best>=2?'drop':'coin');
   lastPull.cos=res.map(o=>o.id);openPull('cos',n,res.map(o=>{const k=CSM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-cpr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${modTxt([cosBonus(o.id)])}</small></div>`}).join(''));
-  for(const pc of $('pullB').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:o.id})}
+  for(const pc of $('pullB').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{...(SV.wear||{}),[o.slot]:o.id})}
 }
 function openPull(kind,n,html){pullKind=kind;pullN=n;const best=Math.max(...(kind==='skin'?lastPull.skin.map(id=>SKM[id].rar):lastPull.cos.map(id=>CSM[id].rar)));
   $('pullT').textContent=(kind==='skin'?'造型':'時裝')+(n>1?'十連抽':'單抽')+(best>=3?'・出現 SSR！':best>=2?'・出現 SR！':'');$('pullB').innerHTML=html;
