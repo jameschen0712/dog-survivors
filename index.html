@@ -1276,8 +1276,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.18.0';
+const VERSION='0.18.1';
 const NEWS=[
+ {v:'0.18.1',d:'11/24',t:'巴塔公主會說話了',items:[['新增','找「公主・巴塔」說話，牠會隨機回你：「嗚嗚～我要找媽媽～」然後加速亂跑跑掉；或是依照你們現在的感情回話（每次找牠說話都會增加，愛心越多越黏你）；或是一臉疑惑「....???」']]},
  {v:'0.18.0',d:'11/24',t:'雙狗互動',items:[['新增','七種兩隻狗一起做的互動：碰鼻子、拔河、追逐玩耍、摔角玩耍、理毛、依偎、擊掌'],['新增','點別的狗，在「一起玩」裡選一種邀請，對方按「好啊」後兩隻狗會自動走到位置、一起做完整套動作'],['新增','拔河會左右拉扯，最後隨機一隻贏走繩子；追逐會繞圈互追；摔角會抱在一起滾、揚起灰塵；理毛是一隻舔另一隻的臉；依偎是靠在一起坐著冒愛心'],['新增','擊掌要好感度到「好朋友」才解鎖：兩隻一起用後腳站起來，前腳「啪」一聲擊掌'],['新增','每次一起玩都會增加好感度，每天第一次還有小獎勵']]},
  {v:'0.17.1',d:'11/24',t:'貓咪重畫',items:[['調整','照著真貓重畫三隻英短：錢錢改成銀色漸層的毛（背上和頭頂顏色比較深），綠色眼睛；阿咪的黑色花紋改成灰色，配上淡橘色斑；小卡改成深灰藍色、黑鼻子，還戴上綠色條紋小圍兜'],['調整','三隻的耳朵都改成英短那種小小圓圓的']]},
  {v:'0.17.0',d:'11/24',t:'流派・自由換職業',items:[['新增','流派：每個職業都可以選打法，「均衡」「近戰」「遠程」「範圍」「會心」五種，每條職業線有自己的名字（例如劍士線：狂戰流、劍氣流、聖域流、一擊必殺流）'],['新增','選了流派後，那一類招式傷害更高、冷卻更短，升級時也比較常出現，開局還會多送一招；近戰流更耐打、遠程流跑更快、範圍流範圍更大、會心流爆擊更強'],['新增','自由換職業：轉職過後，任何職業線裡你到過的轉數以內的職業都可以在「角色」分頁隨時免費換過去（例如到過二轉，就能在所有職業線的一轉、二轉之間自由切換）；每一轉的 Job Lv 會分別記住，換回來不會掉'],['調整','出戰畫面和戰鬥左上角會顯示目前的流派'],['新增','社交動作都有音效了：汪汪叫、嗷嗚長嚎、搖尾巴、嗅嗅、拍拍、打滾、轉圈、坐下、打呼、丟球、送點心、收到邀請；別的狗做動作時，離你越近聲音越大']]},
@@ -2078,13 +2079,17 @@ function drawTree(c,x,y,s){shadow(c,x,y+4,16*s,5*s);rr(c,x-4*s,y-18*s,8*s,22*s,2
 /* town update & render */
 function townTargets(){const o=NPCS.map(n=>({n,x:n.x,y:n.y,r:n.b&&n.b.k==='myhouse'?ENTERY:0}));const d=digToday();for(let i=0;i<DIGS.length;i++)if(!d.got.includes(i))o.push({dig:i,x:DIGS[i][0],y:DIGS[i][1]});for(const dg of TDOGS)o.push({dog:dg,x:dg.x,y:dg.y});return o}
 function digToday(){const td=new Date().toDateString();if(!SV.dig||SV.dig.d!==td)SV.dig={d:td,got:[]};return SV.dig}
-function actLabel(a){return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
+function actLabel(a){if(a.dog&&a.dog.n==='公主・巴塔')return '跟 公主・巴塔 說話';return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
 function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
  if(a.n){if(a.n.id==='home'){enterHouse();return}a.n.open();return}
  if(a.dig!==undefined){const d=digToday();if(d.got.includes(a.dig))return;d.got.push(a.dig);const h=homeData(),r=Math.random(),st=SV.stage||0;let msg;
    if(r<.08){SV.bones++;msg='挖到 1 根狗骨頭！'}else if(r<.55){const k=['wood','cloth','stone'][Math.floor(Math.random()*3)],v=2+Math.floor(Math.random()*3)+st;h.mat[k]+=v;msg=`挖到 ${MATN[k]} ×${v}！`}else{const z=Math.round((80+Math.random()*120)*(1+st));SV.zeny+=z;msg=`挖到 ${z} 金幣！`}
    save();sfx('coin');townFx.push({x:DIGS[a.dig][0],y:DIGS[a.dig][1]-30,s:msg,life:2.2});for(let q=0;q<14;q++)townFx.push({p:1,x:DIGS[a.dig][0],y:DIGS[a.dig][1],vx:R(-60,60),vy:R(-120,-40),life:.7});renderTownUI();return}
- if(a.dog){a.dog.heart=1.6;a.dog.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:a.dog.x,y:a.dog.y-40,s:'♥',life:1.2})}}
+ if(a.dog){const dg=a.dog;if(dg.n==='公主・巴塔'){bataTalk(dg);return}dg.heart=1.6;dg.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:dg.x,y:dg.y-40,s:'♥',life:1.2})}}
+function bataTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.bata=Math.min(10,(SV.npcLove.bata||0)+1);save();dg.face=TP.x>dg.x?1:-1;const r=Math.random();
+ if(r<1/3){dg.say={s:'嗚嗚～我要找媽媽～',t:0};dg.zoom=3.2;dg.tx=0;sfx('s_howl',.7,.2)}
+ else if(r<2/3){const L=n<3?'哼！本公主才不讓你隨便摸～':n<6?'嗯…勉強讓你摸一下好了':n<10?'嘿嘿，最喜歡你了！再摸一下嘛～':'你是巴塔公主專屬的騎士！';const hc=Math.max(1,Math.min(5,Math.ceil(n/2)));dg.say={s:L,t:0,h:hc};dg.heart=1.6;dg.w=2.5;TP.heart=1;sfx('s_patted',1,.2)}
+ else{dg.say={s:'....???',t:0,q:1};dg.w=2.5;sfx('ui')}}
 const townFx=[];
 function camOf(){if(inHouse)return [0,0];const vw=W/S/2,vh=H/S/2;return [Math.max(TOWN.x0+vw,Math.min(TOWN.x1-vw,TP.x)),Math.max(TOWN.y0+vh,Math.min(TOWN.y1-vh,TP.y))].map((v,i)=>{const span=i?TOWN.y1-TOWN.y0:TOWN.x1-TOWN.x0,view=i?H/S:W/S;return span<view?(i?(TOWN.y0+TOWN.y1)/2:(TOWN.x0+TOWN.x1)/2):v})}
 function houseBounds(){const L=HOUSE_LV[curHome().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
@@ -2098,7 +2103,9 @@ function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;netTick(dt);
  const m=Math.hypot(ix,iy);TP.mv=m>0;if(m){const sp=(inHouse?140:190)*dt/Math.max(1,m);TP.x+=ix*sp;TP.y+=iy*sp;if(ix)TP.face=ix>0?1:-1;TP.idle=0}else TP.idle+=dt;
  if(inHouse){const hb=houseBounds();TP.x=Math.max(hb.x0+14,Math.min(hb.x1-14,TP.x));TP.y=Math.max(hb.y0+12,Math.min(hb.y1-8,TP.y));if(TP.y>hb.y1-12&&Math.abs(TP.x)<22&&iy>0&&!houseEdit)leaveHouse()}
  else{TP.x=Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,TP.x));TP.y=Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,TP.y));
-   for(const dg of TDOGS){dg.heart=Math.max(0,dg.heart-dt);dg.w-=dt;if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
+   for(const dg of TDOGS){dg.heart=Math.max(0,dg.heart-dt);dg.cd=(dg.cd||0)-dt;if(dg.say){dg.say.t+=dt;if(dg.say.t>3)dg.say=null}
+     if(dg.zoom>0){dg.zoom-=dt;dg.zt=(dg.zt||0)-dt;if(dg.zt<=0){dg.zt=.35;dg.zx=clampX(dg.x+R(-140,140));dg.zy=clampY(dg.y+R(-90,90))}const dx=dg.zx-dg.x,dy=dg.zy-dg.y,d=Math.hypot(dx,dy)||1;dg.x+=dx/d*Math.min(d,300*dt);dg.y+=dy/d*Math.min(d,300*dt);dg.face=dx>0?1:-1;dg.mv=true;if(dg.zoom<=0){dg.mv=false;dg.w=3}continue}
+     dg.w-=dt;if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
      if(dg.tx){const dx=dg.tx-dg.x,dy=dg.ty-dg.y,d=Math.hypot(dx,dy);if(d<6){dg.tx=0;dg.w=2+Math.random()*5;dg.mv=false}else{dg.x+=dx/d*60*dt;dg.y+=dy/d*60*dt;dg.face=dx>0?1:-1;dg.mv=true}}}}
  TP.heart=Math.max(0,TP.heart-dt);
  for(let i=townFx.length-1;i>=0;i--){const f=townFx[i];f.life-=dt;if(f.p){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=300*dt}else f.y-=18*dt;if(f.life<=0)townFx.splice(i,1)}
@@ -2135,7 +2142,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=DogCloud.status().username;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
  c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
    const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
- for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26)}
+ for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26);if(dg.say){const al=Math.min(1,(3-dg.say.t)*2);drawBubble(c,dg.x,dg.y-34,dg.say.s,al);if(dg.say.h){c.globalAlpha=al;for(let q=0;q<dg.say.h;q++)heart(c,dg.x-(dg.say.h-1)*5+q*10,dg.y-64-Math.sin(townT*4+q)*2,4,'#ff5a7a');c.globalAlpha=1}if(dg.say.q){c.globalAlpha=al;c.font='900 16px Fredoka,sans-serif';c.fillStyle='#fff6b0';for(let q=0;q<3;q++)c.fillText('?',dg.x+14+q*7,dg.y-60-Math.abs(Math.sin(townT*5+q))*5);c.globalAlpha=1}}}
  for(const f of townFx){c.globalAlpha=Math.min(1,f.life);if(f.p)circ(c,f.x,f.y,f.dust?4:3,f.dust?'#efe4c8':'#9a7048');else{c.font='900 14px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(f.s,f.x,f.y);c.fillStyle=f.s==='♥'?'#ff5a7a':'#fff6b0';c.fillText(f.s,f.x,f.y)}c.globalAlpha=1}
  if(TP.near&&!TP.near.exit){const a=TP.near;c.globalAlpha=.5+.3*Math.sin(t*6);c.strokeStyle='#fff6b0';c.lineWidth=3;c.beginPath();c.ellipse(a.x,a.y+(a.n?(a.r||0):0)+4,26,9,0,0,TAU);c.stroke();c.globalAlpha=1}
  if(TP.tgt){c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.ellipse(TP.tgt[0],TP.tgt[1],10,4,0,0,TAU);c.stroke();c.globalAlpha=1}
