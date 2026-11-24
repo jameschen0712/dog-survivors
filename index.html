@@ -147,6 +147,8 @@ textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;b
 .pr small,.sk2 small{font-size:12px;line-height:1.3}.pr em{font-style:normal;font-size:12px;font-weight:700;color:#a0661e}
 .pr.r3{border-color:#f08a1a;box-shadow:0 0 0 3px rgba(240,138,26,.3);animation:glow 1.2s ease-in-out infinite alternate}.pr.r2{border-color:#9a5ae0}
 @keyframes glow{to{box-shadow:0 0 14px 4px rgba(240,138,26,.55)}}
+.builds{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:6px}.bld{border:2px solid #e8d8b0;background:#fff;border-radius:12px;padding:8px;text-align:left;display:grid;gap:2px;cursor:pointer;color:var(--pink)}.bld.on{border-color:#f5c542;background:#fff3c0}.bld:disabled{opacity:.45;cursor:default}.bld small{font-size:12px;line-height:1.35}
+.jsw{display:grid;gap:4px}.jline{display:flex;flex-wrap:wrap;gap:4px}.jline .btn{margin:0}
 .skrow h4{margin:10px 0 6px;font:900 15px "Noto Sans TC",sans-serif}
 .skins{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .sk2{cursor:pointer}.sk2.on{border-color:#2f7a3e;box-shadow:0 0 0 3px rgba(47,122,62,.25)}.sk2.no{cursor:default;opacity:.75}
@@ -341,6 +343,17 @@ const JM={},SKL={};
 for(const r of JOBS){const j={id:r[0],n:r[1],line:r[2],tier:r[3],p:r[4],c:r[5],acc:r[6]};j.sk=r[7].map((s,i)=>{const o={id:r[0]+'_'+i,n:s[0],g:s[1],k:s[2],c:s[3],x:s[4]||{},m:TM[r[3]],sig:i===0,job:r[0]};SKL[o.id]=o;return o});JM[j.id]=j}
 const kids=id=>JOBS.filter(r=>r[4]===id).map(r=>r[0]);
 function chain(id){const a=[];while(id){a.unshift(id);id=JM[id].p}return a}
+/* 流派 builds */
+const BCAT={melee:['bash','burst','combo','asura','flurry','cross','aura','breath','sanct'],ranged:['wave','pierce','arrow','boomer','bolt','coin','ball','lov'],area:['rain','storm','meteor','shower','nova','trap','falcon','flask','orb','holy','heal']};
+const BUILDS={balance:{n:'均衡',d:'不偏重任何招式，什麼都可能出現；適合還在摸索的時候'},
+ melee:{n:'近戰',d:'近戰招式傷害 +35%、冷卻 -10%，生命上限 +20%、受到傷害 -8%；升級時比較常出現近戰招式',dm:1.35,cd:.9,perk:g=>{g.p.max=Math.round(g.p.max*1.2);g.p.hp=g.p.max;g.st.dr+=.08}},
+ ranged:{n:'遠程',d:'遠程招式傷害 +25%、冷卻 -20%，移動速度 +10%；升級時比較常出現遠程招式',dm:1.25,cd:.8,perk:g=>{g.st.spd+=.1}},
+ area:{n:'範圍',d:'範圍招式傷害 +30%、冷卻 -10%，全部招式範圍 +20%；升級時比較常出現範圍招式',dm:1.3,cd:.9,perk:g=>{g.st.area+=.2}},
+ crit:{n:'會心',d:'所有招式都一樣；爆擊率 +15%、爆擊傷害 +40%',perk:g=>{g.st.crit+=.15;g.st.critD+=.4}}};
+const BNAME={nov:{melee:'撲咬流',ranged:'丟骨頭流',area:'打滾流',crit:'幸運流'},sw:{melee:'狂戰流',ranged:'劍氣流',area:'聖域流',crit:'一擊必殺流'},mg:{melee:'近身魔導流',ranged:'魔彈流',area:'元素風暴流',crit:'奧術會心流'},ar:{melee:'舞刃流',ranged:'神射流',area:'陷阱獵鷹流',crit:'狙殺流'},ac:{melee:'武僧流',ranged:'聖十字流',area:'聖光流',crit:'天罰流'},me:{melee:'鐵拳流',ranged:'金幣砸人流',area:'鍊金流',crit:'暴富流'},th:{melee:'連刺流',ranged:'飛刀流',area:'毒霧流',crit:'暗殺流'},sn:{melee:'野性流',ranged:'萬能流',area:'奇蹟流',crit:'幸運流'},gs:{melee:'近距散射流',ranged:'快槍流',area:'爆破流',crit:'神槍流'}};
+const buildName=(jid,b)=>b==='balance'||!BUILDS[b]?'均衡流':(BNAME[JM[jid].line]||BNAME.nov)[b];
+const buildCount=(jid,b)=>BCAT[b]?chain(jid).reduce((a,id)=>a+JM[id].sk.filter(s=>BCAT[b].includes(s.k)).length,0):99;
+function curBuild(jid){jid=jid||SV.job;const b=(SV.builds||{})[JM[jid].line]||'balance';return BUILDS[b]&&(b==='balance'||b==='crit'||buildCount(jid,b)>0)?b:'balance'}
 const LINES=[['sw','劍士系'],['mg','魔法師系'],['ar','弓手系'],['ac','服事系'],['me','商人系'],['th','盜賊系'],['sn','超級見習生系'],['gs','槍手系']];
 
 const MECH={
@@ -372,7 +385,7 @@ const MECH={
  cross:{b:32,cd:3.4,d:v=>`以自己為中心展開十字形聖光，傷害 ${v}`},
  breath:{b:8,cd:2.8,d:v=>`朝前方噴出火焰吐息，連續傷害 ${v}`},
  bolt:{b:15,cd:1.1,d:(v,l)=>`發射 ${1+(l>>1)} 發追蹤彈，傷害 ${v}`}};
-const skDmg=(s,l,inRun)=>(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1));
+const skDmg=(s,l,inRun)=>(inRun&&G&&G.bfav&&G.bfav.includes(s.k)?G.bdm:1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1));
 const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x);
 
 const PD={
@@ -930,6 +943,7 @@ function newRun(stage,trialJob,o){
     rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[],bones:0}};
   const lv0=1+st.bonusLv;
   for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;G.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}
+  {const bk=trialJob?'balance':curBuild(job),bd=BUILDS[bk];G.build=bk;if(BCAT[bk]){G.bfav=BCAT[bk];G.bdm=bd.dm;G.bcd=bd.cd;const fav=chain(job).slice().reverse().flatMap(id=>JM[id].sk).find(s2=>BCAT[bk].includes(s2.k)&&!G.wep[s2.id]&&!(job!=='novice'&&s2.job==='novice'));if(fav)G.wep[fav.id]={l:lv0,cd:.6,a:0,tick:0,s:fav}}if(bd.perk)bd.perk(G)}
   if(st.freePick)G.pend=1;
   banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
   $('spdb').classList.toggle('hide',!(mode==='stage'&&(SV.cleared||0)>stage));$('spdb').textContent='×1';
@@ -1112,7 +1126,7 @@ function update(dt){
       for(let i=0;i<n;i++){const [ox,oy,a]=orbPos(w,i);near(ox,oy,M,e=>{if(e.dead||e.orbT>0)return;if(Math.hypot(e.x-ox,e.y-oy)<e.r+11){e.orbT=.4;hurt(e,skDmg(s,l,1),Math.cos(a),Math.sin(a),60);sparks(ox,oy,3,s.c,120)}})}
       continue}
     if(k==='aura'||k==='sanct'){w.tick-=dt;w.a+=dt;if(w.tick<=0){w.tick=.5;areaHit(p.x,p.y,auraR(w),skDmg(s,l,1),25);if(k==='sanct')heal(.6+.4*l)}continue}
-    w.cd-=dt;if(w.cd>0)continue;w.cd=Math.max(.15,MECH[k].cd*(1-.06*(l-1)))*G.st.cd;FIRE[k](w,l,ar);skillSfx(s);
+    w.cd-=dt;if(w.cd>0)continue;w.cd=Math.max(.15,MECH[k].cd*(1-.06*(l-1)))*G.st.cd*(G.bfav&&G.bfav.includes(k)?G.bcd:1);FIRE[k](w,l,ar);skillSfx(s);
   }
   for(const b of G.P){b.life-=dt;
     if(b.tg){if(b.tg.dead)b.tg=null;else{const a=Math.atan2(b.tg.y-b.y,b.tg.x-b.x),sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx),da=((a-cur)%TAU+TAU*1.5)%TAU-Math.PI,na=cur+Math.max(-5*dt,Math.min(5*dt,da));b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}}
@@ -1187,9 +1201,10 @@ function rollChoices(){
   for(const jid of chain(G.job))for(const s of JM[jid].sk){const w=G.wep[s.id];if(!w)pool.push({t:'w',s,l:1});else if(w.l<5)pool.push({t:'w',s,l:w.l+1})}
   for(const k in PD){const l=G.pas[k]||0;if(l<5)pool.push({t:'p',k,l:l+1})}
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  if(G.bfav){const key=o=>Math.random()+(o.t==='w'?(G.bfav.includes(o.s.k)?.28:-.12):0);const ks=new Map(pool.map(o=>[o,key(o)]));pool.sort((a,b)=>ks.get(b)-ks.get(a))}
   const out=[...evo.slice(0,1),...pool].slice(0,3);if(!out.length)out.push({t:'h'});return out;
 }
-function choiceScore(o){if(o.t==='h')return 0;if(o.t==='e')return 10;if(o.t==='p')return {might:2.3,haste:2.1,area:1.7,luck:1.6,vit:1.5,swift:1.2,regen:1.1,magnet:1}[o.k]||1;return o.l===1?2.6:3+(o.s.sig?1:0)+o.s.m*.3}
+function choiceScore(o){if(o.t==='h')return 0;if(o.t==='e')return 10;if(o.t==='w'&&G.bfav&&G.bfav.includes(o.s.k))return (o.l===1?2.6:3+(o.s.sig?1:0)+o.s.m*.3)+1.5;if(o.t==='p')return {might:2.3,haste:2.1,area:1.7,luck:1.6,vit:1.5,swift:1.2,regen:1.1,magnet:1}[o.k]||1;return o.l===1?2.6:3+(o.s.sig?1:0)+o.s.m*.3}
 function applyChoice(o){if(o.t==='e'){const w=G.wep[o.s.id];if(w){w.evo=1;banner(`${o.s.n} 進化了！`);flash=.4;sparks(G.p.x,G.p.y,40,'#ffe27a',260,.8);sfx('job')}return}if(o.t==='h')heal(40);else if(o.t==='w'){if(G.wep[o.s.id])G.wep[o.s.id].l++;else G.wep[o.s.id]={l:1,cd:.2,a:0,tick:0,s:o.s}}else{G.pas[o.k]=(G.pas[o.k]||0)+1;PD[o.k].f(G)}}
 const choiceName=o=>o.t==='e'?o.s.n+'・進化':o.t==='h'?'大骨頭':o.t==='p'?PD[o.k].n+' Lv'+o.l:o.s.n+(o.l===1?'（學會）':' Lv'+o.l);
 function openLevel(){
@@ -1258,8 +1273,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.16.2';
+const VERSION='0.17.0';
 const NEWS=[
+ {v:'0.17.0',d:'11/24',t:'流派・自由換職業',items:[['新增','流派：每個職業都可以選打法，「均衡」「近戰」「遠程」「範圍」「會心」五種，每條職業線有自己的名字（例如劍士線：狂戰流、劍氣流、聖域流、一擊必殺流）'],['新增','選了流派後，那一類招式傷害更高、冷卻更短，升級時也比較常出現，開局還會多送一招；近戰流更耐打、遠程流跑更快、範圍流範圍更大、會心流爆擊更強'],['新增','自由換職業：轉職過後，任何職業線裡你到過的轉數以內的職業都可以在「角色」分頁隨時免費換過去（例如到過二轉，就能在所有職業線的一轉、二轉之間自由切換）；每一轉的 Job Lv 會分別記住，換回來不會掉'],['調整','出戰畫面和戰鬥左上角會顯示目前的流派'],['新增','社交動作都有音效了：汪汪叫、嗷嗚長嚎、搖尾巴、嗅嗅、拍拍、打滾、轉圈、坐下、打呼、丟球、送點心、收到邀請；別的狗做動作時，離你越近聲音越大']]},
  {v:'0.16.2',d:'11/24',t:'手機發燙改善',items:[['新增','省電模式（手機預設開啟）：戰鬥維持 30 FPS、解析度稍微降低，手機比較不會發燙；可以在暫停選單關掉'],['調整','高更新率手機（120Hz）不會再用 120 FPS 狂跑，戰鬥最多 60 FPS；主城最多 30～45 FPS；打開選單、暫停、看結算時幾乎不重畫'],['調整','手機上同一時間最多 260 隻怪（電腦 380 隻），畫面不會塞爆'],['調整','地上寶石太多時，附近的寶石會自動合成一顆比較大的（經驗不會少）；寶石改用預先畫好的圖']]},
  {v:'0.16.1',d:'11/24',t:'貓咪寵物',items:[['新增','三隻英國短毛貓寵物：傳說「錢錢」（銀白英短，戴著金幣鈴鐺，金幣 +18%）、史詩「阿咪」（三花英短，爆擊率 +6%）、稀有「小卡」（灰色英短，生命 +30）；孵寵物蛋就有機會抽到'],['修正','時裝預覽會用你現在穿的整套搭配，再換上要看的那一件；不會再出現換了頭飾、看其他部位時還是顯示舊樣子的問題']]},
  {v:'0.16.0',d:'11/24',t:'真實動作・效能優化',items:[['調整','社交動作全部重做，改成像真的狗：坐下會把後腳收起來、趴下睡覺會把下巴靠在前腳上、打滾會翻肚子四腳朝天亂踢、汪一聲會張嘴、嗷嗚會抬頭對天長嚎、轉圈是在原地追自己的尾巴、比愛心改成狗狗的「伸懶腰邀玩」姿勢、搖尾巴會連屁股一起扭'],['調整','聞聞會先走到對方屁股後面再聞；摸摸頭會走到對方面前、坐下抬起前腳拍拍牠，被摸的狗會瞇眼搖尾巴'],['調整','坐下、趴下會一直維持，直到你移動為止'],['新增','衝刺按鈕會顯示冷卻倒數，還有一圈慢慢轉回來的進度，冷卻好時按鈕會閃一下'],['調整','怪物變多時大幅減少卡頓：怪物改用預先畫好的圖、畫面外的東西不畫、特效和傷害數字太多時自動精簡'],['新增','手機跑不動時會自動降低一點解析度保持順暢，順了再自動調回來']]},
@@ -1363,7 +1379,7 @@ function renderHub(){
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small><small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`<button class="btn sm" data-stage="${i}">出發</button>${(SV.cleared||0)>i?`<span class="heat">${[1,2,3,4,5].map(h=>`<button class="btn sm ${h<=((SV.heat||{})[i]||0)+1?'':'ghost'}" data-stage="${i}" data-heat="${h}" ${h>((SV.heat||{})[i]||0)+1?'disabled':''} title="難度 ${h}">難${h}${h<=((SV.heat||{})[i]||0)?'✓':''}</button>`).join('')}</span><small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small><small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`<button class="btn sm" data-stage="${i}">出發</button>${(SV.cleared||0)>i?`<span class="heat">${[1,2,3,4,5].map(h=>`<button class="btn sm ${h<=((SV.heat||{})[i]||0)+1?'':'ghost'}" data-stage="${i}" data-heat="${h}" ${h>((SV.heat||{})[i]||0)+1?'disabled':''} title="難度 ${h}">難${h}${h<=((SV.heat||{})[i]||0)?'✓':''}</button>`).join('')}</span><small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
       <div class="box"><p class="note" style="margin-top:0">一路往上爬：每層撐 40 秒後打倒守衛就上樓，招式和強化會一直帶著，每 10 層換一個區域、越爬越難。每通過 5 層多拿 1 根骨頭。每 10 層是存檔點，可以直接從那裡開始。</p>${(()=>{const cps=[1];for(let f=11;f<=(SV.towerBest||0)+1;f+=10)cps.push(f);return cps.map(f=>`<button class="btn sm" data-tower="${f}">從第 ${f} 層開始</button>`).join('')})()}</div>
       <h3 style="margin-top:18px" data-anchor="dung">每日副本　<span class="note">今天還剩 ${dailyLeft()} 次（每天 0 點重置）</span></h3>
@@ -1374,7 +1390,8 @@ function renderHub(){
     const jobBox=t>=4?'<p>已經是三轉職業，恭喜！</p>':kids(SV.job).length?(canJob()?`<p>Job Lv 已經到 ${SV.jlv}，可以轉職了！</p><button class="btn" id="doJob">轉職</button>`:`<p>Job Lv ${JREQ[t]} 才能轉職（目前 ${SV.jlv}）。</p>`):'';
     H.innerHTML=`<h3>${SKM[curSkin()].n}・${j.n}</h3>
       <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
-      <div class="box"><strong>轉職</strong>${jobBox}</div>
+      <div class="box"><strong>流派</strong>　<span class="note">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西</span><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,ok=n>0;return `<button class="bld${on?' on':''}" data-build="${b}" ${ok?'':'disabled'}><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${BCAT[b]?`<small class="note">${ok?`這個職業線有 ${n} 招屬於這一類`:'這個職業線沒有這類招式'}</small>`:''}</button>`}).join('')}</div></div>
+      <div class="box"><strong>轉職</strong>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
       <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b>（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
       <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
       <div class="box"><strong>換一隻狗</strong><p class="note">等級、職業、裝備都會保留，只換外表。</p><button class="btn sm ghost" id="chgDog">換狗</button></div>
@@ -1504,6 +1521,8 @@ function hubClick(e){
   if(d.tower){newRun(0,null,{mode:'tower',floor:+d.tower});return}
   if(d.dung){if(dailyLeft()<=0)return;SV.daily.n--;save();newRun(dungStage(),null,{mode:'dungeon',dtype:d.dung});return}
   if(b.id==='doJob'){openJob();return}
+  if(d.build){SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build;sfx('ui');save();renderHub();return}
+  if(d.swjob){switchJob(d.swjob);return}
   if(b.id==='chgDog'){openBreeds('change');return}
   if(b.id==='expSave'){const code=btoa(unescape(encodeURIComponent(JSON.stringify(SV))));try{navigator.clipboard.writeText(code).then(()=>{$('saveMsg').textContent='已複製存檔碼。'},()=>{$('impTxt').value=code;$('saveMsg').textContent='無法自動複製，請手動複製上方文字框。'})}catch(err){$('impTxt').value=code;$('saveMsg').textContent='請手動複製上方文字框。'}return}
   if(b.id==='impSave'){try{const s=JSON.parse(decodeURIComponent(escape(atob($('impTxt').value.trim()))));if(s&&s.v===1&&B[s.breed]&&JM[s.job]){SV=Object.assign(defSave(),s);SV.owned=SV.owned.filter(id=>SKM[id]);save();renderHub();$('saveMsg').textContent='讀取成功！'}else throw 0}catch(err){$('saveMsg').textContent='存檔碼看起來不正確。'}return}
@@ -1526,7 +1545,9 @@ function openJob(){
   for(const pc of $('jobs').querySelectorAll('canvas[data-dog]'))portrait(pc,curSkin(),pc.dataset.dog);
   show('jobov');
 }
-function chooseJob(i){const id=jobsNow[i];if(!id)return;sfx('job');SV.bones+=5;SV.job=id;SV.jlv=1;SV.jxp=0;save();tab='char';renderHub();show('hub')}
+function chooseJob(i){const id=jobsNow[i];if(!id)return;sfx('job');SV.jobsGot=SV.jobsGot||[];if(!SV.jobsGot.includes(id)){SV.jobsGot.push(id);SV.bones+=5}stashTier();SV.job=id;const rec=(SV.tierLv||{})[JM[id].tier];if(rec){SV.jlv=rec.lv;SV.jxp=rec.xp}else{SV.jlv=1;SV.jxp=0}SV.maxTier=Math.max(SV.maxTier||0,JM[id].tier);save();tab='char';renderHub();show('hub')}
+function stashTier(){SV.tierLv=SV.tierLv||{};const t=JM[SV.job].tier;SV.tierLv[t]={lv:SV.jlv,xp:SV.jxp};SV.maxTier=Math.max(SV.maxTier||0,t)}
+function switchJob(id){if(!JM[id]||id===SV.job)return;const t=JM[id].tier;if(t>(SV.maxTier=Math.max(SV.maxTier||0,JM[SV.job].tier)))return;stashTier();const rec=(SV.tierLv||{})[t];SV.job=id;if(rec){SV.jlv=rec.lv;SV.jxp=rec.xp}else{SV.jlv=t<SV.maxTier?JCAP[t]:1;SV.jxp=0}sfx('job');save();renderHub()}
 function openBreeds(mode){
   breedMode=mode;$('breedCancel').classList.toggle('hide',mode!=='change');
   $('breeds').innerHTML=Object.keys(B).map(k=>`<button class="br" data-b="${k}"><canvas width="192" height="144" data-br="${k}"></canvas><strong>${B[k][0]}</strong><small>適合：${REC[k]||'都可以'}</small></button>`).join('');
@@ -1660,7 +1681,7 @@ function hud(){
   c.textBaseline='top';
   const T=(s,x,y,al,f)=>{c.font=f;c.textAlign=al;c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(s,x,y);c.fillStyle='#fff';c.fillText(s,x,y)};
   T('Lv '+G.lvl,14,16,'left','700 18px Fredoka, sans-serif');
-  T(`${j.n} · ${G.heat?`難度${G.heat} `:''}${G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,14,40,'left','700 13px "Noto Sans TC", sans-serif');
+  T(`${j.n}${G.build&&G.build!=='balance'?'（'+buildName(G.job,G.build)+'）':''} · ${G.heat?`難度${G.heat} `:''}${G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,14,40,'left','700 13px "Noto Sans TC", sans-serif');
   if(G.mode==='tower'&&!G.boss)T(`守衛出現 ${Math.max(0,Math.ceil(40-G.ft))} 秒`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   if(G.mode!=='tower'&&!G.boss&&!G.bossDone)T(`魔王出現 ${fmt(Math.max(0,G.bossT-G.t))}`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   T(fmt(G.t),W/2,14,'center','700 26px Fredoka, sans-serif');
@@ -1716,7 +1737,23 @@ function auApply(){
 }
 function tone(f,t,d,type,v,dest,sl){const c=AU.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(20,sl),t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0005,t+d);o.connect(g);g.connect(dest||AU.sg);o.start(t);o.stop(t+d+.03)}
 function noise(t,d,v,ft,f,dest,f2){const c=AU.ctx,s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();s.buffer=AU.noise;fl.type=ft;fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0005,t+d);s.connect(fl);fl.connect(g);g.connect(dest||AU.sg);s.start(t,Math.random()*.5);s.stop(t+d+.03)}
+const woof=(t,v,f)=>{f=f||1;tone(430*f,t,.13,'sawtooth',.11*v,null,170*f);tone(215*f,t,.12,'square',.07*v,null,110*f);noise(t,.07,.12*v,'bandpass',900*f)};
 const SFX={
+ s_bark:(t,v)=>{v=v||1;for(const d of [0,.31,.62])woof(t+d,v)},
+ s_howl:(t,v)=>{v=v||1;tone(290,t,.42,'triangle',.13*v,null,560);tone(560,t+.38,.95,'triangle',.12*v,null,430);tone(840,t+.38,.9,'sine',.04*v,null,650)},
+ s_wag:(t,v)=>{v=v||1;for(let i=0;i<4;i++)noise(t+i*.11,.08,.07*v,'bandpass',1300+(i%2)*500)},
+ s_sniff:(t,v)=>{v=v||1;for(let i=0;i<5;i++)noise(t+i*.085,.045,.09*v,'highpass',2600+(i%2)*800)},
+ s_pat:(t,v)=>{v=v||1;for(const d of [0,.13,.26]){tone(210,t+d,.06,'sine',.16*v,null,150);noise(t+d,.04,.06*v,'lowpass',500)}},
+ s_patted:(t,v)=>{v=v||1;tone(720,t,.22,'sine',.09*v,null,980);tone(980,t+.2,.18,'sine',.07*v,null,820)},
+ s_heart:(t,v)=>{v=v||1;tone(900,t,.08,'triangle',.1*v,null,1300);tone(1250,t+.11,.1,'triangle',.09*v,null,1500);woof(t+.3,.6*v,1.5)},
+ s_roll:(t,v)=>{v=v||1;noise(t+.15,.7,.1*v,'lowpass',700,null,300);tone(1100,t+.45,.07,'triangle',.07*v,null,1400);tone(1200,t+.62,.07,'triangle',.07*v,null,1500)},
+ s_spin:(t,v)=>{v=v||1;noise(t,.5,.1*v,'bandpass',500,null,2200);noise(t+.5,.4,.08*v,'bandpass',600,null,2000)},
+ s_sit:(t,v)=>{v=v||1;tone(150,t,.09,'sine',.18*v,null,90)},
+ s_snore:(t,v)=>{v=v||1;noise(t,.55,.05*v,'lowpass',260,null,180);noise(t+.7,.4,.035*v,'lowpass',420,null,600)},
+ s_ball:(t,v)=>{v=v||1;tone(280,t,.28,'sine',.15*v,null,720)},
+ s_pop:(t,v)=>{v=v||1;tone(620,t,.06,'square',.08*v,null,1250)},
+ s_gift:(t,v)=>{v=v||1;tone(1047,t,.2,'triangle',.1*v);tone(1319,t+.08,.2,'triangle',.09*v);tone(1568,t+.16,.3,'triangle',.09*v)},
+ s_ding:(t,v)=>{v=v||1;tone(1319,t,.18,'sine',.11*v);tone(1760,t+.12,.25,'sine',.09*v)},
  ui:t=>tone(880,t,.06,'square',.1),
  hit:t=>noise(t,.05,.16,'highpass',2500),
  crit:t=>{noise(t,.08,.22,'bandpass',3000);tone(1400,t,.08,'square',.07,null,700)},
@@ -2149,15 +2186,15 @@ const clampX=v=>Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,+v||0)),clampY=v=>Math.m
 function netPeers(list){const seen=new Set();let fresh=false;for(const m of list){seen.add(m.id);let p=NET.peers.get(m.id);const c=cleanPeer(m);if(!p){fresh=true;p={id:m.id,x:clampX(m.x),y:clampY(m.y),tx:clampX(m.x),ty:clampY(m.y),face:1,mv:false,em:null,say:null,heart:0};NET.peers.set(m.id,p)}Object.assign(p,c)}for(const id of [...NET.peers.keys()])if(!seen.has(id))NET.peers.delete(id);if(NET.menu&&!NET.peers.has(NET.menu))closePeerMenu();if(fresh&&NET.ctl)NET.force=.3+Math.random()*1.2;netChip()}
 function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.n))return;
  if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if((p.nap||p.sit)&&Math.hypot(tx-p.x,ty-p.y)>10){p.nap=false;p.sit=false}if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
- else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};if(d.e==='nap'){p.nap=true;p.sit=false}if(d.e==='sit'){p.sit=true;p.nap=false}if(d.e==='howl'){p.howlT=townT;howlCheck()}}
- else if(ev==='ball'){if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b))NET.balls.push({id:String(d.b).slice(0,60),owner:d.id,x0:clampX(d.x),y0:clampY(d.y),tx:clampX(d.tx),ty:clampY(d.ty),t:0,dur:.7,taken:null})}
+ else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};emoteSfx(d.e,p.x,p.y);if(d.e==='nap'){p.nap=true;p.sit=false}if(d.e==='sit'){p.sit=true;p.nap=false}if(d.e==='howl'){p.howlT=townT;howlCheck()}}
+ else if(ev==='ball'){if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b)){const dd=Math.hypot(p.x-TP.x,p.y-TP.y);if(dd<420)sfx('s_ball',.7*(1-dd/420)+.1,.2)}if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b))NET.balls.push({id:String(d.b).slice(0,60),owner:d.id,x0:clampX(d.x),y0:clampY(d.y),tx:clampX(d.tx),ty:clampY(d.ty),t:0,dur:.7,taken:null})}
  else if(ev==='grab'){const b=NET.balls.find(x=>x.id===d.b);if(b)ballTaken(b,d.id)}
  else if(ev==='inv'){if(d.to!==myId())return;if(SV.dnd||NET.walk){NET.ctl.send('acc',{to:d.id,k:'walk',ok:false});return}showInvite(d.id)}
  else if(ev==='acc'){if(d.to!==myId())return;if(d.ok&&!NET.walk){NET.walk={leader:myId(),follower:d.id,t:0};townFx.push({x:TP.x,y:TP.y-46,s:`${p.n} 答應了！一起散步吧`,life:2})}else if(!d.ok)townFx.push({x:TP.x,y:TP.y-46,s:`${p.n} 說下次吧`,life:1.8})}
  else if(ev==='unwalk'){if(d.to===myId()&&NET.walk){NET.walk=null;townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}}
  else if(ev==='gift'){if(d.to===myId())gotGift(p)}
  else if(ev==='say'&&PHRASES[d.k|0])p.say={k:d.k|0,t:0};
- else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};p.face=(me?TP.x:tg.x)>p.x?1:-1;if(me){NET.me.em={e:d.a==='pat'?'patted':'sniffed',t:0};NET.me.nap=false;friendGain(p.id,p.n,1);townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.em={e:d.a==='pat'?'patted':'sniffed',t:0}}}
+ else if(ev==='it'&&(d.a==='sniff'||d.a==='pat')){const me=d.to===NET.ctl.id;if(me&&SV.dnd)return;const tg=me?null:NET.peers.get(d.to);if(!me&&!tg)return;p.em={e:d.a,t:0,to:d.to};p.face=(me?TP.x:tg.x)>p.x?1:-1;emoteSfx(d.a,p.x,p.y);if(me){NET.me.em={e:d.a==='pat'?'patted':'sniffed',t:0};setTimeout(()=>emoteSfx(d.a==='pat'?'patted':'sniffed'),350);NET.me.nap=false;friendGain(p.id,p.n,1);townFx.push({x:TP.x,y:TP.y-46,s:d.a==='pat'?`${p.n} 摸摸你！`:`${p.n} 聞聞你～`,life:2})}else tg.em={e:d.a==='pat'?'patted':'sniffed',t:0}}}
 async function netConnect(){if(NET.busy)return;NET.busy=true;NET.status='connecting';netChip();
  try{NET.ctl=await DogCloud.joinTown(netMeta(),{onPeers:netPeers,onEvent:netEvent,onState:s=>{if(s==='error'){NET.status='error';NET.err='連線中斷，重新連線中…';NET.retry=5;netDrop()}}});NET.status='on';NET.err='';NET.lastDest=[TP.x,TP.y];NET.mk=netKey()}
  catch(e){NET.status='error';NET.err=e.message||String(e);NET.retry=30}
@@ -2179,11 +2216,13 @@ function netTick(dt){NET.emCd-=dt;NET.sayCd-=dt;NET.itCd-=dt;updateBalls(dt);if(
  if(!NET.ctl||state!=='town')return;NET.sendT-=dt;if(NET.sendT>0)return;NET.sendT=.7;
  let dest;if(TP.go)dest=[TP.go.x,TP.go.y+(TP.go.n?(TP.go.r||30):18)];else if(TP.tgt)dest=TP.tgt;else if(TP.mv){const ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup')),m=Math.hypot(ix,iy)||1;dest=[TP.x+ix/m*140,TP.y+iy/m*140]}else dest=[TP.x,TP.y];
  dest=[Math.round(clampX(dest[0])),Math.round(clampY(dest[1]))];const L=NET.lastDest;if(!L||Math.hypot(dest[0]-L[0],dest[1]-L[1])>28||(!TP.mv&&Math.hypot(TP.x-L[0],TP.y-L[1])>10)){if(!TP.mv)dest=[Math.round(TP.x),Math.round(TP.y)];NET.lastDest=dest;NET.ctl.send('mv',{tx:dest[0],ty:dest[1]})}}
-function netEmote(e){if(e==='ball'){throwBall();return}if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};if(e==='nap'){NET.me.nap=true;NET.me.sit=false;NET.napDone=false}if(e==='sit'){NET.me.sit=true;NET.me.nap=false}if(e==='howl'){NET.me.howlT=townT;setTimeout(howlCheck,60)}sfx(e==='bark'?'swing':'ui');if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
+const EMS={wag:'s_wag',sit:'s_sit',roll:'s_roll',spin:'s_spin',bark:'s_bark',heart:'s_heart',nap:'s_snore',howl:'s_howl',sniff:'s_sniff',pat:'s_pat',patted:'s_patted',sniffed:'s_wag'};
+function emoteSfx(e,x,y){const n=EMS[e];if(!n)return;let v=1;if(x!==undefined){const d=Math.hypot(x-TP.x,y-TP.y);if(d>420||inHouse)return;v=.7*(1-d/420)+.1}sfx(n,v,.2)}
+function netEmote(e){if(e==='ball'){throwBall();return}if(NET.emCd>0)return;NET.emCd=1.5;NET.me.em={e,t:0};emoteSfx(e);if(e==='nap'){NET.me.nap=true;NET.me.sit=false;NET.napDone=false}if(e==='sit'){NET.me.sit=true;NET.me.nap=false}if(e==='howl'){NET.me.howlT=townT;setTimeout(howlCheck,60)}if(NET.ctl)NET.ctl.send('em',{e});closeEmoteBar()}
 function netSay(k){if(NET.sayCd>0)return;NET.sayCd=3;NET.me.say={k,t:0};sfx('ui');if(NET.ctl)NET.ctl.send('say',{k});closeEmoteBar()}
 function interactSpot(p,a){const pf=p.face||1;return a==='sniff'?[p.x-pf*26,p.y+1]:[p.x+pf*30,p.y]}
 function netInteract(id,a,arrived){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}const sp=interactSpot(p,a);if(!arrived&&Math.hypot(sp[0]-TP.x,sp[1]-TP.y)>16){NET.pend={id,a,t:6};TP.tgt=sp;TP.go=null;closePeerMenu();return}NET.pend=null;
- NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};NET.me.sit=false;NET.me.nap=false;p.em={e:a==='pat'?'patted':'sniffed',t:0};sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
+ NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};emoteSfx(a);NET.me.sit=false;NET.me.nap=false;p.em={e:a==='pat'?'patted':'sniffed',t:0};sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
 function netChip(){const el=$('netchip');if(!el)return;const s=NET.status;el.classList.toggle('hide',!(state==='town'));
  el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?'登入帳號後，就能在主城看到其他玩家':s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
 function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n),fr=(SV.friends||{})[id],L=fr?flv(fr.p):0,walking=NET.walk&&(NET.walk.leader===id||NET.walk.follower===id);
@@ -2247,24 +2286,24 @@ function socReward(kind,msg){const s=soc();if(s[kind])return false;s[kind]=1;con
 const myId=()=>NET.ctl?NET.ctl.id:'';
 /* walk together */
 function walkInvite(id){const p=NET.peers.get(id);if(!p||!NET.ctl)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}if(NET.walk){townFx.push({x:TP.x,y:TP.y-46,s:'你已經在散步了',life:1.4});return}if(NET.itCd>0)return;NET.itCd=3;NET.ctl.send('inv',{to:id,k:'walk'});townFx.push({x:TP.x,y:TP.y-46,s:`邀請 ${p.n} 一起散步…`,life:1.8});closePeerMenu()}
-function showInvite(from){const p=NET.peers.get(from);if(!p)return;NET.inv={from,t:12};$('invpop').innerHTML=`<b>${esc(p.n)}</b> 邀請你一起散步！<div><button class="btn sm" data-inv="1">好啊</button><button class="btn sm ghost" data-inv="0">下次吧</button></div>`;$('invpop').classList.remove('hide');sfx('lvl')}
+function showInvite(from){const p=NET.peers.get(from);if(!p)return;NET.inv={from,t:12};$('invpop').innerHTML=`<b>${esc(p.n)}</b> 邀請你一起散步！<div><button class="btn sm" data-inv="1">好啊</button><button class="btn sm ghost" data-inv="0">下次吧</button></div>`;$('invpop').classList.remove('hide');sfx('s_ding')}
 function answerInvite(ok){const iv=NET.inv;NET.inv=null;$('invpop').classList.add('hide');if(!iv||!NET.ctl)return;NET.ctl.send('acc',{to:iv.from,k:'walk',ok:!!ok});if(ok&&NET.peers.has(iv.from)&&!NET.walk){NET.walk={leader:iv.from,follower:myId(),t:0};townFx.push({x:TP.x,y:TP.y-46,s:'牽好繩子，出發！',life:1.8})}}
 function endWalk(send){const w=NET.walk;if(!w)return;NET.walk=null;if(send&&NET.ctl){const other=w.leader===myId()?w.follower:w.leader;NET.ctl.send('unwalk',{to:other})}townFx.push({x:TP.x,y:TP.y-46,s:'散步結束',life:1.4})}
 /* ball */
 let ballSeq=0;
-function throwBall(){if((NET.ballCd||0)>0)return;NET.ballCd=3;const f=TP.face,tx=clampX(TP.x+f*R(160,260)),ty=clampY(TP.y+R(-70,70)),b={id:(myId()||'me')+':'+(++ballSeq),owner:myId()||'me',x0:TP.x+f*10,y0:TP.y-6,tx,ty,t:0,dur:.7,taken:null};NET.balls.push(b);if(NET.ctl)NET.ctl.send('ball',{b:b.id,x:Math.round(b.x0),y:Math.round(b.y0),tx:Math.round(tx),ty:Math.round(ty)});sfx('swing');closeEmoteBar()}
-function ballTaken(b,by,name){if(b.taken)return;b.taken=by;b.hold=2;const me=by===(myId()||'me');if(me){SV.st=SV.st||{};SV.st.balls=(SV.st.balls||0)+1;sfx('coin');townFx.push({x:TP.x,y:TP.y-50,s:'搶到球了！',life:1.6});if(b.owner!==myId()){const o=NET.peers.get(b.owner);if(o)friendGain(o.id,o.n,1)}save()}else{const p=NET.peers.get(by);if(p){townFx.push({x:p.x,y:p.y-50,s:`${p.n} 搶到球！`,life:1.6});if(b.owner===myId())friendGain(p.id,p.n,1)}}}
+function throwBall(){if((NET.ballCd||0)>0)return;NET.ballCd=3;const f=TP.face,tx=clampX(TP.x+f*R(160,260)),ty=clampY(TP.y+R(-70,70)),b={id:(myId()||'me')+':'+(++ballSeq),owner:myId()||'me',x0:TP.x+f*10,y0:TP.y-6,tx,ty,t:0,dur:.7,taken:null};NET.balls.push(b);if(NET.ctl)NET.ctl.send('ball',{b:b.id,x:Math.round(b.x0),y:Math.round(b.y0),tx:Math.round(tx),ty:Math.round(ty)});sfx('s_ball');closeEmoteBar()}
+function ballTaken(b,by,name){if(b.taken)return;b.taken=by;b.hold=2;const me=by===(myId()||'me');if(me){SV.st=SV.st||{};SV.st.balls=(SV.st.balls||0)+1;sfx('s_pop');townFx.push({x:TP.x,y:TP.y-50,s:'搶到球了！',life:1.6});if(b.owner!==myId()){const o=NET.peers.get(b.owner);if(o)friendGain(o.id,o.n,1)}save()}else{const p=NET.peers.get(by);if(p){townFx.push({x:p.x,y:p.y-50,s:`${p.n} 搶到球！`,life:1.6});if(b.owner===myId())friendGain(p.id,p.n,1)}}}
 function updateBalls(dt){NET.ballCd=(NET.ballCd||0)-dt;for(let i=NET.balls.length-1;i>=0;i--){const b=NET.balls[i];b.t+=dt;if(b.taken){b.hold-=dt;if(b.hold<=0)NET.balls.splice(i,1);continue}if(b.t>12){NET.balls.splice(i,1);continue}
   if(b.t>=b.dur&&!inHouse&&Math.hypot(TP.x-b.tx,TP.y-b.ty)<26){ballTaken(b,myId()||'me');if(NET.ctl)NET.ctl.send('grab',{b:b.id})}}}
 function drawBalls(c){for(const b of NET.balls){let x,y,h;if(b.taken){const me=b.taken===(myId()||'me'),p=me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(b.taken);if(!p)continue;x=p.x+(p.face||1)*16;y=p.y-2;h=0}else{const k=Math.min(1,b.t/b.dur);x=b.x0+(b.tx-b.x0)*k;y=b.y0+(b.ty-b.y0)*k;h=Math.sin(k*Math.PI)*60*(1-Math.max(0,b.t-b.dur));if(k>=1){h=Math.abs(Math.sin((b.t-b.dur)*9))*6*Math.max(0,1-(b.t-b.dur))}}
   shadow(c,x,y+6,6,2.4);circ(c,x,y-h,5.5,'#ff5a5a');lineP(c,[[x-5.5,y-h],[x+5.5,y-h]],'#fff',1.2);if(!b.taken&&b.t>=b.dur){c.globalAlpha=.4+.3*Math.sin(townT*8);c.strokeStyle='#fff6b0';c.lineWidth=2;c.beginPath();c.ellipse(x,y+6,12,5,0,0,TAU);c.stroke();c.globalAlpha=1}}}
 /* nap & howl */
-function napCheck(dt){if(TP.mv){NET.me.nap=false;NET.me.sit=false}if(!NET.me.nap){NET.napT=0;return}const near=[...NET.peers.values()].filter(p=>p.nap&&Math.hypot(p.x-TP.x,p.y-TP.y)<130);if(!near.length){NET.napT=Math.max(0,(NET.napT||0)-dt);return}NET.napT=(NET.napT||0)+dt;
+function napCheck(dt){if(TP.mv){NET.me.nap=false;NET.me.sit=false}if(NET.me.nap){NET.snT=(NET.snT||0)-dt;if(NET.snT<=0){NET.snT=3.2;sfx('s_snore',.6,.5)}}if(!NET.me.nap){NET.napT=0;return}const near=[...NET.peers.values()].filter(p=>p.nap&&Math.hypot(p.x-TP.x,p.y-TP.y)<130);if(!near.length){NET.napT=Math.max(0,(NET.napT||0)-dt);return}NET.napT=(NET.napT||0)+dt;
   if(NET.napT>=20&&!NET.napDone){NET.napDone=true;for(const p of near)friendGain(p.id,p.n,2);if(!socReward('nap','一起睡了個好覺！'))townFx.push({x:TP.x,y:TP.y-60,s:'一起睡了個好覺～',life:2})}}
 function howlCheck(){const now=townT,me=NET.me.howlT||-99;if(now-me>3)return;const ps=[...NET.peers.values()].filter(p=>now-(p.howlT||-99)<3&&Math.hypot(p.x-TP.x,p.y-TP.y)<280);if(!ps.length)return;const n=ps.length+1;townFx.push({x:TP.x,y:TP.y-70,s:`汪汪合唱 ×${n}！`,life:2});for(const p of ps)friendGain(p.id,p.n,1);if(n>=3)socReward('howl','大合唱成功！')}
 /* gifts */
-function sendGift(id){const p=NET.peers.get(id),s=soc();if(!p||!NET.ctl||s.gift[id])return;s.gift[id]=1;NET.ctl.send('gift',{to:id});friendGain(id,p.n,3);townFx.push({x:TP.x,y:TP.y-50,s:`送 ${p.n} 一份點心`,life:1.8});NET.me.em={e:'heart',t:0};sfx('drop');save();closePeerMenu()}
-function gotGift(p){const s=soc();friendGain(p.id,p.n,3);if((s.giftIn||0)<5){s.giftIn=(s.giftIn||0)+1;const z=Math.round(100*(1+(SV.stage||0)));SV.zeny+=z;townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！金幣 +${z}`,life:2.6})}else townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！`,life:2.2});TP.heart=1.4;sfx('job');save();renderTownUI()}
+function sendGift(id){const p=NET.peers.get(id),s=soc();if(!p||!NET.ctl||s.gift[id])return;s.gift[id]=1;NET.ctl.send('gift',{to:id});friendGain(id,p.n,3);townFx.push({x:TP.x,y:TP.y-50,s:`送 ${p.n} 一份點心`,life:1.8});NET.me.em={e:'heart',t:0};sfx('s_gift');save();closePeerMenu()}
+function gotGift(p){const s=soc();friendGain(p.id,p.n,3);if((s.giftIn||0)<5){s.giftIn=(s.giftIn||0)+1;const z=Math.round(100*(1+(SV.stage||0)));SV.zeny+=z;townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！金幣 +${z}`,life:2.6})}else townFx.push({x:TP.x,y:TP.y-56,s:`${p.n} 送你點心！`,life:2.2});TP.heart=1.4;sfx('s_gift');save();renderTownUI()}
 /* friends list */
 function friendsHTML(){const fr=Object.entries(SV.friends||{}).sort((a,b)=>b[1].p-a[1].p);if(!fr.length)return '<p class="note">還沒有朋友。在主城點別的狗，聞聞、摸摸、一起散步、丟球、午睡、合唱都會增加好感度。</p>';
  return `<div class="frl">${fr.map(([id,f])=>{const on=NET.peers.has(id),L=flv(f.p),nx=FLV[L+1];return `<div class="fr"><div><b>${esc(f.n)}</b> ${on?'<span class="on">● 在線</span>':''}<small>${FLV[L][1]}　${'♥'.repeat(L)}${'♡'.repeat(4-L)}　${f.p}${nx?`/${nx[0]}`:''}</small></div><span>${netCan()?`<button class="btn sm ghost" data-visit="${id}" data-vn="${esc(f.n)}">拜訪家</button>`:''}${on&&!soc().gift[id]?`<button class="btn sm" data-gift="${id}">送點心</button>`:''}</span></div>`}).join('')}</div>`}
