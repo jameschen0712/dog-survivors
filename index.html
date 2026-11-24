@@ -110,6 +110,9 @@ textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;b
 .skins{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .sk2{cursor:pointer}.sk2.on{border-color:#2f7a3e;box-shadow:0 0 0 3px rgba(47,122,62,.25)}.sk2.no{cursor:default;opacity:.75}
 .iic{width:44px;height:44px;flex:none;border-radius:10px}
+.cs{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}.cslot{font-size:12px;border:1.5px dashed #c9b88a;border-radius:6px;padding:0 6px;color:#9a8a6a}.cslot.on{border-style:solid;border-color:#d0609a;background:#ffe6f2;color:#a03070;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:8px}
+.cardi{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid #e3d6b0;border-radius:12px;padding:8px}.cardi canvas{width:60px;height:75px;flex:none}.cardi strong{font-size:15px}.cardi em{font-style:normal;font-weight:700;color:#c0407a;margin-left:6px}.cardi small{display:block;font-size:12px}.cardi.no{filter:grayscale(1);opacity:.55}
 @media(prefers-reduced-motion:reduce){.pr.r3{animation:none}}
 .how{padding:28px 0 8px;max-width:780px}
 .how h2,.dex h2{font:900 24px/1.2 "Noto Sans TC",sans-serif;margin:0 0 10px;color:var(--gold)}
@@ -321,12 +324,34 @@ const STAGES=[
  {n:'冰霜山脈',rec:45,hp:20,dmg:5.2,rw:14,boss:'冰封樹王',g:['#9fb8c8','#7f98a8','#c8dce6'],col:'#4a7a9a'},
  {n:'天空之城',rec:60,hp:48,dmg:8.5,rw:32,boss:'天空古神木',g:['#a8c8e8','#88a8d0','#d8e8f8'],col:'#5a6ab8'}];
 
+/* ---------- monsters & cards ---------- */
+const EN={sprout:'苔芽',bat:'燈籠蝠',shroom:'毒菇',wisp:'墨靈',golem:'卵石魔像',knight:'枯木騎士'};
+/* card: id, name, slot, mods [[key,value]], source monster type (or boss stage index), drop text */
+const CARDS=[
+ ['c_sprout','苔芽卡','armor',[['hp',40]],'sprout'],
+ ['c_bat','燈籠蝠卡','acc',[['spd',8]],'bat'],
+ ['c_shroom','毒菇卡','weapon',[['atk',8]],'shroom'],
+ ['c_wisp','墨靈卡','acc',[['cd',6]],'wisp'],
+ ['c_golem','卵石魔像卡','armor',[['dr',6]],'golem'],
+ ['c_knight','枯木騎士卡','weapon',[['crit',6]],'knight'],
+ ['c_b0','古樹王卡','weapon',[['atk',15],['area',5]],0],
+ ['c_b1','腐根古樹卡','armor',[['hp',120],['regen',1]],1],
+ ['c_b2','熔岩樹魔卡','weapon',[['critD',30]],2],
+ ['c_b3','冰封樹王卡','acc',[['cd',12]],3],
+ ['c_b4','天空古神木卡','acc',[['atk',10],['exp',20],['zeny',20]],4]];
+const CM={};for(const r of CARDS)CM[r[0]]={id:r[0],n:r[1],slot:r[2],mods:r[3],src:r[4]};
+const MODN={atk:['傷害','%'],cd:['冷卻縮短','%'],spd:['移速','%'],area:['範圍','%'],hp:['生命',''],regen:['回復/秒',''],mag:['撿取範圍','%'],crit:['爆擊率','%'],exp:['經驗','%'],zeny:['金幣','%'],dr:['減傷','%'],critD:['爆擊傷害','%']};
+const modTxt=mods=>mods.map(([k,v])=>`${MODN[k][0]} ${k==='cd'?'-':'+'}${v}${MODN[k][1]}`).join('、');
+function applyMod(st,k,v){if(k==='atk')st.dmg+=v/100;else if(k==='cd')st.cd*=1-v/100;else if(k==='spd')st.spd+=v/100;else if(k==='area')st.area+=v/100;else if(k==='hp')st.hp+=v;else if(k==='regen')st.regen+=v;else if(k==='mag')st.mag*=1+v/100;else if(k==='crit')st.crit+=v/100;else if(k==='exp')st.exp+=v/100;else if(k==='zeny')st.zeny+=v/100;else if(k==='dr')st.dr+=v/100;else if(k==='critD')st.critD+=v/100}
+const CARD_RATE={normal:.0015,elite:.06,boss:.35};
+
 /* ---------- save ---------- */
 const SAVE_KEY='dog-save-v1';
-function defSave(){return{v:1,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
-function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
+function defSave(){return{v:1,cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
+function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';for(const it of [...o.inv,...Object.values(o.eq)])if(it)fixItem(it);o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
 let SV=loadSave();
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}}
+function fixItem(it){if(it.slots===undefined)it.slots=Math.min(3,[0,1,1,2,2][it.rar]||0);if(!it.cards)it.cards=[];return it}
 const curSkin=()=>(SV.skin&&SV.skin[SV.breed])||BASE[SV.breed||'shiba'];
 const owns=id=>SKM[id]&&(SKM[id].rar===0||SV.owned.includes(id));
 const bNeed=l=>Math.floor(40*l**1.45),jNeed=(l,t)=>Math.floor((14+9*t)*l+10);
@@ -353,14 +378,16 @@ function genItem(stage,minR){
   const aff=keys2.map(k=>{let v=AFF[k][2]*(1+stage*.6)*R(.7,1.25)*RR.m;v=k==='regen'?Math.round(v*10)/10:Math.max(1,Math.round(v));return[k,v]});
   const base=slot==='weapon'?WNAME[JM[SV.job].line]:slot==='armor'?ANAME[Math.floor(Math.random()*4)]:CNAME[Math.floor(Math.random()*4)];
   const ic=slot==='armor'?ANAME.indexOf(base):slot==='acc'?CNAME.indexOf(base):0;
-  return{id:SV.nid++,slot,rar,stage,main,aff,ref:0,n:`${MAT[stage]}${base}`,wt:JM[SV.job].line,ic};
+  const slots=rar===0?(Math.random()<.3?1:0):rar===1?1:rar===2?(Math.random()<.5?2:1):2+(Math.random()<.35?1:0);
+  return{id:SV.nid++,slot,rar,stage,main,aff,ref:0,n:`${MAT[stage]}${base}`,wt:JM[SV.job].line,ic,slots,cards:[]};
 }
 const mainVal=it=>Math.round(it.main*(1+.1*it.ref));
 const mainTxt=it=>it.slot==='weapon'?`傷害 +${mainVal(it)}%`:it.slot==='armor'?`生命 +${mainVal(it)}`:`爆擊率 +${mainVal(it)}%`;
 const affTxt=it=>it.aff.map(([k,v])=>`${AFF[k][0]} ${k==='cd'?'-':'+'}${v}${AFF[k][1]}`).join('、');
 const refCost=it=>Math.round(80*(it.ref+1)**2*(1+it.stage*1.5));
 const sellVal=it=>Math.round(15*(1+it.stage*1.5)*(it.rar+1)**2*(1+it.ref*.5));
-function itemHTML(it,btns){ITEMREF[it.id]=it;return `<div class="it" style="border-left-color:${RAR[it.rar].c}"><canvas class="iic" width="88" height="88" data-it="${it.id}"></canvas><div class="nm"><strong style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${it.n}${it.ref?` +${it.ref}`:''}</strong><small>${SLOTN[it.slot]} · ${mainTxt(it)}${it.aff.length?' · '+affTxt(it):''}</small></div>${btns}</div>`}
+function itemHTML(it,btns){ITEMREF[it.id]=it;return `<div class="it" style="border-left-color:${RAR[it.rar].c}"><canvas class="iic" width="88" height="88" data-it="${it.id}"></canvas><div class="nm"><strong style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${it.n}${it.ref?` +${it.ref}`:''}</strong><small>${SLOTN[it.slot]} · ${mainTxt(it)}${it.aff.length?' · '+affTxt(it):''}</small>${slotsHTML(it)}</div>${btns}</div>`}
+function slotsHTML(it){fixItem(it);if(!it.slots)return '<small class="cs">沒有卡槽</small>';let h='';for(let i=0;i<it.slots;i++){const c=CM[it.cards[i]];h+=c?`<span class="cslot on" title="${modTxt(c.mods)}">${c.n}</span>`:'<span class="cslot">空卡槽</span>'}return `<span class="cs">${h}</span>`}
 
 
 const ITEMREF={};
@@ -387,13 +414,25 @@ function drawItemIcon(pc,it){const c=pc.getContext('2d'),w=pc.width,k=w/40,col=R
     else if(i===2){c.beginPath();c.moveTo(-8,-14);c.lineTo(0,-2);c.lineTo(8,-14);c.strokeStyle=O;c.lineWidth=1.4;c.stroke();c.beginPath();c.moveTo(0,-4);c.lineTo(9,6);c.lineTo(0,16);c.lineTo(-9,6);c.closePath();stroke('#7fe3a0');circ(c,-2,4,2,'#fff')}
     else{c.beginPath();c.arc(0,4,9,0,TAU);c.strokeStyle=O;c.lineWidth=5;c.stroke();c.strokeStyle='#ffd35a';c.lineWidth=3;c.stroke();c.beginPath();c.moveTo(0,-12);c.lineTo(5,-6);c.lineTo(0,-1);c.lineTo(-5,-6);c.closePath();stroke('#8ec5ff');circ(c,-1.5,-7,1.2,'#fff')}}
 }
-function paintItems(root){for(const pc of (root||document).querySelectorAll('canvas[data-it]')){const it=ITEMREF[pc.dataset.it];if(it)drawItemIcon(pc,it)}}
+const SW={atk:1,hp:.12,crit:1.4,critD:.35,cd:1.6,area:.7,spd:1,regen:4,mag:.25,exp:.4,zeny:.3,dr:1.6};
+function itemScore(it){let v=it.slot==='weapon'?mainVal(it)*SW.atk:it.slot==='armor'?mainVal(it)*SW.hp:mainVal(it)*SW.crit;for(const [k,x] of it.aff)v+=x*(SW[k]||0);for(const cid of (it.cards||[]))if(CM[cid])for(const [k,x] of CM[cid].mods)v+=x*(SW[k]||0);return v+(it.slots-(it.cards||[]).length)*2}
+function autoEquip(){let n=0;for(const sl of ['weapon','armor','acc']){let best=SV.eq[sl],bs=best?itemScore(best):-1,bi=-1;SV.inv.forEach((it,i)=>{if(it.slot===sl){const sc=itemScore(it);if(sc>bs){bs=sc;bi=i}}});if(bi>=0){const it=SV.inv.splice(bi,1)[0];if(SV.eq[sl])SV.inv.push(SV.eq[sl]);SV.eq[sl]=it;n++}}return n}
+function cardHTML(cid,btns,dex){const c=CM[cid],n=SV.cards[cid]||0,src=typeof c.src==='number'?`${STAGES[c.src].n}魔王`:EN[c.src];
+  return `<div class="cardi${dex&&!n?' no':''}"><canvas width="120" height="150" data-card="${cid}"></canvas><div><strong>${c.n}</strong>${n?`<em>×${n}</em>`:''}<small>${SLOTN[c.slot]}用 · ${modTxt(c.mods)}</small><small class="note">來源：${src}</small>${btns||''}</div></div>`}
+function drawCard(pc,cid){const c=pc.getContext('2d'),w=pc.width,h=pc.height,cd=CM[cid];c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);
+  rr(c,0,0,w,h,10,'#7a5a2a');rr(c,5,5,w-10,h-10,7,'#fbf2dc');const boss=typeof cd.src==='number';
+  const g=c.createLinearGradient(0,12,0,h*.68);g.addColorStop(0,boss?STAGES[cd.src].g[2]:'#cfe8c0');g.addColorStop(1,boss?STAGES[cd.src].col:'#8fc07a');rr(c,12,12,w-24,h*.62,5,g);
+  c.save();c.beginPath();c.rect(12,12,w-24,h*.62);c.clip();c.translate(w/2,h*.4);const sc=boss?1.1:2.4;c.scale(sc,sc);
+  drawEnemy(c,boss?{type:'treant',x:0,y:0,r:22,face:1,ph:0,hit:0,slow:0,elite:false,col:STAGES[cd.src].col}:{type:cd.src,x:0,y:0,r:12,face:1,ph:0,hit:0,slow:0,elite:false},0);c.restore();
+  c.fillStyle='#3a2a1c';c.font='900 15px "Noto Sans TC", sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(cd.n,w/2,h*.8);
+  c.font='700 11px "Noto Sans TC", sans-serif';c.fillStyle='#8a6a3a';c.fillText(SLOTN[cd.slot]+'卡',w/2,h*.91)}
+function paintItems(root){for(const pc of (root||document).querySelectorAll('canvas[data-card]'))drawCard(pc,pc.dataset.card);for(const pc of (root||document).querySelectorAll('canvas[data-it]')){const it=ITEMREF[pc.dataset.it];if(it)drawItemIcon(pc,it)}}
 function calcStats(){
   const t=k=>SV.tal[k]||0;
   const st={dmg:1+(SV.blv-1)*.03+t('a1')*.04,crit:.05+t('a2')*.02,critD:1.5+t('a4')*.1,sig:1+t('a3')*.08,cd:1-t('b1')*.03,area:1+t('b2')*.04,mag:75*(1+t('b3')*.1),exp:1+t('b3')*.05,zeny:1+t('b4')*.1,hp:100+(SV.blv-1)*8+t('c1')*15,regen:t('c2')*.3,spd:1+t('c3')*.03,dr:t('c4')*.03,revive:t('c5'),bonusLv:t('a5'),freePick:t('b5')};
   for(const s of ['weapon','armor','acc']){const it=SV.eq[s];if(!it)continue;const mv=mainVal(it);
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
-    for(const [k,v] of it.aff){if(k==='atk')st.dmg+=v/100;else if(k==='cd')st.cd*=1-v/100;else if(k==='spd')st.spd+=v/100;else if(k==='area')st.area+=v/100;else if(k==='hp')st.hp+=v;else if(k==='regen')st.regen+=v;else if(k==='mag')st.mag*=1+v/100;else if(k==='crit')st.crit+=v/100;else if(k==='exp')st.exp+=v/100;else if(k==='zeny')st.zeny+=v/100}}
+    for(const [k,v] of it.aff)applyMod(st,k,v);for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   st.hp=Math.round(st.hp);return st;
 }
 
@@ -491,12 +530,13 @@ function drawEnemy(c,e,t){
     case 'wisp':c.translate(0,bob);c.beginPath();c.moveTo(-8,-2);c.quadraticCurveTo(-16,10+bob*2,-21,3);c.quadraticCurveTo(-10,15,2,9);c.closePath();c.fillStyle='#1d1530';c.fill();circ(c,0,0,10,'#1d1530');circ(c,-3,-4,4,'rgba(160,120,255,.35)');circ(c,2,-1,2.3,'#e9e1ff');circ(c,7,-1,2.3,'#e9e1ff');break;
     case 'golem':rr(c,-14,0,5,9,2,'#77796f');rr(c,9,0,5,9,2,'#77796f');rr(c,-11,-2,22,14,5,'#8d8f86');rr(c,-8,-13,16,12,5,'#a3a59a');ell(c,-2,-13,6,2.5,0,'#6aa84f');circ(c,1,-7,1.8,'#7ff0ff');circ(c,6,-7,1.8,'#7ff0ff');break;
     case 'knight':rr(c,10,-14,2.5,26,1,'#9a7a52');tri(c,11.2,-21,8,-14,14.5,-14,'#cfd6dc');rr(c,-9,-4,18,15,4,'#6b4a2e');rr(c,-9,1,18,3,1,'#4a3220');rr(c,-8,-16,16,13,5,'#7d5a38');rr(c,-1,-12,9,2.5,1,'#ffcf4a');c.strokeStyle='#4f8a3d';c.lineWidth=2;c.beginPath();c.moveTo(-3,-16);c.lineTo(-6,-22);c.moveTo(-5,-20);c.lineTo(-9,-21);c.stroke();break;
-    case 'treant':{const lc=G?STAGES[G.stage].col:'#3f8f4e';rr(c,-12,8,6,4,2,'#4f3520');rr(c,6,8,6,4,2,'#4f3520');rr(c,-9,-8,18,20,4,'#6b4a2e');circ(c,-8,-14,8,lc);circ(c,8,-14,8,lc);circ(c,0,-20,9,shade(lc,.15));circ(c,-3,-22,3,'rgba(255,255,255,.18)');circ(c,-3,0,2,'#ffdd55');circ(c,4,0,2,'#ffdd55');c.beginPath();c.arc(.5,6,3,0,Math.PI);c.fillStyle='#2a1a10';c.fill();break}
+    case 'treant':{const lc=e.col||(G?STAGES[G.stage].col:'#3f8f4e');rr(c,-12,8,6,4,2,'#4f3520');rr(c,6,8,6,4,2,'#4f3520');rr(c,-9,-8,18,20,4,'#6b4a2e');circ(c,-8,-14,8,lc);circ(c,8,-14,8,lc);circ(c,0,-20,9,shade(lc,.15));circ(c,-3,-22,3,'rgba(255,255,255,.18)');circ(c,-3,0,2,'#ffdd55');circ(c,4,0,2,'#ffdd55');c.beginPath();c.arc(.5,6,3,0,Math.PI);c.fillStyle='#2a1a10';c.fill();break}
   }
   c.restore();
   if(e.slow>0){c.globalAlpha=.25;circ(c,e.x,e.y,e.r,'#8ee8ff');c.globalAlpha=1}
   if(e.hit>0){c.globalAlpha=Math.min(1,e.hit*8)*.55;circ(c,e.x,e.y,e.r,'#fff');c.globalAlpha=1}
-  if(e.elite){c.beginPath();c.arc(e.x,e.y,e.r+4,0,TAU);c.strokeStyle='rgba(245,197,66,.85)';c.lineWidth=2.5;c.stroke()}
+  if(e.elite){c.beginPath();c.arc(e.x,e.y,e.r+4,0,TAU);c.strokeStyle='rgba(245,197,66,.85)';c.lineWidth=2.5;c.stroke();c.font='700 12px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.6)';const nm='菁英・'+EN[e.type];c.strokeText(nm,e.x,e.y-e.r-10);c.fillStyle='#ffd35a';c.fillText(nm,e.x,e.y-e.r-10);rr(c,e.x-16,e.y-e.r-6,32,3,1,'rgba(0,0,0,.5)');rr(c,e.x-16,e.y-e.r-6,32*Math.max(0,e.hp/e.max),3,1,'#ff6b5a')}
+  if(e.boss){c.font='900 14px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.6)';const nm=G?STAGES[G.stage].boss:'';c.strokeText(nm,e.x,e.y-e.r-22);c.fillStyle='#ff8a6a';c.fillText(nm,e.x,e.y-e.r-22)}
 }
 
 /* ---------- ground tiles ---------- */
@@ -524,7 +564,7 @@ function newRun(stage,trialJob){
     p:{x:0,y:0,r:13,hp:st.hp,max:st.hp,spd:150,fx:1,fy:0,face:1,inv:0,mv:false},
     st:{dmg:st.dmg,cd:st.cd,area:st.area,mag:st.mag,regen:st.regen,spd:st.spd,crit:st.crit,critD:st.critD,sig:st.sig,dr:st.dr,exp:st.exp,zeny:st.zeny},
     revive:st.revive,wep:{},pas:{},E:[],P:[],B:[],J:[],Z:[],FX:[],TX:[],spawn:1,eliteT:60,boss:null,bossDone:false,winT:0,shake:0,banner:null,ring2:0,ring4:0,
-    rw:{bxp:0,jxp:0,zeny:0,items:[]}};
+    rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[]}};
   const lv0=1+st.bonusLv;
   for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;G.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}
   if(st.freePick)G.pend=1;
@@ -566,7 +606,8 @@ function kill(e){
   const sg=STAGES[G.stage],xp=e.boss?200:e.elite?20:ET[e.type].xp;
   G.rw.bxp+=xp*3*sg.rw*G.st.exp;G.rw.jxp+=xp*3*sg.rw*G.st.exp;
   {const zv=Math.round((e.boss?600:e.elite?60:R(1,4)/.4)*sg.rw*G.st.zeny),nc=e.boss?10:e.elite?5:(Math.random()<.4?1:0);for(let i=0;i<nc;i++)G.J.push({x:e.x+R(-18,18),y:e.y+R(-18,18),v:0,coin:Math.max(1,Math.round(zv/nc)),m:false})}
-  if(!G.trial){if(e.boss){G.rw.items.push(genItem(G.stage,2),genItem(G.stage,1))}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004)G.rw.items.push(genItem(G.stage,0))}
+  if(!G.trial){const cr=e.boss?CARD_RATE.boss:e.elite?CARD_RATE.elite:CARD_RATE.normal;if(Math.random()<cr){const cid=e.boss?'c_b'+G.stage:'c_'+e.type;if(CM[cid]){G.rw.cards.push(cid);txt(e.x,e.y-44,`獲得 ${CM[cid].n}！`,'#ff9ec4',true);sfx('job');fx({k:'ring',x:e.x,y:e.y,R:60,c:'#ff9ec4',life:.5,max:.5,fill:1})}}
+    if(e.boss){G.rw.items.push(genItem(G.stage,2),genItem(G.stage,1))}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004)G.rw.items.push(genItem(G.stage,0))}
   if(e.boss){G.bossDone=true;G.boss=null;G.winT=1.6;banner(`${sg.boss}倒下了！`);flash=.6;return}
   G.J.push({x:e.x,y:e.y,v:e.elite?12:ET[e.type].xp,m:false});
   if(e.elite||Math.random()<.012)G.J.push({x:e.x+10,y:e.y,v:0,heal:30,m:false});
@@ -762,13 +803,15 @@ function end(win){
     const b0=SV.blv,j0=SV.jlv;SV.bxp+=bx;while(SV.bxp>=bNeed(SV.blv)&&SV.blv<99){SV.bxp-=bNeed(SV.blv);SV.blv++}
     const tier=JM[SV.job].tier,cap=JCAP[tier];if(SV.jlv<cap){SV.jxp+=jx;while(SV.jlv<cap&&SV.jxp>=jNeed(SV.jlv,tier)){SV.jxp-=jNeed(SV.jlv,tier);SV.jlv++;SV.tpe++}if(SV.jlv>=cap)SV.jxp=0}
     const firstClear=win&&!(SV.cleared>G.stage);let bones=1+(win?3:0)+(firstClear?10:0)+(SV.blv-b0);SV.bones+=bones;
-    SV.zeny+=zn;for(const it of rw.items)if(SV.inv.length<80)SV.inv.push(it);
+    SV.zeny+=zn;for(const it of rw.items)if(SV.inv.length<80)SV.inv.push(it);for(const cid of rw.cards)SV.cards[cid]=(SV.cards[cid]||0)+1;const autoN=SV.autoEq?autoEquip():0;
     SV.runs++;if(win){SV.stage=Math.max(SV.stage,Math.min(STAGES.length-1,G.stage+1));SV.cleared=Math.max(SV.cleared||0,G.stage+1)}
     if(!SV.best[G.stage]||t>SV.best[G.stage])SV.best[G.stage]=t;save();
     lines.push(`<div>Base 經驗 +${bx}${SV.blv>b0?` <b>→ Base Lv ${SV.blv}！</b>`:''}</div>`);
     lines.push(`<div>Job 經驗 +${jx}${SV.jlv>j0?` <b>→ Job Lv ${SV.jlv}！獲得 ${SV.jlv-j0} 天賦點</b>`:''}${SV.jlv>=JCAP[tier]?'（已達上限）':''}</div>`);
     lines.push(`<div>金幣 +${zn}${win?'（通關加成 ×1.3）':''}　🦴 狗骨頭 +${bones}${firstClear?'（首次通關 +10）':''}</div>`);
     lines.push(rw.items.length?`<div>獲得裝備：</div>`+rw.items.map(it=>`<div style="display:flex;gap:8px;align-items:center;color:${RAR[it.rar].c};font-weight:700">${(ITEMREF[it.id]=it,'')}<canvas class="iic" style="width:32px;height:32px" width="64" height="64" data-it="${it.id}"></canvas>${RAR[it.rar].n} ${it.n}</div>`).join(''):'<div>這局沒有撿到裝備（打倒金框菁英怪必掉）</div>');
+    if(rw.cards.length)lines.push(`<div><b style="color:#c0407a">獲得卡片：${rw.cards.map(c=>CM[c].n).join('、')}</b>（到城鎮「裝備」頁插到有卡槽的裝備上）</div>`);
+    if(autoN)lines.push(`<div>已自動換上 ${autoN} 件更好的裝備。</div>`);
     if(canJob())lines.push('<div><b style="color:#2f7a3e">可以轉職了！回城鎮到「角色」頁轉職。</b></div>');
     if(win&&G.stage+1<STAGES.length)lines.push(`<div><b>解鎖新關卡：${STAGES[G.stage+1].n}</b></div>`);
   }
@@ -779,7 +822,8 @@ function toTown(){G=null;state='hub';playMusic('town');document.body.classList.r
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
-const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['skin','造型'],['shop','商店']];
+const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['shop','商店']];
+let insFor=null;
 function renderHub(){
   const j=JM[SV.job],tier=j.tier,cap=JCAP[tier],pts=SV.tpe-tSpent();
   $('hinfo').innerHTML=`<strong>${SKM[curSkin()].n}</strong><small>${TIERN[tier]} · ${j.n}</small>
@@ -806,8 +850,13 @@ function renderHub(){
       <p><button class="btn sm ghost" id="resetTal">重置天賦（免費）</button></p>`;
   }else if(tab==='eq'){
     const inv=SV.inv.slice().sort((a,b)=>b.rar-a.rar||b.stage-a.stage);
-    H.innerHTML=`<h3>身上的裝備</h3><div class="slots">${['weapon','armor','acc'].map(s=>{const it=SV.eq[s];return it?itemHTML(it,`<button class="btn sm" data-ref="${s}" ${SV.zeny<refCost(it)||it.ref>=10?'disabled':''}>精煉 ${it.ref>=10?'MAX':refCost(it)+' 金幣'}</button><button class="btn sm ghost" data-uneq="${s}">卸下</button>`):`<div class="it"><div class="nm"><strong>${SLOTN[s]}</strong><small>空的，打倒菁英怪或到商店開寶箱拿裝備</small></div></div>`}).join('')}</div>
-      <h3>背包（${SV.inv.length}/80）　<button class="btn sm ghost" id="sellLow">賣掉所有普通、精良</button></h3><div class="items">${inv.length?inv.map(it=>itemHTML(it,`<button class="btn sm" data-eq="${it.id}">裝備</button><button class="btn sm ghost" data-sell="${it.id}">賣 ${sellVal(it)}</button>`)).join(''):'<p class="note">背包是空的。</p>'}</div>`;
+    const canIns=it=>it.cards.length<it.slots&&Object.keys(SV.cards).some(c=>SV.cards[c]>0&&CM[c].slot===it.slot);
+    const insBox=(()=>{const it=insFor&&[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);if(!it)return '';const cs=Object.keys(SV.cards).filter(c=>SV.cards[c]>0&&CM[c].slot===it.slot);return `<div class="box"><strong>把卡片插進「${it.n}」</strong><p class="note">插進去就拿不出來了（跟 RO 一樣），請想清楚再插。</p><div class="cards">${cs.map(c=>cardHTML(c,`<button class="btn sm" data-ins2="${c}">插入</button>`)).join('')||'<p class="note">沒有可以插這個部位的卡片。</p>'}</div><button class="btn sm ghost" data-insx="1">取消</button></div>`})();
+    H.innerHTML=`${insBox}<h3>身上的裝備　<button class="btn sm" id="autoEq">一鍵換上最好的</button></h3><label class="note" style="display:block;margin:-4px 0 10px"><input type="checkbox" id="autoEqChk" ${SV.autoEq?'checked':''}> 每局結束自動換上撿到的更好裝備</label><div class="slots">${['weapon','armor','acc'].map(s=>{const it=SV.eq[s];return it?itemHTML(it,`${canIns(it)?`<button class="btn sm" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-ref="${s}" ${SV.zeny<refCost(it)||it.ref>=10?'disabled':''}>精煉 ${it.ref>=10?'MAX':refCost(it)+' 金幣'}</button><button class="btn sm ghost" data-uneq="${s}">卸下</button>`):`<div class="it"><div class="nm"><strong>${SLOTN[s]}</strong><small>空的，打倒菁英怪或到商店開寶箱拿裝備</small></div></div>`}).join('')}</div>
+      <h3>背包（${SV.inv.length}/80）　<button class="btn sm ghost" id="sellLow">賣掉所有普通、精良</button></h3><div class="items">${inv.length?inv.map(it=>itemHTML(it,`${canIns(it)?`<button class="btn sm ghost" data-ins="${it.id}">插卡</button>`:''}<button class="btn sm" data-eq="${it.id}">裝備</button><button class="btn sm ghost" data-sell="${it.id}">賣 ${sellVal(it)}</button>`)).join(''):'<p class="note">背包是空的。</p>'}</div>`;
+  }else if(tab==='card'){
+    const have=CARDS.filter(r=>SV.cards[r[0]]).length;
+    H.innerHTML=`<h3>卡片圖鑑（收集 ${have}/${CARDS.length}）</h3><p class="note">打倒怪物有機率掉牠的卡片：一般怪 ${(CARD_RATE.normal*100).toFixed(2)}%、金框菁英怪 ${CARD_RATE.elite*100}%、魔王 ${CARD_RATE.boss*100}%（掉該關卡的魔王卡）。卡片要插在對應部位、而且有空卡槽的裝備上。</p><div class="cards">${CARDS.map(r=>cardHTML(r[0],'',true)).join('')}</div>`;
   }else if(tab==='skin'){
     const total=SKINS.filter(r=>r[3]>0).length,got=SV.owned.length;
     H.innerHTML=`<h3>抽造型　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
@@ -838,7 +887,12 @@ function pull(n){
 }
 const BONE_COST=1000;
 function hubClick(e){
+  if(e.target.id==='autoEqChk'){SV.autoEq=e.target.checked;save();return}
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(b.id==='autoEq'){const n=autoEquip();save();renderHub();if(!n){const h=$('hbody').querySelector('h3');if(h)h.insertAdjacentHTML('beforeend','<span class="note">　身上已經是最好的了</span>')}return}
+  if(d.ins){insFor=+d.ins;renderHub();$('hbody').scrollTop=0;return}
+  if(d.insx){insFor=null;renderHub();return}
+  if(d.ins2){const it=[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);const c=d.ins2;if(it&&SV.cards[c]>0&&CM[c].slot===it.slot&&it.cards.length<it.slots){it.cards.push(c);SV.cards[c]--;if(!SV.cards[c])delete SV.cards[c];sfx('job')}insFor=null;save();renderHub();return}
   if(d.pull){pull(+d.pull);return}
   if(d.buybone){if(SV.zeny>=BONE_COST){SV.zeny-=BONE_COST;SV.bones++;save();renderHub()}return}
   if(d.skin){const k=SKM[d.skin];if(!owns(d.skin))return;SV.breed=k.b;SV.skin[k.b]=d.skin;save();renderHub();buildDex();return}
@@ -990,7 +1044,7 @@ function hud(){
   T(`${j.n} · ${STAGES[G.stage].n}`,14,40,'left','700 13px "Noto Sans TC", sans-serif');
   T(fmt(G.t),W/2,14,'center','700 26px Fredoka, sans-serif');
   T('擊倒 '+G.kills,W-62,18,'right','700 16px "Noto Sans TC", sans-serif');
-  if(!G.trial)T(`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}`,W-62,40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
+  if(!G.trial)T(`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}  卡片 ${G.rw.cards.length}`,W-62,40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
   const items=[...Object.values(G.wep).map(w=>[w.s,w.l]),...Object.keys(G.pas).map(k=>[PD[k],G.pas[k]])],per=Math.max(1,Math.floor((W-20)/36));
   items.forEach(([d,l],i)=>{const x=12+(i%per)*36,y=H-46-Math.floor(i/per)*42;
     rr(c,x,y,30,30,8,'rgba(16,38,26,.82)');c.strokeStyle=d.c;c.lineWidth=2;c.beginPath();if(c.roundRect)c.roundRect(x,y,30,30,8);else c.rect(x,y,30,30);c.stroke();
