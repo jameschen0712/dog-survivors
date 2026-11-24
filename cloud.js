@@ -138,7 +138,7 @@
   api.userId = () => (user ? user.id : '');
   api.joinTown = async function (meta, h) {
     needUser();
-    try { await sb.realtime.setAuth(); } catch (e) { /* 舊版 supabase-js 會自動帶入 */ }
+    try { const { data } = await sb.auth.getSession(); await sb.realtime.setAuth(data.session ? data.session.access_token : undefined); } catch (e) { /* ignore */ }
     for (let room = 1; room <= MAX_ROOM; room++) {
       const ch = sb.channel('town:' + room, { config: { private: true, broadcast: { self: false }, presence: { key: user.id } } });
       const peers = () => { const st = ch.presenceState(), out = []; for (const k in st) { const m = st[k][st[k].length - 1]; if (k !== user.id && m) out.push(Object.assign({}, m, { id: k })); } return out; };
