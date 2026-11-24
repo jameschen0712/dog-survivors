@@ -120,6 +120,8 @@ textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;b
 #changelog summary{cursor:pointer;font-weight:900}#changelog summary span{float:right;font-weight:500;color:var(--mute);font-size:13px}
 #changelog .nl{margin-top:8px;color:var(--ink)}
 @media(max-width:560px){.news{grid-template-columns:minmax(0,1fr)}.nlist{display:flex;overflow-x:auto;max-height:none}.nv{flex:none}}
+.pullcard{width:min(640px,100%);max-height:100%;overflow:auto}.pullcard .pulls{max-height:60vh;overflow:auto;padding:2px}
+.secs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.secs .btn{margin:0;padding:6px 12px;min-height:34px;font-size:14px}
 .pulls{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
 .pr,.sk2{position:relative;display:grid;justify-items:center;background:#fff;border:2px solid #e3d6b0;border-radius:12px;padding:6px 4px 8px;text-align:center}
 .pr canvas,.sk2 canvas{width:96px;height:72px}
@@ -177,6 +179,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
       <div class="ov hide" id="acctov" style="z-index:26"><div class="card"><h2 id="acctT">帳號與雲端存檔</h2><div id="acctB" style="text-align:left"></div><p class="note" id="acctMsg" role="status" aria-live="polite" style="min-height:1.4em;text-align:center"></p><button class="btn ghost" id="acctClose">關閉</button></div></div>
       <div class="ov hide" id="resumeov" style="z-index:30"><div class="card"><h2>繼續上一局？</h2><div id="resumeB"></div><button class="btn" id="resumeYes">繼續關卡</button><button class="btn ghost" id="resumeNo">放棄（本局獎勵不會拿到）</button></div></div>
+      <div class="ov hide" id="pullov" style="z-index:25"><div class="card pullcard"><h2 id="pullT">抽卡結果</h2><div id="pullB" class="pulls"></div><div><button class="btn" id="pullAgain"></button><button class="btn ghost" id="pullClose">關閉，去換上</button></div></div></div>
       <div class="ov hide" id="chestov" style="z-index:22"><div class="card"><h2 id="chestT">寶箱！</h2><div id="chestB"></div><button class="btn" id="chestOk">太好了！</button></div></div>
       <div class="ov hide" id="shrineov" style="z-index:22"><div class="card"><h2>祭壇</h2><p class="sub">選一個本局有效的效果</p><div id="shrineB" class="choices"></div></div></div>
       <div class="ov hide" id="tipov" style="z-index:30"><div class="card"><h2 id="tipT"></h2><div id="tipB" style="text-align:left;font-size:15px;line-height:1.7;margin:0 0 12px"></div><button class="btn" id="tipOk">知道了</button></div></div>
@@ -214,6 +217,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
 const $=id=>document.getElementById(id);
 const frame=$('frame'),cv=$('cv'),ctx=cv.getContext('2d');
 const TAU=Math.PI*2,R=(a,b)=>a+Math.random()*(b-a),M=70,CELL=80,BOSS_T=240;
+let skinSec='all',cosSec='all',lastPull={skin:[],cos:[]},pullKind=null,pullN=1;
 let W=800,H=500,DPR=1,S=1,state='hub',G=null,menuT=0,last=performance.now(),choicesNow=[],jobsNow=[],tab='go',breedMode='new',flash=0;
 const keys=new Set(),joy={on:false,id:null,ox:0,oy:0,x:0,y:0,mouse:false},grid=new Map();
 
@@ -437,7 +441,7 @@ const achReady=()=>ACH.filter(a=>!(SV.ach||{})[a[0]]&&a[2]());
 
 /* ---------- save ---------- */
 const SAVE_KEY='dog-save-v1';
-function defSave(){return{v:1,cown:[],wear:{},cstar:{},cpity:0,petMode:'atk',autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
+function defSave(){return{v:1,cown:[],wear:{},cstar:{},cpity:0,petMode:'auto',autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
 function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';for(const it of [...o.inv,...Object.values(o.eq)])if(it)fixItem(it);o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
 let SV=loadSave();
 function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}if(window.DogCloud)DogCloud.queue(SV)}
@@ -1026,9 +1030,10 @@ function update(dt){
   if(p.mv){const sp=p.spd*G.st.spd*dt*(p.slow>0?.55:1);p.x+=ix*sp;p.y+=iy*sp;const n=Math.hypot(ix,iy);p.fx=ix/n;p.fy=iy/n;if(Math.abs(ix)>.1)p.face=Math.sign(ix)}
   p.inv-=dt;if(G.st.regen)heal(G.st.regen*dt);
   if(G.pet){const pt=G.pet;let tx=p.x-p.face*26,ty=p.y+8,fetching=false;
-    if(SV.petMode==='fetch'){if(!pt.tgt||pt.tgt.got||pt.tgt.m){pt.tgt=null;let bd=330*330;for(const j of G.J){if(j.got||j.m)continue;const d2=(j.x-p.x)**2+(j.y-p.y)**2;if(d2<bd){bd=d2;pt.tgt=j}}}
+    const pm=SV.petMode||'auto';if(pm==='auto'){pt.ck=(pt.ck||0)-dt;if(pt.ck<=0){pt.ck=.5;let n=0;for(const j of G.J)if(!j.got&&!j.m&&(j.x-p.x)**2+(j.y-p.y)**2<330*330)n++;pt.auto=n>=8||(pt.auto&&n>=3)}}
+    if(pm==='fetch'||(pm==='auto'&&pt.auto)){if(!pt.tgt||pt.tgt.got||pt.tgt.m){pt.tgt=null;let bd=330*330;for(const j of G.J){if(j.got||j.m)continue;const d2=(j.x-p.x)**2+(j.y-p.y)**2;if(d2<bd){bd=d2;pt.tgt=j}}}
       if(pt.tgt){fetching=true;const dx=pt.tgt.x-pt.x,dy=pt.tgt.y-pt.y,d=Math.hypot(dx,dy);if(d<14){pt.tgt.m=true;pt.tgt=null}else{const sp=Math.min(d,380*dt);pt.x+=dx/d*sp;pt.y+=dy/d*sp}}}
-    if(!fetching){pt.x+=(tx-pt.x)*Math.min(1,dt*5);pt.y+=(ty-pt.y)*Math.min(1,dt*5)}pt.cd-=dt*(SV.petMode==='fetch'?.5:1);if(pt.cd<=0){const t=nearestN(pt.x,pt.y,1,220)[0];if(t){pt.cd=.9;const a=Math.atan2(t.y-pt.y,t.x-pt.x);G.P.push({k:'bolt',x:pt.x,y:pt.y-4,vx:Math.cos(a)*380,vy:Math.sin(a)*380,r:5,dmg:pt.dmg/ G.st.dmg,pr:0,life:1.2,tg:t,hits:new Set(),c:PM[pt.id].c==='#ffffff'?'#ffd0e0':PM[pt.id].c})}else pt.cd=.3}}
+    if(!fetching){pt.x+=(tx-pt.x)*Math.min(1,dt*5);pt.y+=(ty-pt.y)*Math.min(1,dt*5)}pt.cd-=dt*(fetching?.5:1);if(pt.cd<=0){const t=nearestN(pt.x,pt.y,1,220)[0];if(t){pt.cd=.9;const a=Math.atan2(t.y-pt.y,t.x-pt.x);G.P.push({k:'bolt',x:pt.x,y:pt.y-4,vx:Math.cos(a)*380,vy:Math.sin(a)*380,r:5,dmg:pt.dmg/ G.st.dmg,pr:0,life:1.2,tg:t,hits:new Set(),c:PM[pt.id].c==='#ffffff'?'#ffd0e0':PM[pt.id].c})}else pt.cd=.3}}
 
   G.spawn-=dt;
   const TT=tE();
@@ -1193,8 +1198,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.12.0';
+const VERSION='0.12.1';
 const NEWS=[
+ {v:'0.12.1',d:'11/24',t:'抽卡畫面改版',items:[['調整','抽造型、抽時裝的結果改成跳出視窗顯示，可以直接「再抽一次」，關掉後會回到收藏'],['新增','收藏可以按分類切換：造型分品種；時裝分頭飾、臉部、頸部、背部、特效，還有「剛抽到」「只看已擁有」，剛抽到的可以馬上換上'],['新增','寵物新增「自動」模式（預設）：平常跟著你攻擊，地上掉的東西一多就自己跑去叼回來']]},
  {v:'0.12.0',d:'11/24',t:'時裝扭蛋・寵物撿東西',items:[['新增','時裝系統：194 款可愛時裝，分頭飾、臉部、頸部、背部、特效五個部位，穿上後打怪時也看得到'],['新增','26 個主題套裝：草莓甜心、小蜜蜂、聖誕快樂、小天使、小惡魔、海盜船長、魔法少女、星空魔導、櫻花祭、南瓜派對、夢幻獨角獸、小火龍、太空探險……集滿一整套傷害 +1%'],['新增','時裝扭蛋（「時裝」分頁）：用狗骨頭抽，SSR 3%，十連保底 SR，60 抽必中 SSR；每收集一件都會永久加能力，不用穿也有效，重複的會升星'],['新增','寵物可以切換「跟著我攻擊」或「幫我撿東西」：撿東西模式會把附近的寶石、金幣和寶箱叼回來'],['新增','雲端存檔正式開放：點「雲端存檔」註冊帳號，換裝置也能接著玩'],['新增','3 個新成就：收集時裝、集滿套裝']]},
  {v:'0.11.0',d:'11/24',t:'斷線續玩・小地圖・玩法大更新',items:[['新增','斷線、關掉頁面或手機跳出時，會自動記住目前的關卡；下次打開可以選擇「繼續關卡」，等級、技能和撿到的獎勵都會保留'],['新增','小地圖：右上角顯示附近的怪物、菁英、魔王、寶箱和祭壇，可以在暫停選單關閉'],['新增','招式進化：招式練到 Lv5、又有對應的被動，升級時會出現金色的「進化」選項'],['新增','菁英怪會掉寶箱，打開有機會一次拿 1～3 個強化'],['新增','祭壇：大約每 75 秒出現一次，可以選祝福，或用詛咒交換更多獎勵，畫面邊緣有箭頭指路'],['新增','菁英怪詞綴：迅捷、巨大、分裂、護盾、自爆、再生'],['新增','難度挑戰：通關後可以挑戰難度 1～5，獎勵更多，第一次通過還送狗骨頭'],['新增','每日任務、每週任務，完成可以領狗骨頭（「任務」分頁）'],['新增','衝刺：空白鍵／Shift 或右下角「衝」按鈕，衝刺時短暫無敵，冷卻 3 秒'],['新增','打倒魔王後可以從三件裝備裡挑一件帶走'],['調整','後面關卡的怪物血量和攻擊成長變平緩，難度曲線更順'],['調整','爆擊率上限 75%，超過的部分會轉成爆擊傷害']]},
  {v:'0.10.0',d:'11/24',t:'雲端帳號・平衡調整',items:[['新增','帳號＋密碼登入，進度自動存到雲端，換手機、換電腦都能接著玩'],['新增','可以綁定 Email，忘記密碼時收信重設'],['新增','雲端和裝置進度不同時，會讓你選要留哪一份'],['調整','關卡魔王改成 4:00 出現，出現前 15 秒會預告，畫面上方有倒數'],['新增','裝備升星（最多 ★5）：花金幣並消耗一件同部位裝備，每顆星能力 +12%'],['新增','寵物可以用金幣餵點心，一路養到 Lv10'],['調整','背包上限 80 → 120，每局結束可自動賣掉比身上差的普通、精良裝備']]},
@@ -1317,7 +1323,7 @@ function renderHub(){
     H.innerHTML=`<h3>卡片圖鑑（收集 ${have}/${CARDS.length}）</h3><p class="note">打倒怪物有機率掉牠的卡片：一般怪 ${(CARD_RATE.normal*100).toFixed(2)}%、金框菁英怪 ${CARD_RATE.elite*100}%、魔王 ${CARD_RATE.boss*100}%（掉該關卡的魔王卡）。卡片要插在對應部位、而且有空卡槽的裝備上。</p><div class="cards">${CARDS.map(r=>cardHTML(r[0],'',true)).join('')}</div>`;
   }else if(tab==='pet'){
     const own=Object.keys(SV.pets||{});
-    H.innerHTML=`<div class="box"><strong>寵物行動</strong>　<button class="btn sm ${SV.petMode!=='fetch'?'':'ghost'}" data-petmode="atk">跟著我攻擊</button><button class="btn sm ${SV.petMode==='fetch'?'':'ghost'}" data-petmode="fetch">幫我撿東西</button><p class="note" style="margin:4px 0 0">「幫我撿東西」：寵物會跑去把附近的經驗寶石、金幣、寶箱叼回來，攻擊速度變一半；沒東西撿時會回來一起打。</p></div><h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5），也可以用金幣餵點心一路養到 Lv10。</span></h3>
+    H.innerHTML=`<div class="box"><strong>寵物行動</strong>　${[['auto','自動（推薦）'],['atk','只攻擊'],['fetch','專心撿東西']].map(([k,n])=>`<button class="btn sm ${(SV.petMode||'auto')===k?'':'ghost'}" data-petmode="${k}">${n}</button>`).join('')}<p class="note" style="margin:4px 0 0">自動：平常跟著你攻擊，地上掉的東西一多（8 個以上）就跑去叼回來，撿完再回來打。專心撿東西：只要附近有東西就去撿。撿東西的時候攻擊速度會減半。</p></div><h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5），也可以用金幣餵點心一路養到 Lv10。</span></h3>
       <div class="box"><strong>孵寵物蛋</strong><p class="note">機率：傳說 3%、史詩 12%、稀有 30%、普通 55%</p><button class="btn" data-egg="z" ${SV.zeny<eggZeny()?'disabled':''}>${eggZeny()} 金幣</button><button class="btn" data-egg="b" ${SV.bones<EGG_BONES?'disabled':''}>🦴 ${EGG_BONES}</button><div id="eggRes"></div></div>
       <div class="cards">${PETS.map(r=>{const id=r[0],has=own.includes(id),lv=(SV.pets||{})[id]||0,on=SV.pet===id;return `<div class="cardi${has?'':' no'}"><canvas width="96" height="96" data-pet="${id}" style="width:48px;height:48px"></canvas><div><strong style="color:${PRAR[r[4]].c}">${r[1]}</strong>${has?`<em>Lv ${lv}</em>`:''}<small>${PRAR[r[4]].n} · ${modTxt([has?petBon(id):r[3]])}</small>${has?(on?'<small><b>出戰中</b></small><button class="btn sm ghost" data-petoff="1">收回</button>':`<button class="btn sm" data-peton="${id}">帶出門</button>`)+(lv<PET_MAX?`<button class="btn sm ghost" data-feed="${id}" ${SV.zeny<feedCost(id)?'disabled':''}>餵點心 ${feedCost(id)} 金幣</button>`:'<small class="note">已滿級</small>'):'<small class="note">還沒孵到</small>'}</div></div>`}).join('')}</div>`;
     for(const pc of H.querySelectorAll('canvas[data-pet]')){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,96,96);c.translate(48,52);c.scale(3,3);drawPet(c,pc.dataset.pet,0,0,0)}
@@ -1331,19 +1337,21 @@ function renderHub(){
     H.innerHTML=`<h3>抽造型　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
       <div class="box gacha"><p class="note">造型只改外觀，不影響數值。機率：SSR 3%、SR 17%、R 80%。十連抽保底一個 SR 以上；連續 60 抽沒中 SSR，第 60 抽必中（目前已累積 ${SV.pity} 抽）。每抽到一款造型，就會永久增加一點能力，<b>不用穿上也有效</b>，收越多越強。抽到重複的會讓那款升星（最多 ★3，每顆星加成 +35%）；滿星後再重複才變成碎片，10 個碎片換 1 根骨頭。集滿同一隻狗的所有毛色，額外再加傷害 +1.5%。</p>
       <button class="btn" data-pull="1" ${SV.bones<1?'disabled':''}>單抽　🦴1</button><button class="btn" data-pull="10" ${SV.bones<10?'disabled':''}>十連抽　🦴10</button><button class="btn ghost" data-buybone="1" ${SV.zeny<BONE_COST?'disabled':''}>用 ${BONE_COST} 金幣換 1 根骨頭</button>
-      <p class="note">骨頭來源：每次出戰 +1、通關 +3、第一次通關一個關卡 +10、每升 1 Base Lv +1、轉職 +5。</p><div id="pullRes" class="pulls"></div></div>
+      <p class="note">骨頭來源：每次出戰 +1、通關 +3、第一次通關一個關卡 +10、每升 1 Base Lv +1、轉職 +5。</p></div>
       ${(()=>{const cm=collectionMods(),ks=Object.keys(cm.m);return `<div class="box"><strong>收藏加成（已經算進角色能力）</strong><p style="margin:4px 0 0;font-size:14px">${ks.length?modTxt(ks.map(k=>[k,cm.m[k]])):'還沒有，抽到造型就會開始累積。'}${cm.sets.length?`<br><span class="note">集滿全套：${cm.sets.map(b=>B[b][0]).join('、')}（每套傷害 +${SET_BONUS}%）</span>`:''}</p></div>`})()}
       <h3>造型收藏（${got}/${total}）　<span class="note">點一下就換上；換別的品種會一起換狗</span></h3>
-      ${Object.keys(B).map(bk=>`<div class="skrow"><h4>${B[bk][0]}</h4><div class="skins">${SKINS.filter(r=>r[1]===bk).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}${own?'':' no'}" data-skin="${id}" ${own?'':'disabled'}><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${own?r[2]:'未取得'}${own&&(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${SKM[id].bon?bonTxt(id):'基本款'}</small></button>`}).join('')}</div></div>`).join('')}`;
+      <div class="secs">${[['all','全部'],...(lastPull.skin.length?[['new','剛抽到']]:[]),...Object.keys(B).map(bk=>[bk,B[bk][0]])].map(([k,n])=>`<button class="btn sm ${skinSec===k?'':'ghost'}" data-ssec="${k}">${n}</button>`).join('')}</div>
+      ${skinSec==='new'?`<div class="skrow"><h4>剛抽到</h4><div class="skins">${[...new Set(lastPull.skin)].map(id=>SKINS.find(r=>r[0]===id)).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}" data-skin="${id}"><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${r[2]}${(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${on?'<b>使用中</b>':'點一下換上'}</small></button>`}).join('')}</div></div>`:''}${Object.keys(B).filter(bk=>skinSec==='all'||skinSec===bk).map(bk=>`<div class="skrow"><h4>${B[bk][0]}</h4><div class="skins">${SKINS.filter(r=>r[1]===bk).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}${own?'':' no'}" data-skin="${id}" ${own?'':'disabled'}><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${own?r[2]:'未取得'}${own&&(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${SKM[id].bon?bonTxt(id):'基本款'}</small></button>`}).join('')}</div></div>`).join('')}`;
     for(const pc of H.querySelectorAll('canvas[data-sk]')){portrait(pc,pc.dataset.sk,SV.job);if(!owns(pc.dataset.sk)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}
   }else if(tab==='cos'){
     const own=SV.cown||[],w=SV.wear||{},cs=cosSets();
     H.innerHTML=`<h3>時裝扭蛋　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
       <div class="box gacha"><p class="note">一共 <b>${COS.length}</b> 款時裝，分成頭飾、臉部、頸部、背部、特效五個部位，每個部位可以穿一件，打怪時也看得到。機率：SSR 3%、SR 17%、R 80%；十連抽保底一個 SR 以上；連續 60 抽沒中 SSR，第 60 抽必中（目前 ${SV.cpity||0} 抽）。跟造型一樣，<b>每收集一件就永久加一點能力，不用穿也有效</b>；重複的會升星（最多 ★3），集滿一整套五件再加傷害 +${CSET_BONUS}%。</p>
       <button class="btn" data-cpull="1" ${SV.bones<1?'disabled':''}>單抽　🦴1</button><button class="btn" data-cpull="10" ${SV.bones<10?'disabled':''}>十連抽　🦴10</button><button class="btn ghost" data-cwear="clear">全部脫掉</button>
-      <div id="cpullRes" class="pulls"></div></div>
+      </div>
       <div class="box"><strong>已收集 ${own.length}/${COS.length}　完成套裝 ${cs.length}/${CSETS.length}</strong><p class="note" style="margin:4px 0 0">${cs.length?'已集滿：'+cs.join('、'):'集滿同一套的五件（頭飾、臉部、頸部、背部、特效）就有套裝加成。'}</p></div>
-      ${CSLOT.map(([slot,sn])=>`<div class="skrow"><h4>${sn}　<span class="note">${COS.filter(o=>o.slot===slot&&cosOwn(o.id)).length}/${COS.filter(o=>o.slot===slot).length}</span></h4><div class="skins">${COS.filter(o=>o.slot===slot).sort((a,b)=>cosOwn(b.id)-cosOwn(a.id)||b.rar-a.rar).map(o=>{const has=cosOwn(o.id),on=w[slot]===o.id;return `<button class="sk2${on?' on':''}${has?'':' no'}" data-cwear="${o.id}" ${has?'':'disabled'}><canvas width="160" height="120" data-cs="${o.id}"></canvas><i style="background:${SRAR[o.rar].c}">${SRAR[o.rar].n}</i><small>${has?o.n:'未取得'}${has&&(SV.cstar||{})[o.id]?` ${'★'.repeat(SV.cstar[o.id])}`:''}</small><small class="note">${on?'<b>穿著中（點一下脫掉）</b>':modTxt([cosBonus(o.id)])}</small></button>`}).join('')}</div></div>`).join('')}`;
+      <div class="secs">${[['all','全部'],...(lastPull.cos.length?[['new','剛抽到']]:[]),...CSLOT,['own','只看已擁有']].map(([k,n])=>`<button class="btn sm ${cosSec===k?'':'ghost'}" data-csec="${k}">${n}</button>`).join('')}</div>
+      ${CSLOT.filter(([slot])=>cosSec==='all'||cosSec==='own'||cosSec==='new'||cosSec===slot).map(([slot,sn])=>`<div class="skrow"><h4>${sn}　<span class="note">${COS.filter(o=>o.slot===slot&&cosOwn(o.id)).length}/${COS.filter(o=>o.slot===slot).length}</span></h4><div class="skins">${COS.filter(o=>o.slot===slot&&(cosSec!=='own'||cosOwn(o.id))&&(cosSec!=='new'||lastPull.cos.includes(o.id))).sort((a,b)=>cosOwn(b.id)-cosOwn(a.id)||b.rar-a.rar).map(o=>{const has=cosOwn(o.id),on=w[slot]===o.id;return `<button class="sk2${on?' on':''}${has?'':' no'}" data-cwear="${o.id}" ${has?'':'disabled'}><canvas width="160" height="120" data-cs="${o.id}"></canvas><i style="background:${SRAR[o.rar].c}">${SRAR[o.rar].n}</i><small>${has?o.n:'未取得'}${has&&(SV.cstar||{})[o.id]?` ${'★'.repeat(SV.cstar[o.id])}`:''}</small><small class="note">${on?'<b>穿著中（點一下脫掉）</b>':modTxt([cosBonus(o.id)])}</small></button>`}).join('')}</div></div>`).join('')}`;
     const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
   }else if(tab==='shop'){
     const s=SV.stage,c1=Math.round(250*(1+s*1.8)),c2=Math.round(1800*(1+s*2.2));
@@ -1361,9 +1369,8 @@ function pull(n){
     res.push({id,dup,star})}
   save();renderHub();
   const best=Math.max(...res.map(o=>SKM[o.id].rar));sfx(best>=3?'job':best>=2?'drop':'coin');
-  $('pullRes').innerHTML=res.map(o=>{const k=SKM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-pr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${k.bon?bonTxt(o.id):''}</small></div>`}).join('');
-  for(const pc of $('pullRes').querySelectorAll('canvas[data-pr]'))portrait(pc,pc.dataset.pr,SV.job);
-  try{$('pullRes').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}
+  lastPull.skin=res.map(o=>o.id);openPull('skin',n,res.map(o=>{const k=SKM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-pr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${k.bon?bonTxt(o.id):''}</small></div>`}).join(''));
+  for(const pc of $('pullB').querySelectorAll('canvas[data-pr]'))portrait(pc,pc.dataset.pr,SV.job);
 }
 function cosPull(n){
   if(SV.bones<n)return;SV.bones-=n;SV.cown=SV.cown||[];SV.cstar=SV.cstar||{};const res=[];
@@ -1373,10 +1380,14 @@ function cosPull(n){
     if(SV.cown.includes(id)){dup=true;if((SV.cstar[id]||0)<STAR_MAX)star=SV.cstar[id]=(SV.cstar[id]||0)+1;else{SV.pieces+=[0,1,3,10][r];while(SV.pieces>=10){SV.pieces-=10;SV.bones++}}}else SV.cown.push(id);
     res.push({id,dup,star})}
   save();renderHub();const best=Math.max(...res.map(o=>CSM[o.id].rar));sfx(best>=3?'job':best>=2?'drop':'coin');
-  $('cpullRes').innerHTML=res.map(o=>{const k=CSM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-cpr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${modTxt([cosBonus(o.id)])}</small></div>`}).join('');
-  for(const pc of $('cpullRes').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:o.id})}
-  try{$('cpullRes').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}
+  lastPull.cos=res.map(o=>o.id);openPull('cos',n,res.map(o=>{const k=CSM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-cpr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${modTxt([cosBonus(o.id)])}</small></div>`}).join(''));
+  for(const pc of $('pullB').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:o.id})}
 }
+function openPull(kind,n,html){pullKind=kind;pullN=n;const best=Math.max(...(kind==='skin'?lastPull.skin.map(id=>SKM[id].rar):lastPull.cos.map(id=>CSM[id].rar)));
+  $('pullT').textContent=(kind==='skin'?'造型':'時裝')+(n>1?'十連抽':'單抽')+(best>=3?'・出現 SSR！':best>=2?'・出現 SR！':'');$('pullB').innerHTML=html;
+  $('pullAgain').textContent=`再抽一次　🦴${n}（剩 ${SV.bones}）`;$('pullAgain').disabled=SV.bones<n;$('pullov').classList.remove('hide');$('pullB').scrollTop=0}
+function closePull(){$('pullov').classList.add('hide');if(pullKind==='skin')skinSec='new';else cosSec='new';renderHub();toSecs()}
+function toSecs(){const sc=$('hbody').querySelector('.secs');if(sc)try{sc.scrollIntoView({block:'start'})}catch(e){}}
 const BONE_COST=1000;
 function hubClick(e){
   if(e.target.id==='autoEqChk'){SV.autoEq=e.target.checked;save();return}
@@ -1388,6 +1399,8 @@ function hubClick(e){
   if(d.ins2){const it=[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);const c=d.ins2;if(it&&SV.cards[c]>0&&CM[c].slot===it.slot&&it.cards.length<it.slots){it.cards.push(c);SV.cards[c]--;if(!SV.cards[c])delete SV.cards[c];sfx('job')}insFor=null;save();renderHub();return}
   if(d.pull){pull(+d.pull);return}
   if(d.cpull){cosPull(+d.cpull);return}
+  if(d.ssec){skinSec=d.ssec;renderHub();toSecs();return}
+  if(d.csec){cosSec=d.csec;renderHub();toSecs();return}
   if(d.cwear){SV.wear=SV.wear||{};if(d.cwear==='clear')SV.wear={};else{const o=CSM[d.cwear];if(o&&cosOwn(o.id)){if(SV.wear[o.slot]===o.id)delete SV.wear[o.slot];else SV.wear[o.slot]=o.id}}save();renderHub();return}
   if(d.petmode){SV.petMode=d.petmode;save();renderHub();return}
   if(d.egg){const z=d.egg==='z';if(z?SV.zeny<eggZeny():SV.bones<EGG_BONES)return;if(z)SV.zeny-=eggZeny();else SV.bones-=EGG_BONES;let x=Math.random()*100,r=0;for(let i=3;i>=0;i--){const cum=PRAR.slice(i).reduce((a,b)=>a+b.w,0);if(x<cum){r=i;break}}
@@ -1737,6 +1750,8 @@ $('toTown').addEventListener('click',toTown);
 $('ovR').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.dataset.bp!==undefined)takeBossPick(+b.dataset.bp)});
 $('tipOk').addEventListener('click',closeTip);
 $('chestOk').addEventListener('click',closeChest);
+$('pullClose').addEventListener('click',closePull);
+$('pullAgain').addEventListener('click',()=>{if(SV.bones<pullN)return;if(pullKind==='skin')pull(pullN);else cosPull(pullN)});
 $('shrineB').addEventListener('click',e=>{const b=e.target.closest('.ch');if(b)pickShrine(+b.dataset.sh)});
 $('newsBtn').addEventListener('click',()=>{newsSel=0;openNews()});
 $('acctBtn').addEventListener('click',openAcct);
