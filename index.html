@@ -70,6 +70,13 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .plist b{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font:900 15px "Noto Sans TC",sans-serif;color:#1b1408}
 .plist small{display:block;color:#6b5a40;font-size:13px}
 /* town hub */
+.townui{position:absolute;inset:0;pointer-events:none;z-index:5}.townui>*{pointer-events:auto}
+.tinfo{position:absolute;top:10px;left:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 12px;display:grid;font-size:12px;line-height:1.45;max-width:calc(100% - 20px)}.tinfo b{font-size:15px}.tinfo.t2{top:76px}
+.tbtns{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap}.tbtns .btn{margin:0;min-height:44px;padding:8px 16px;font-size:16px}.tbtns .btn.ghost{background:#fff8e6;color:#5a3a10;border-color:#fff8e6}
+.talkb{position:absolute;bottom:68px;left:50%;transform:translateX(-50%);margin:0;min-height:44px;animation:pop .9s ease-in-out infinite alternate}@keyframes pop{to{transform:translateX(-50%) scale(1.06)}}
+.editbar{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:42%;overflow:auto}.editbar p{margin:0 0 6px;font-size:13px}
+.fchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.fchip{border:2px solid #e8d8b0;background:#fff;border-radius:10px;padding:4px;display:grid;justify-items:center;min-width:76px;cursor:pointer;color:var(--pink)}.fchip.on{border-color:#f5c542;background:#fff3c0}.fchip canvas{width:42px;height:42px}.fchip small{font-size:11px}
+.furn{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.fc{background:#fff;border:2px solid #eadbb4;border-radius:12px;padding:8px;display:grid;justify-items:center;text-align:center;gap:2px}.fc canvas{width:56px;height:56px}.fc small{font-size:12px}.fc .btn{margin:4px 0 0}
 .hub{position:absolute;inset:0;background:linear-gradient(#fbf6e6,#f1e6c8);color:var(--pink);display:flex;flex-direction:column}
 .htop{display:flex;gap:12px;align-items:center;padding:10px 14px;background:#2f6b3c;color:#fff;flex-wrap:wrap}
 .htop canvas{width:84px;height:64px;background:#5a9a46;border-radius:10px;flex:none}
@@ -167,8 +174,9 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <button id="sbtn" class="sbtn" aria-label="關閉聲音">♪</button>
       <button id="dashb" class="dashb hide" aria-label="衝刺">衝</button>
       <button id="spdb" class="pbtn hide" style="right:58px" aria-label="切換速度">×1</button>
+      <div id="townui" class="townui hide"><div class="tinfo" id="tinfo"></div><div class="tinfo t2 hide" id="tinfo2"></div><button id="talkb" class="btn talkb hide"></button><div id="editbar" class="editbar hide"></div><div class="tbtns" id="tbtns"></div></div>
       <div class="hub hide" id="hub">
-        <div class="htop"><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button><button class="btn sm" id="acctBtn" style="margin:0">登入／註冊</button></div>
+        <div class="htop"><button class="btn sm ghost" id="hubBack" style="margin:0">← 回城鎮</button><canvas id="hubDog" width="168" height="128"></canvas><div class="hinfo" id="hinfo"></div><div class="zeny" id="hzeny"></div><button class="btn sm" id="newsBtn" style="margin:0">最新消息</button><button class="btn sm" id="acctBtn" style="margin:0">登入／註冊</button></div>
         <div class="tabs" id="tabs"></div>
         <div class="hbody" id="hbody"></div>
       </div>
@@ -193,6 +201,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <li>偶爾會掉紅色的<b>磁鐵</b>（金框菁英怪比較常掉），撿到就把畫面上所有經驗寶石、金幣、肉骨頭一次吸過來。</li>
       <li>不管輸贏，這局拿到的 Base／Job 經驗、金幣和裝備都會帶回城鎮。在城鎮可以點天賦、換裝備、精煉、轉職。</li>
       <li>除了一般關卡，還有<b>無限之塔</b>（一路往上爬、每 10 層存檔）和<b>每日副本</b>（黃金／卡片／經驗，每天 3 次）。已通關的關卡可以開 <b>×2 速度</b>。</li>
+      <li>回到<b>主城</b>後可以帶著狗狗散步，走到 NPC 旁邊就能用對應的功能；東邊是你自己的<b>狗屋</b>，可以買家具、擺家具，西邊的<b>狗狗公園</b>每天可以挖寶。</li>
       <li><kbd>空白鍵</kbd>／<kbd>Shift</kbd> 或右下角的「衝」按鈕可以<b>衝刺</b>，衝刺時短暫無敵，冷卻 3 秒。</li>
       <li>招式練到 Lv5、又有對應的被動，就能<b>進化</b>。菁英怪會掉<b>寶箱</b>，地圖上偶爾出現<b>祭壇</b>。</li>
       <li>升級時可以開<b>自動選技能</b>，之後在暫停畫面隨時關掉。</li>
@@ -533,6 +542,7 @@ function calcStats(){
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
     for(const [k,v] of it.aff)applyMod(st,k,v*(1+.12*(it.star||0)));for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   for(const [k,v] of Object.entries(collectionMods().m))applyMod(st,k,v);
+  st.exp+=comfortExp()/100;
   if(SV.pet&&PM[SV.pet]){const [k,v]=petBon(SV.pet);applyMod(st,k,v)}
   st.hp=Math.round(st.hp*(1+st.hpPct));return st;
 }
@@ -1167,6 +1177,7 @@ function end(win){
     if(!G.trial)questProgress({kills:G.kills,runs:1,wins:win?1:0,bosses:G.bossKills||0,floors:G.mode==='tower'?G.floor-1:0,elites:G.eliteKills||0,shrines:(G.blessed||[]).length,evos:Object.values(G.wep).filter(w=>w.evo).length,dungeons:G.mode==='dungeon'?1:0});
     let towerNew=false;if(G.mode==='tower'){const cl=G.floor-1;if(cl>(SV.towerBest||0)){SV.towerBest=cl;towerNew=true}}
     SV.zeny+=zn;for(const it of rw.items)if(SV.inv.length<BAG)SV.inv.push(it);for(const cid of rw.cards){SV.cards[cid]=(SV.cards[cid]||0)+1;SV.cardSeen=SV.cardSeen||{};SV.cardSeen[cid]=1}const autoN=SV.autoEq?autoEquip():0;let soldN=0,soldZ=0;if(SV.autoSell){SV.inv=SV.inv.filter(it=>{const eq=SV.eq[it.slot];if(it.rar<=1&&!(it.cards||[]).length&&!(it.star)&&eq&&itemScore(it)<=itemScore(eq)){soldN++;soldZ+=sellVal(it);return false}return true});SV.zeny+=soldZ}
+    const mats=runMats();if(mats){const hm=homeData().mat;for(const k in mats)hm[k]=(hm[k]||0)+mats[k];G.matsGot=mats}
     SV.runs++;if(win&&G.mode==='stage'){SV.stage=Math.max(SV.stage,Math.min(STAGES.length-1,G.stage+1));SV.cleared=Math.max(SV.cleared||0,G.stage+1)}
     if(G.mode==='stage'&&(!SV.best[G.stage]||t>SV.best[G.stage]))SV.best[G.stage]=t;save();if(CLOUD())DogCloud.flush(VERSION);
     if(G.mode==='tower')lines.push(`<div><b>這次通過了 ${G.floor-1} 層</b>${towerNew?'（新紀錄！）':''}　最高紀錄 ${SV.towerBest||0} 層</div>`);
@@ -1174,6 +1185,7 @@ function end(win){
     lines.push(`<div>Job 經驗 +${jx}${SV.jlv>j0?` <b>→ Job Lv ${SV.jlv}！獲得 ${SV.jlv-j0} 天賦點</b>`:''}${SV.jlv>=JCAP[tier]?'（已達上限）':''}</div>`);
     lines.push(`<div>金幣 +${zn}${win?'（通關加成 ×1.3）':''}　🦴 狗骨頭 +${bones}${firstClear?'（首次通關 +10）':''}${heatFirst?`（首次通過難度 ${G.heat} +${5*G.heat}）`:''}</div>`);
     lines.push(rw.items.length?`<div>獲得裝備：</div>`+rw.items.map(it=>`<div style="display:flex;gap:8px;align-items:center;color:${RAR[it.rar].c};font-weight:700">${(ITEMREF[it.id]=it,'')}<canvas class="iic" style="width:32px;height:32px" width="64" height="64" data-it="${it.id}"></canvas>${RAR[it.rar].n} ${it.n}</div>`).join(''):'<div>這局沒有撿到裝備（打倒金框菁英怪必掉）</div>');
+    if(G.matsGot&&Object.keys(G.matsGot).length)lines.push(`<div>狗屋材料：${Object.entries(G.matsGot).map(([k,v])=>`${MATN[k]} +${v}`).join('、')}</div>`);
     if(rw.cards.length)lines.push(`<div><b style="color:#c0407a">獲得卡片：${rw.cards.map(c=>CM[c].n).join('、')}</b>（到城鎮「裝備」頁插到有卡槽的裝備上）</div>`);
     if(autoN)lines.push(`<div>已自動換上 ${autoN} 件更好的裝備。</div>`);
     if(soldN)lines.push(`<div>自動賣掉 ${soldN} 件比身上差的普通／精良裝備，得到 ${soldZ} 金幣。</div>`);
@@ -1187,19 +1199,20 @@ function end(win){
 let tipPrev=null;
 function showTip(id,title,html,force){if(!force&&(SV.tut||{})[id])return;SV.tut=SV.tut||{};SV.tut[id]=1;save();$('tipT').textContent=title;$('tipB').innerHTML=html;$('tipov').classList.remove('hide');if(state==='play'){tipPrev='play';state='tip';keys.clear()}}
 function closeTip(){$('tipov').classList.add('hide');if(state==='tip'){state='play';last=performance.now()}}
-function idleIncome(){if(!SV.breed||!SV.seen)return;const h=Math.min(12,(Date.now()-SV.seen)/3600000);if(h<.25)return;const zn=Math.round(h*120*(1+SV.stage*1.6)),bx=Math.round(h*40*(1+SV.stage));SV.zeny+=zn;SV.bxp+=bx;while(SV.bxp>=bNeed(SV.blv)&&SV.blv<99){SV.bxp-=bNeed(SV.blv);SV.blv++}save();
+function idleIncome(){if(!SV.breed||!SV.seen)return;const h=Math.min(12,(Date.now()-SV.seen)/3600000);if(h<.25)return;const zn=Math.round(h*120*(1+SV.stage*1.6)*(1+comfortIdle())),bx=Math.round(h*40*(1+SV.stage));SV.zeny+=zn;SV.bxp+=bx;while(SV.bxp>=bNeed(SV.blv)&&SV.blv<99){SV.bxp-=bNeed(SV.blv);SV.blv++}save();
   showTip('idle','狗狗散步回來了！',`你離開的 <b>${h.toFixed(1)} 小時</b>裡，狗狗在城鎮附近散步，撿到了 <b>${zn.toLocaleString()} 金幣</b>和 <b>${bx} Base 經驗</b>。<br><span class="note">離線收益最多累積 12 小時，通關越多關卡撿得越多。</span>`,true)}
 let bossPickOpen=null;
 function takeBossPick(i){if(!bossPickOpen)return;const it=bossPickOpen[i];if(SV.inv.length<BAG+10)SV.inv.push(it);bossPickOpen=null;if(SV.autoEq)autoEquip();save();const bp=$('bpick');if(bp)bp.innerHTML=`<p>已帶走：<b style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${esc(it.n)}</b></p>`;sfx('drop')}
-function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>itemScore(it)>itemScore(a[b])?i:b,0));G=null;state='hub';playMusic('town');document.body.classList.remove('playing');renderHub();show('hub');
+function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>itemScore(it)>itemScore(a[b])?i:b,0));G=null;goTown();
   if(canJob())showTip('job','可以轉職了！','打開<b>「角色」</b>分頁按「轉職」，選一個新職業。轉職後會學到新招式，裝扮也會變。');
   else if(SV.tpe-tSpent()>0)showTip('tal','有天賦點可以用','每升 1 Job Lv 會得到 1 點天賦點。到<b>「天賦」</b>分頁把點數點下去，角色會更強，點錯了也可以免費重置。');
   else if(Object.keys(SV.cards||{}).length)showTip('card','拿到卡片了！','卡片要插在<b>有空卡槽</b>的裝備上才有效果。到<b>「裝備」</b>分頁，在裝備旁邊按「插卡」。注意：插進去就拿不出來了。');
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.12.1';
+const VERSION='0.13.0';
 const NEWS=[
+ {v:'0.13.0',d:'11/24',t:'主城・狗狗的家',items:[['新增','主城：回城鎮後可以帶著狗狗在城裡散步，用方向鍵／WASD 或點畫面移動，走到 NPC 旁邊按「對話」（或 E／空白鍵）'],['新增','每個功能都有對應的 NPC：守門犬（出戰）、塔守（無限之塔）、地城嚮導（副本）、轉職教官、長老（天賦）、鐵匠（裝備）、卡片研究員、狗狗美容院（造型）、時裝店、孵蛋婆婆（寵物）、公告欄（任務）、雜貨商、報童（消息）、郵差（雲端存檔）、家具店'],['新增','城裡有其他狗狗在散步，走過去可以「摸摸」牠們'],['新增','狗狗公園：每天有 4 個可以挖的土堆，挖到金幣、狗屋材料，運氣好有狗骨頭'],['新增','狗狗的家：從紙箱小窩一路升級到庭院小別墅，房間越來越大；36 種家具、6 種牆壁、5 種地板，可以自由擺放'],['新增','舒適度：家具擺越多種越舒服，最多讓出戰經驗 +20%、離線收入 +100%；家裡也會有你其他的寵物在玩'],['新增','狗屋材料（木材、布料、石材、亮晶晶）：每次出戰都會拿到，打越多怪、打倒越多魔王和菁英越多'],['調整','畫面下方仍有「出戰」「選單」「回家」按鈕，不想走路也可以直接點']]},
  {v:'0.12.1',d:'11/24',t:'抽卡畫面改版',items:[['調整','抽造型、抽時裝的結果改成跳出視窗顯示，可以直接「再抽一次」，關掉後會回到收藏'],['新增','收藏可以按分類切換：造型分品種；時裝分頭飾、臉部、頸部、背部、特效，還有「剛抽到」「只看已擁有」，剛抽到的可以馬上換上'],['新增','寵物新增「自動」模式（預設）：平常跟著你攻擊，地上掉的東西一多就自己跑去叼回來']]},
  {v:'0.12.0',d:'11/24',t:'時裝扭蛋・寵物撿東西',items:[['新增','時裝系統：194 款可愛時裝，分頭飾、臉部、頸部、背部、特效五個部位，穿上後打怪時也看得到'],['新增','26 個主題套裝：草莓甜心、小蜜蜂、聖誕快樂、小天使、小惡魔、海盜船長、魔法少女、星空魔導、櫻花祭、南瓜派對、夢幻獨角獸、小火龍、太空探險……集滿一整套傷害 +1%'],['新增','時裝扭蛋（「時裝」分頁）：用狗骨頭抽，SSR 3%，十連保底 SR，60 抽必中 SSR；每收集一件都會永久加能力，不用穿也有效，重複的會升星'],['新增','寵物可以切換「跟著我攻擊」或「幫我撿東西」：撿東西模式會把附近的寶石、金幣和寶箱叼回來'],['新增','雲端存檔正式開放：點「雲端存檔」註冊帳號，換裝置也能接著玩'],['新增','3 個新成就：收集時裝、集滿套裝']]},
  {v:'0.11.0',d:'11/24',t:'斷線續玩・小地圖・玩法大更新',items:[['新增','斷線、關掉頁面或手機跳出時，會自動記住目前的關卡；下次打開可以選擇「繼續關卡」，等級、技能和撿到的獎勵都會保留'],['新增','小地圖：右上角顯示附近的怪物、菁英、魔王、寶箱和祭壇，可以在暫停選單關閉'],['新增','招式進化：招式練到 Lv5、又有對應的被動，升級時會出現金色的「進化」選項'],['新增','菁英怪會掉寶箱，打開有機會一次拿 1～3 個強化'],['新增','祭壇：大約每 75 秒出現一次，可以選祝福，或用詛咒交換更多獎勵，畫面邊緣有箭頭指路'],['新增','菁英怪詞綴：迅捷、巨大、分裂、護盾、自爆、再生'],['新增','難度挑戰：通關後可以挑戰難度 1～5，獎勵更多，第一次通過還送狗骨頭'],['新增','每日任務、每週任務，完成可以領狗骨頭（「任務」分頁）'],['新增','衝刺：空白鍵／Shift 或右下角「衝」按鈕，衝刺時短暫無敵，冷卻 3 秒'],['新增','打倒魔王後可以從三件裝備裡挑一件帶走'],['調整','後面關卡的怪物血量和攻擊成長變平緩，難度曲線更順'],['調整','爆擊率上限 75%，超過的部分會轉成爆擊傷害']]},
@@ -1232,7 +1245,7 @@ const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function acctMsg(t,ok){const m=$('acctMsg');m.textContent=t||'';m.style.color=ok?'#2f7a3e':'#b03a3a'}
 function acctBtnTxt(){const b=$('acctBtn');if(!b)return;if(!CLOUD()){b.textContent='雲端存檔';return}const st=DogCloud.status();b.textContent=st.loggedIn?`☁ ${st.username||'已登入'}${st.pending||st.syncing?'（同步中）':''}`:'登入／註冊'}
 function saveSummary(d){if(!d||!d.breed)return '沒有進度';const j=JM[d.job]?JM[d.job].n:'';return `${(SKM[(d.skin||{})[d.breed]]||SKM[BASE[d.breed]]||{n:''}).n}・${j}<br>Base Lv ${d.blv||1}・Job Lv ${d.jlv||1}<br>出戰 ${d.runs||0} 次・金幣 ${(d.zeny||0).toLocaleString()}<br><span class="note">最後更新：${d.seen?new Date(d.seen).toLocaleString():'不明'}</span>`}
-function adoptSave(d){SV=Object.assign(defSave(),d);if(SV.breed&&!B[SV.breed])SV.breed='shiba';for(const it of [...SV.inv,...Object.values(SV.eq)])if(it)fixItem(it);SV.owned=(SV.owned||[]).filter(id=>SKM[id]);SV.cown=(SV.cown||[]).filter(id=>CSM[id]);try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}buildDex();if(SV.breed){renderHub();show('hub')}else openBreeds('new')}
+function adoptSave(d){SV=Object.assign(defSave(),d);if(SV.breed&&!B[SV.breed])SV.breed='shiba';for(const it of [...SV.inv,...Object.values(SV.eq)])if(it)fixItem(it);SV.owned=(SV.owned||[]).filter(id=>SKM[id]);SV.cown=(SV.cown||[]).filter(id=>CSM[id]);try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}buildDex();if(SV.breed)goTown();else openBreeds('new')}
 async function syncAfterLogin(){
   let remote;try{remote=await DogCloud.load()}catch(e){acctMsg(e.message);return}
   const local=SV,hasLocal=!!(local.breed&&(local.runs||local.blv>1));
@@ -1282,7 +1295,7 @@ function openAcct(){acctMsg('');renderAcct();$('acctov').classList.remove('hide'
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
-const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['cos','時裝'],['pet','寵物'],['ach','任務'],['shop','商店']];
+const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['cos','時裝'],['pet','寵物'],['ach','任務'],['shop','商店'],['home','狗屋']];
 let insFor=null;
 function renderHub(){
   const j=JM[SV.job],tier=j.tier,cap=JCAP[tier],pts=SV.tpe-tSpent();
@@ -1294,9 +1307,9 @@ function renderHub(){
   const H=$('hbody');
   if(tab==='go'){
     H.innerHTML=`<h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small><small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`<button class="btn sm" data-stage="${i}">出發</button>${(SV.cleared||0)>i?`<span class="heat">${[1,2,3,4,5].map(h=>`<button class="btn sm ${h<=((SV.heat||{})[i]||0)+1?'':'ghost'}" data-stage="${i}" data-heat="${h}" ${h>((SV.heat||{})[i]||0)+1?'disabled':''} title="難度 ${h}">難${h}${h<=((SV.heat||{})[i]||0)?'✓':''}</button>`).join('')}</span><small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
-      <h3 style="margin-top:18px">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
+      <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
       <div class="box"><p class="note" style="margin-top:0">一路往上爬：每層撐 40 秒後打倒守衛就上樓，招式和強化會一直帶著，每 10 層換一個區域、越爬越難。每通過 5 層多拿 1 根骨頭。每 10 層是存檔點，可以直接從那裡開始。</p>${(()=>{const cps=[1];for(let f=11;f<=(SV.towerBest||0)+1;f+=10)cps.push(f);return cps.map(f=>`<button class="btn sm" data-tower="${f}">從第 ${f} 層開始</button>`).join('')})()}</div>
-      <h3 style="margin-top:18px">每日副本　<span class="note">今天還剩 ${dailyLeft()} 次（每天 0 點重置）</span></h3>
+      <h3 style="margin-top:18px" data-anchor="dung">每日副本　<span class="note">今天還剩 ${dailyLeft()} 次（每天 0 點重置）</span></h3>
       <div class="stages">${Object.entries(DUNG).map(([k,d])=>`<div class="stg" style="background:linear-gradient(160deg,${k==='gold'?'#e8b84a,#a8741a':k==='card'?'#e88ab8,#9a3a6a':'#7ab8e8,#2a5a9a'})"><strong>${d.n}</strong><small>${d.d}</small><small>難度：${STAGES[dungStage()].n}再強一點 · 3:00 出魔王</small><button class="btn sm" data-dung="${k}" ${dailyLeft()<=0?'disabled':''}>挑戰</button></div>`).join('')}</div>
       <p class="note" style="margin-top:12px">每局都從 Lv1 開始、重新選強化；你的轉職招式、天賦和裝備會一起帶進去。輸了也會拿到經驗、金幣和撿到的裝備。</p>`;
   }else if(tab==='char'){
@@ -1353,6 +1366,15 @@ function renderHub(){
       <div class="secs">${[['all','全部'],...(lastPull.cos.length?[['new','剛抽到']]:[]),...CSLOT,['own','只看已擁有']].map(([k,n])=>`<button class="btn sm ${cosSec===k?'':'ghost'}" data-csec="${k}">${n}</button>`).join('')}</div>
       ${CSLOT.filter(([slot])=>cosSec==='all'||cosSec==='own'||cosSec==='new'||cosSec===slot).map(([slot,sn])=>`<div class="skrow"><h4>${sn}　<span class="note">${COS.filter(o=>o.slot===slot&&cosOwn(o.id)).length}/${COS.filter(o=>o.slot===slot).length}</span></h4><div class="skins">${COS.filter(o=>o.slot===slot&&(cosSec!=='own'||cosOwn(o.id))&&(cosSec!=='new'||lastPull.cos.includes(o.id))).sort((a,b)=>cosOwn(b.id)-cosOwn(a.id)||b.rar-a.rar).map(o=>{const has=cosOwn(o.id),on=w[slot]===o.id;return `<button class="sk2${on?' on':''}${has?'':' no'}" data-cwear="${o.id}" ${has?'':'disabled'}><canvas width="160" height="120" data-cs="${o.id}"></canvas><i style="background:${SRAR[o.rar].c}">${SRAR[o.rar].n}</i><small>${has?o.n:'未取得'}${has&&(SV.cstar||{})[o.id]?` ${'★'.repeat(SV.cstar[o.id])}`:''}</small><small class="note">${on?'<b>穿著中（點一下脫掉）</b>':modTxt([cosBonus(o.id)])}</small></button>`}).join('')}</div></div>`).join('')}`;
     const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
+  }else if(tab==='home'){
+    const h=homeData(),L=HOUSE_LV[h.lv],nx=HOUSE_LV[h.lv+1],cnt=id=>(h.inv[id]||0)+h.items.filter(it=>it.f===id).length;
+    H.innerHTML=`<h3>我的狗屋　<span class="note">舒適度 ${homeComfort()}：出戰經驗 +${comfortExp().toFixed(1)}%、離線收入 +${Math.round(comfortIdle()*100)}%</span></h3>
+      <div class="box"><strong>${L.n}</strong>　<span class="note">房間 ${L.w}×${L.h} 格</span><p class="note" style="margin:6px 0">材料：${Object.keys(MATN).map(k=>`${MATN[k]} <b>${h.mat[k]||0}</b>`).join('　')}<br>材料從出戰拿（打越多怪、打倒魔王和菁英越多），也可以在狗狗公園挖到。舒適度：每擺一種家具就加分，同一種重複擺只算一半；狗屋等級越高也會加。</p>
+      ${nx?`<button class="btn" data-hup="1" ${canPay(nx.cost.z,{...nx.cost,z:undefined})?'':'disabled'}>升級成「${nx.n}」（${costTxt(nx.cost.z,Object.fromEntries(Object.entries(nx.cost).filter(([k])=>k!=='z')))}）</button>`:'<p><b>已經是最高等級的狗屋了！</b></p>'}<button class="btn ghost" data-enterhome="1">回家擺家具</button></div>
+      <h3>家具店</h3><div class="furn">${FURN.map(f=>{const o=FM[f[0]],ok=canPay(o.z,o.m);return `<div class="fc"><canvas width="112" height="112" data-fi="${o.id}"></canvas><strong>${o.n}</strong><small>舒適度 +${o.cf}　擁有 ${cnt(o.id)}</small><small class="note">${costTxt(o.z,o.m)}</small><button class="btn sm" data-fbuy="${o.id}" ${ok?'':'disabled'}>購買</button></div>`}).join('')}</div>
+      <h3>牆壁</h3><div class="secs">${WALLS.map(w=>{const own=h.walls.includes(w[0]),on=h.wall===w[0];return `<button class="btn sm ${on?'':'ghost'}" data-wall="${w[0]}" ${!own&&SV.zeny<w[3]?'disabled':''} style="border-left:14px solid ${w[2]}">${w[1]}${own?(on?'（使用中）':''):`（${w[3]} 金幣）`}</button>`}).join('')}</div>
+      <h3>地板</h3><div class="secs">${FLOORS.map(w=>{const own=h.floors.includes(w[0]),on=h.floor===w[0];return `<button class="btn sm ${on?'':'ghost'}" data-floor="${w[0]}" ${!own&&SV.zeny<w[3]?'disabled':''} style="border-left:14px solid ${w[2]}">${w[1]}${own?(on?'（使用中）':''):`（${w[3]} 金幣）`}</button>`}).join('')}</div>`;
+    for(const pc of H.querySelectorAll('canvas[data-fi]'))furnIcon(pc,pc.dataset.fi);
   }else if(tab==='shop'){
     const s=SV.stage,c1=Math.round(250*(1+s*1.8)),c2=Math.round(1800*(1+s*2.2));
     H.innerHTML=`<h3>商店</h3><div class="slots"><div class="box"><strong>冒險寶箱</strong><p class="note">隨機一件「${MAT[s]}」等級的裝備，任何品質都可能。</p><button class="btn" data-buy="0" ${SV.zeny<c1?'disabled':''}>${c1} 金幣</button></div><div class="box"><strong>黃金寶箱</strong><p class="note">至少「稀有」品質，有機會開出史詩、傳說。</p><button class="btn" data-buy="1" ${SV.zeny<c2?'disabled':''}>${c2} 金幣</button></div></div><div id="shopRes"></div>`;
@@ -1399,6 +1421,11 @@ function hubClick(e){
   if(d.ins2){const it=[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);const c=d.ins2;if(it&&SV.cards[c]>0&&CM[c].slot===it.slot&&it.cards.length<it.slots){it.cards.push(c);SV.cards[c]--;if(!SV.cards[c])delete SV.cards[c];sfx('job')}insFor=null;save();renderHub();return}
   if(d.pull){pull(+d.pull);return}
   if(d.cpull){cosPull(+d.cpull);return}
+  if(d.fbuy){const o=FM[d.fbuy];if(o&&canPay(o.z,o.m)){pay(o.z,o.m);const h=homeData();h.inv[o.id]=(h.inv[o.id]||0)+1;sfx('coin');save();renderHub()}return}
+  if(d.hup){const h=homeData(),nx=HOUSE_LV[h.lv+1];if(!nx)return;const m=Object.fromEntries(Object.entries(nx.cost).filter(([k])=>k!=='z'));if(canPay(nx.cost.z,m)){pay(nx.cost.z,m);h.lv++;sfx('job');save();renderHub()}return}
+  if(d.wall){const h=homeData(),w=WALLS.find(x=>x[0]===d.wall);if(!h.walls.includes(w[0])){if(SV.zeny<w[3])return;SV.zeny-=w[3];h.walls.push(w[0])}h.wall=w[0];sfx('ui');save();renderHub();return}
+  if(d.floor){const h=homeData(),w=FLOORS.find(x=>x[0]===d.floor);if(!h.floors.includes(w[0])){if(SV.zeny<w[3])return;SV.zeny-=w[3];h.floors.push(w[0])}h.floor=w[0];sfx('ui');save();renderHub();return}
+  if(d.enterhome){show(null);enterHouse();return}
   if(d.ssec){skinSec=d.ssec;renderHub();toSecs();return}
   if(d.csec){cosSec=d.csec;renderHub();toSecs();return}
   if(d.cwear){SV.wear=SV.wear||{};if(d.cwear==='clear')SV.wear={};else{const o=CSM[d.cwear];if(o&&cosOwn(o.id)){if(SV.wear[o.slot]===o.id)delete SV.wear[o.slot];else SV.wear[o.slot]=o.id}}save();renderHub();return}
@@ -1449,7 +1476,7 @@ function openBreeds(mode){
   for(const pc of $('breeds').querySelectorAll('canvas[data-br]'))portrait(pc,(SV.skin&&SV.skin[pc.dataset.br])||BASE[pc.dataset.br],mode==='change'?SV.job:'novice');
   show('breedov');
 }
-function pickBreed(k){SV.breed=k;save();if(breedMode==='new'){tab='go'}renderHub();show('hub');buildDex();
+function pickBreed(k){SV.breed=k;save();if(breedMode==='new'){tab='go';goTown()}else{renderHub();show('hub')}buildDex();
   if(breedMode==='new')showTip('hub','歡迎來到城鎮！','這裡是你的基地：<br>・<b>出戰</b>：選關卡開打，也有無限之塔和每日副本<br>・<b>天賦／裝備／卡片</b>：讓角色變強<br>・<b>造型／寵物</b>：用狗骨頭抽造型、孵寵物<br>・<b>成就</b>：完成目標領骨頭<br>先按「青青草原」的<b>出發</b>試試看吧！送你 10 根狗骨頭，可以先去「造型」十連抽一次。')}
 
 /* ---------- render ---------- */
@@ -1736,7 +1763,7 @@ $('breedCancel').addEventListener('click',()=>show('hub'));
 $('breedLogin').addEventListener('click',openAcct);
 $('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(b)chooseJob(+b.dataset.i)});
 $('jobCancel').addEventListener('click',()=>show('hub'));
-$('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;if(!SV.breed){SV.breed='shiba';save()}if(state==='hub')newRun(0,b.dataset.trial)});
+$('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;if(!SV.breed){SV.breed='shiba';save()}if(state==='hub'||state==='town'||state==='house')newRun(0,b.dataset.trial)});
 $('choices').addEventListener('click',e=>{const b=e.target.closest('.ch');if(b)choose(+b.dataset.i)});
 $('pbtn').addEventListener('click',pause);
 $('dashb').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();dash()});
@@ -1762,6 +1789,9 @@ addEventListener('keydown',e=>{const k=e.key.toLowerCase();
   if(state==='play'&&['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
   if(state==='play'&&(k===' '||k==='shift')){dash();return}
   if(state==='tip'&&(k==='enter'||k===' '||k==='escape')){closeTip();return}
+  if((state==='town'||state==='house')&&['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
+  if((state==='town'||state==='house')&&(k==='e'||k===' '||k==='enter')){townInteract();return}
+  if(state==='hub'&&k==='escape'&&$('acctov').classList.contains('hide')){backToTown();return}
   if(k==='escape'||k==='p'){if(state==='play')pause();else if(state==='pause')resume();return}
   if(/^[1-9]$/.test(k)&&state==='level'){choose(+k-1);return}
   if(/^[1-3]$/.test(k)&&state==='shrine'){pickShrine(+k-1);return}
@@ -1780,18 +1810,259 @@ cv.addEventListener('pointerdown',e=>{if(state!=='play')return;joy.on=true;joy.i
 cv.addEventListener('pointermove',e=>{if(!joy.on||e.pointerId!==joy.id)return;if(joy.mouse){mouseAim(e);return}const r=cv.getBoundingClientRect();let dx=e.clientX-r.left-joy.ox,dy=e.clientY-r.top-joy.oy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d}joy.x=dx/m;joy.y=dy/m;placeJoy()});
 const up=e=>{if(e.pointerId!==joy.id)return;joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('pointerdown',townDown);cv.addEventListener('pointermove',townMove);cv.addEventListener('pointerup',townUp);cv.addEventListener('pointercancel',townUp);
+$('tbtns').addEventListener('click',townBtn);$('editbar').addEventListener('click',townBtn);$('talkb').addEventListener('click',townInteract);$('hubBack').addEventListener('click',backToTown);
+
+/* ---------- town (主城) & dog house ---------- */
+const TOWN={x0:-980,x1:980,y0:-640,y1:560};
+const TP={x:0,y:110,face:1,mv:false,go:null,tgt:null,near:null,idle:0,heart:0};
+let townT=0,inHouse=false,townPtr=null,houseEdit=false,houseSel=null;
+const panelTab=t=>()=>openPanel(t);
+const NPCS=[
+ {id:'gate',n:'守門犬・阿布',r:'出戰',x:0,y:-372,skin:'shiba0',job:'knight',open:panelTab('go'),b:{k:'gate',w:190,h:120}},
+ {id:'tower',n:'塔守・小灰',r:'無限之塔',x:340,y:-352,skin:'husky0',job:'wizard',open:()=>openPanel('go','tower'),b:{k:'tower',w:90,h:170,wall:'#b8b2c8',roof:'#6a4ab8'}},
+ {id:'cave',n:'地城嚮導・波波',r:'每日副本',x:-340,y:-352,skin:'lab1',job:'hunter',open:()=>openPanel('go','dung'),b:{k:'cave',w:150,h:96}},
+ {id:'jobm',n:'轉職教官・雷歐',r:'轉職・角色',x:-280,y:-170,skin:'golden0',job:'lknight',open:panelTab('char'),b:{k:'house',w:150,h:84,wall:'#f3e6c8',roof:'#c8443a',sign:'轉職所'}},
+ {id:'smith',n:'鐵匠・大熊',r:'裝備',x:280,y:-170,skin:'border0',job:'smith',open:panelTab('eq'),b:{k:'house',w:150,h:84,wall:'#d8c8b0',roof:'#5a5a62',sign:'鐵匠鋪'}},
+ {id:'elder',n:'長老・白鬍子',r:'天賦',x:-400,y:60,skin:'westie0',job:'sage',open:panelTab('tal'),b:{k:'house',w:136,h:80,wall:'#e8e0f0',roof:'#6a5ab8',sign:'長老之家'}},
+ {id:'card',n:'研究員・眼鏡妹',r:'卡片',x:400,y:60,skin:'poodle0',job:'alch',open:panelTab('card'),b:{k:'house',w:136,h:80,wall:'#f0e8f8',roof:'#c8508a',sign:'卡片研究所'}},
+ {id:'salon',n:'美容師・可可',r:'造型扭蛋',x:-290,y:270,skin:'poodle2',job:'dancer',open:panelTab('skin'),b:{k:'house',w:150,h:84,wall:'#fff0f4',roof:'#ff8ab0',sign:'狗狗美容院'}},
+ {id:'cos',n:'設計師・咪咪',r:'時裝扭蛋',x:290,y:270,skin:'chi0',job:'bard',open:panelTab('cos'),b:{k:'house',w:150,h:84,wall:'#f0f6ff',roof:'#5a8ae0',sign:'時裝店'}},
+ {id:'pet',n:'孵蛋婆婆',r:'寵物',x:0,y:420,skin:'dachs0',job:'priest',open:panelTab('pet'),b:{k:'tent',w:150,h:86}},
+ {id:'board',n:'公告欄',r:'任務・成就',x:-118,y:-150,skin:null,open:panelTab('ach'),b:{k:'board',w:80,h:62}},
+ {id:'shop',n:'雜貨商・小米',r:'商店',x:128,y:-146,skin:'corgi0',job:'merch',open:panelTab('shop'),b:{k:'stall',w:96,h:60}},
+ {id:'news',n:'報童・豆豆',r:'最新消息',x:-110,y:160,skin:'chi2',job:'novice',open:()=>{newsSel=0;openNews()}},
+ {id:'mail',n:'郵差・小黑',r:'雲端存檔',x:112,y:160,skin:'lab1',job:'thief',open:()=>openAcct(),b:{k:'mailbox',w:30,h:40}},
+ {id:'furn',n:'家具店・阿木',r:'狗屋・家具',x:560,y:220,skin:'shiba2',job:'smith',open:panelTab('home'),b:{k:'house',w:140,h:80,wall:'#f6ead0',roof:'#8a5a3a',sign:'家具店'}},
+ {id:'home',n:'我的家',r:'回家',x:720,y:-10,skin:null,open:()=>enterHouse(),b:{k:'myhouse'}}
+];
+const DIGS=[[-700,-120],[-820,120],[-610,250],[-880,-260]];
+const TREES=(()=>{let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<70;i++){const side=i%4;let x,y;if(side===0){x=TOWN.x0+20+r()*1900;y=TOWN.y0+10+r()*70}else if(side===1){x=TOWN.x0+20+r()*1900;y=TOWN.y1-50+r()*60}else if(side===2){x=TOWN.x0+10+r()*60;y=TOWN.y0+r()*1150}else{x=TOWN.x1-60+r()*60;y=TOWN.y0+r()*1150}o.push([x,y,.8+r()*.5])}
+  for(const p of [[-560,-300],[-900,0],[-560,330],[-760,-380],[-940,330],[860,-360],[880,300],[480,-420],[-480,-470],[150,470],[-160,470]])o.push([p[0],p[1],1.1]);return o})();
+const FLOWERS=(()=>{let s=29;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<90;i++)o.push([TOWN.x0+r()*1960,TOWN.y0+r()*1200,['#ffb3cc','#fff27a','#ffffff','#b3d9ff'][i%4]]);return o})();
+const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-260+i*75,y:i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂'][i]}));
+const ENTERX=720,ENTERY=34;
+
+/* home data */
+const HOUSE_LV=[{n:'紙箱小窩',w:5,h:4,cost:null},{n:'小木屋',w:7,h:5,cost:{z:3000,wood:20,stone:10}},{n:'紅屋頂狗屋',w:9,h:6,cost:{z:15000,wood:60,stone:40,cloth:20}},{n:'庭院小別墅',w:11,h:7,cost:{z:60000,wood:150,stone:100,cloth:60,shine:20}}];
+const MATN={wood:'木材',cloth:'布料',stone:'石材',shine:'亮晶晶'};
+const FURN=[
+ ['box','紙箱窩',2,50,{}],['bed_plaid','格紋狗床',6,800,{cloth:3}],['bed_cloud','雲朵狗床',10,3000,{cloth:8}],['bed_royal','公主床',18,12000,{cloth:20,shine:4}],
+ ['bowl_r','紅色飯碗',2,120,{}],['bowl_b','藍色水碗',2,120,{}],['bowl_bone','骨頭飯碗',5,900,{stone:2}],['feeder','自動餵食器',9,4000,{stone:6,shine:1}],
+ ['toybox','玩具箱',5,700,{wood:4}],['ball','彈力球',2,150,{}],['rope','繩結玩具',3,300,{cloth:1}],['teddy','小熊布偶',6,1500,{cloth:4}],
+ ['rug_round','粉紅圓地毯',4,500,{cloth:2}],['rug_paw','腳印地毯',7,2000,{cloth:6}],['plant','盆栽',3,300,{wood:1}],['cactus','仙人掌',3,350,{stone:1}],
+ ['sunflower','向日葵',4,600,{wood:2}],['tree','室內小樹',8,3500,{wood:8}],['lamp','檯燈',4,800,{stone:2}],['starlamp','星星燈',9,5000,{shine:2}],
+ ['sofa','小沙發',8,2500,{cloth:6,wood:4}],['table','小圓桌',4,900,{wood:4}],['shelf','書櫃',6,1800,{wood:8}],['piano','小鋼琴',12,9000,{wood:12,shine:2}],
+ ['tank','魚缸',10,6000,{stone:6,shine:2}],['heater','暖爐',9,5000,{stone:10}],['clock','落地鐘',6,2200,{wood:6}],['trophy','獎盃櫃',8,4000,{wood:6,shine:2}],
+ ['rack','時裝衣架',8,4000,{wood:4,cloth:6}],['photos','照片牆',6,1500,{wood:2}],['petbed','寵物窩',7,2000,{cloth:5}],['bath','小浴缸',9,5500,{stone:8}],
+ ['minihouse','迷你狗屋',10,7000,{wood:14}],['balloons','氣球束',4,800,{}],['cake','生日蛋糕',5,1200,{}],['snowman','小雪人',6,2500,{stone:3}]];
+const FM={};for(const f of FURN)FM[f[0]]={id:f[0],n:f[1],cf:f[2],z:f[3],m:f[4]};
+const WALLS=[['cream','奶油色','#f6e8c8',0],['pink','草莓牛奶','#ffd8e0',1000],['mint','薄荷綠','#d4f0e0',1000],['sky','天空藍','#d4e8ff',1000],['lav','薰衣草','#e8dcff',2000],['woodw','木紋牆','#d8b088',3000]];
+const FLOORS=[['wood','木地板','#c89a6a',0],['tile','白磁磚','#ececec',1000],['grass','草皮','#8cc070',2000],['carpet','紅地毯','#c8606a',2000],['star','星空地板','#3a3a7a',5000]];
+function homeData(){const h=SV.home=SV.home||{lv:0,items:[{f:'box',x:1,y:1},{f:'bowl_r',x:3,y:1}],inv:{},wall:'cream',floor:'wood',walls:['cream'],floors:['wood'],mat:{wood:0,cloth:0,stone:0,shine:0}};h.mat=h.mat||{wood:0,cloth:0,stone:0,shine:0};h.inv=h.inv||{};return h}
+function homeComfort(){const h=homeData(),seen={};let c=0;for(const it of h.items){const f=FM[it.f];if(!f)continue;c+=seen[it.f]?f.cf*.5:f.cf;seen[it.f]=1}c+=h.lv*5;return Math.round(c)}
+const comfortExp=()=>Math.min(20,homeComfort()*.1),comfortIdle=()=>Math.min(1,homeComfort()/150);
+function canPay(z,m){const h=homeData();if(SV.zeny<z)return false;for(const k in m)if((h.mat[k]||0)<m[k])return false;return true}
+function pay(z,m){const h=homeData();SV.zeny-=z;for(const k in m)h.mat[k]-=m[k]}
+const costTxt=(z,m)=>[z?`${z.toLocaleString()} 金幣`:'',...Object.entries(m||{}).map(([k,v])=>`${MATN[k]} ${v}`)].filter(Boolean).join('、')||'免費';
+function runMats(){if(!G||G.trial)return null;const k=1+G.stage*.6,win=G.bossDone||G.mode==='tower'&&G.floor>1;
+  const m={wood:Math.round((1+G.kills/45)*k),cloth:Math.round(G.kills/70*k),stone:Math.round(((win?2:0)+G.t/90)*k),shine:(G.bossKills||0)+Math.floor((G.eliteKills||0)/4)};for(const x in m)if(m[x]<=0)delete m[x];return m}
+
+/* panel helpers */
+function openPanel(t,scrollTo){tab=t;state='hub';keys.clear();renderHub();show('hub');$('hbody').scrollTop=0;if(scrollTo){const el=$('hbody').querySelector('[data-anchor="'+scrollTo+'"]');if(el)try{el.scrollIntoView({block:'start'})}catch(e){}}sfx('ui')}
+function backToTown(){show(null);state=inHouse?'house':'town';last=performance.now();renderTownUI()}
+function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI()}
+function enterHouse(){inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
+function leaveHouse(){inHouse=false;state='town';houseEdit=false;TP.x=ENTERX;TP.y=ENTERY+30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
+function renderTownUI(){const tu=$('townui');if(!tu||!SV.breed)return;const h=homeData();
+  $('tinfo').innerHTML=`<b>${esc(SKM[curSkin()].n)}</b><small>${JM[SV.job].n} · Base Lv ${SV.blv}</small><small>${SV.zeny.toLocaleString()} 金幣　🦴 ${SV.bones}</small>`;
+  $('tbtns').innerHTML=inHouse?`<button class="btn sm" data-tw="edit">${houseEdit?'完成擺放':'擺放家具'}</button><button class="btn sm ghost" data-tw="shop">家具店</button><button class="btn sm ghost" data-tw="out">出門</button>`
+    :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
+  $('tinfo2').innerHTML=inHouse?`<b>${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
+  $('tinfo2').classList.toggle('hide',!inHouse);
+  const eb=$('editbar');eb.classList.toggle('hide',!(inHouse&&houseEdit));
+  if(inHouse&&houseEdit){const inv=Object.entries(h.inv).filter(([k,v])=>v>0&&FM[k]);eb.innerHTML=`<p>${houseSel?`<b>${FM[houseSel].n}</b>：點地板上的空格放下`:'選一件家具，再點地板放下；點已經擺好的家具可以拿起來移動'}</p><div class="fchips">${inv.length?inv.map(([k,v])=>`<button class="fchip${houseSel===k?' on':''}" data-fsel="${k}"><canvas width="64" height="64" data-fi="${k}"></canvas><small>${FM[k].n} ×${v}</small></button>`).join(''):'<small class="note">沒有可以擺的家具，去家具店買吧！</small>'}</div>`;for(const pc of eb.querySelectorAll('canvas[data-fi]'))furnIcon(pc,pc.dataset.fi)}}
+function furnIcon(pc,id){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,pc.width,pc.height);c.translate(pc.width/2,pc.height*.62);const k=pc.width/56;c.scale(k,k);drawFurn(c,id,0,0,0)}
+
+/* furniture drawing (centered on cell, cell ~44px) */
+function drawFurn(c,id,x,y,t){c.save();c.translate(x,y);shadow(c,0,12,15,4);
+ switch(id){
+  case 'box':rr(c,-15,-8,30,20,2,'#c8a06a');tri(c,-15,-8,-8,-15,-2,-8,'#d8b07a');tri(c,15,-8,8,-15,2,-8,'#b8904a');rr(c,-11,-6,22,4,1,'#a8804a');break;
+  case 'bed_plaid':ell(c,0,4,18,10,0,'#c84a4a');ell(c,0,2,13,7,0,'#f6e8c8');for(let i=-12;i<=12;i+=6)lineP(c,[[i,-4],[i,12]],'rgba(255,255,255,.35)',1.2);break;
+  case 'bed_cloud':for(const [dx,dy,r] of [[-12,2,8],[0,-2,10],[12,2,8],[-6,6,8],[6,6,8]])circ(c,dx,dy,r,'#ffffff');ell(c,0,3,12,5,0,'#e8f4ff');break;
+  case 'bed_royal':rr(c,-18,-14,36,8,4,'#f5c542');ell(c,0,4,18,10,0,'#ff8ab8');ell(c,0,2,13,7,0,'#ffe0ec');starP(c,0,-10,3,'#fff');circ(c,-12,-12,2,'#ff5a8a');circ(c,12,-12,2,'#ff5a8a');break;
+  case 'bowl_r':case 'bowl_b':{const col=id==='bowl_r'?'#e04a4a':'#4a8ae0';ell(c,0,6,11,5,0,shade(col,-.2));ell(c,0,3,11,5,0,col);ell(c,0,2,8,3,0,id==='bowl_r'?'#a8642a':'#9adfff');break}
+  case 'bowl_bone':ell(c,0,4,12,5,0,'#e8e0d0');ell(c,0,2,9,3,0,'#a8642a');rr(c,-6,-8,12,3,1.5,'#fff');for(const dx of [-6,6])for(const dy of [-9,-5])circ(c,dx,dy,2,'#fff');break;
+  case 'feeder':rr(c,-9,-18,18,22,3,'#d8dce4');rr(c,-6,-15,12,9,2,'#9adfff');ell(c,0,7,12,4,0,'#8a8e96');ell(c,0,6,8,2.5,0,'#a8642a');circ(c,5,-3,1.5,'#7fe36b');break;
+  case 'toybox':rr(c,-15,-10,30,22,3,'#e8a84a');rr(c,-15,-10,30,5,2,'#c8883a');circ(c,-6,-12,4,'#ff5a5a');circ(c,6,-13,3.5,'#5aa0ff');rr(c,-3,-17,3,7,1,'#7fe36b');break;
+  case 'ball':circ(c,0,4,7,'#ff5a5a');lineP(c,[[-7,4],[7,4]],'#fff',1.4);circ(c,-2,1,1.6,'rgba(255,255,255,.7)');break;
+  case 'rope':for(const dx of [-8,8])circ(c,dx,4,4,'#5aa0ff');rr(c,-8,2,16,4,2,'#ffd23a');lineP(c,[[-6,3],[6,5]],'#e04a4a',1);break;
+  case 'teddy':circ(c,0,4,9,'#c88a5a');circ(c,0,-8,7,'#c88a5a');circ(c,-6,-13,3,'#c88a5a');circ(c,6,-13,3,'#c88a5a');ell(c,0,-6,3,2.2,0,'#ffcfa8');circ(c,-2.5,-9,1,'#2a2220');circ(c,2.5,-9,1,'#2a2220');heart(c,0,4,3,'#ff7a9a');break;
+  case 'rug_round':ell(c,0,6,20,10,0,'#ffb3cc');ell(c,0,6,14,6.5,0,'#ffd0e0');break;
+  case 'rug_paw':ell(c,0,6,20,10,0,'#8ac0e8');circ(c,0,8,4,'#fff');for(const [dx,dy] of [[-6,3],[-2,1],[2,1],[6,3]])circ(c,dx,dy,1.6,'#fff');break;
+  case 'plant':rr(c,-7,0,14,12,3,'#c8643a');for(const [a,l] of [[-.6,12],[0,15],[.6,12]])ell(c,Math.sin(a)*l*.5,-l*.5,3,l*.5,a,'#5aa83a');break;
+  case 'cactus':rr(c,-7,2,14,10,3,'#e8a84a');rr(c,-4,-16,8,20,4,'#5aa83a');rr(c,-10,-8,5,8,2.5,'#5aa83a');rr(c,5,-12,5,8,2.5,'#5aa83a');circ(c,0,-17,2,'#ff7ab8');break;
+  case 'sunflower':rr(c,-6,2,12,10,3,'#c8643a');lineP(c,[[0,2],[0,-12]],'#5aa83a',2);ell(c,4,-4,4,2,.4,'#5aa83a');for(let q=0;q<10;q++)ell(c,Math.cos(q*.628)*6,-16+Math.sin(q*.628)*6,3,1.6,q*.628,'#ffd23a');circ(c,0,-16,3.6,'#8a5a2a');break;
+  case 'tree':rr(c,-8,2,16,10,3,'#c8643a');rr(c,-2,-10,4,12,1,'#8a5a3a');for(const [dx,dy,r] of [[0,-22,11],[-8,-14,8],[8,-14,8]])circ(c,dx,dy,r,'#4f9a3a');circ(c,-3,-24,3,'#7fd05a');break;
+  case 'lamp':rr(c,-1.5,-10,3,20,1,'#555');ell(c,0,10,7,2.5,0,'#666');tri(c,-9,-10,9,-10,0,-24,'#ffd88a');c.globalAlpha=.25+.1*Math.sin(t*3);circ(c,0,-8,16,'#fff6b0');c.globalAlpha=1;break;
+  case 'starlamp':lineP(c,[[-16,-14],[0,-8],[16,-14]],'#555',.8);for(let q=0;q<5;q++){const sx=-16+q*8,sy=-14+Math.abs(q-2)*-3+6;starP(c,sx,sy,3.4,['#ffe27a','#ff9ad0','#9adfff','#b8ff9a','#ffe27a'][q],t);}c.globalAlpha=.2+.1*Math.sin(t*4);circ(c,0,-8,18,'#fff6b0');c.globalAlpha=1;break;
+  case 'sofa':rr(c,-20,-10,40,14,5,'#e07a5a');rr(c,-22,-4,8,16,4,'#c8643a');rr(c,14,-4,8,16,4,'#c8643a');rr(c,-14,0,28,10,3,'#f09a7a');break;
+  case 'table':ell(c,0,-4,14,6,0,'#c8904a');rr(c,-2,-2,4,14,1,'#a8703a');ell(c,0,-5,10,4,0,'#d8a05a');circ(c,4,-7,2.5,'#fff');break;
+  case 'shelf':rr(c,-14,-28,28,40,2,'#a8703a');for(const sy of [-24,-12,0])rr(c,-12,sy,24,9,1,'#6a4020');for(const [sx,sy,col] of [[-10,-24,'#e04a4a'],[-6,-24,'#4a8ae0'],[-2,-24,'#7fe36b'],[-10,-12,'#ffd23a'],[-5,-12,'#b08aff'],[2,0,'#ff8ab8'],[7,0,'#4a8ae0']])rr(c,sx,sy,3.6,9,.5,col);break;
+  case 'piano':rr(c,-20,-20,40,26,3,'#2a2228');rr(c,-18,-2,36,7,1,'#fff');for(let q=-16;q<18;q+=5)rr(c,q,-2,2.4,4,.4,'#2a2228');rr(c,-18,6,3,8,1,'#2a2228');rr(c,15,6,3,8,1,'#2a2228');break;
+  case 'tank':rr(c,-18,-18,36,28,3,'#8a8e96');rr(c,-16,-16,32,24,2,'#7fd6ff');for(let q=0;q<2;q++){const fx=Math.sin(t*1.5+q*3)*10,fy=-8+q*8;ell(c,fx,fy,4,2.4,0,q?'#ffb43a':'#ff5a8a');tri(c,fx-4,fy,fx-7,fy-2.5,fx-7,fy+2.5,q?'#ffb43a':'#ff5a8a')}circ(c,10,-4+((t*8)%14)*-1,1.2,'#fff');break;
+  case 'heater':rr(c,-16,-16,32,28,4,'#8a5a3a');rr(c,-11,-8,22,16,3,'#2a1e18');for(let q=0;q<3;q++)ell(c,-6+q*6,2-Math.abs(Math.sin(t*6+q))*4,2.4,4,0,q===1?'#ffd23a':'#ff7a2e');break;
+  case 'clock':rr(c,-8,-30,16,42,3,'#a8703a');circ(c,0,-20,6,'#fff6e0');lineP(c,[[0,-20],[0,-24]],'#2a2220',1);lineP(c,[[0,-20],[Math.cos(t)*4,-20+Math.sin(t)*4]],'#2a2220',1);circ(c,Math.sin(t*3)*3,0,2.4,'#f5c542');break;
+  case 'trophy':{rr(c,-16,-26,32,38,2,'#a8703a');rr(c,-14,-24,28,34,1,'#e8f4ff');const n=Math.min(6,1+Math.floor((SV.towerBest||0)/10)+Object.keys(SV.ach||{}).length/6|0);for(let q=0;q<n;q++){const tx2=-9+(q%3)*9,ty2=-14+Math.floor(q/3)*15;ell(c,tx2,ty2,3,3.5,0,'#f5c542');rr(c,tx2-1,ty2+2,2,3,.5,'#f5c542');rr(c,tx2-3,ty2+5,6,1.6,.5,'#c89a2a')}break}
+  case 'rack':lineP(c,[[-14,-26],[14,-26]],'#8a5a3a',2);lineP(c,[[-12,-26],[-12,12]],'#8a5a3a',2);lineP(c,[[12,-26],[12,12]],'#8a5a3a',2);for(const [dx,col] of [[-6,'#ff8ab8'],[2,'#9adfff'],[9,'#ffd23a']]){tri(c,dx-5,-14,dx+5,-14,dx,-24,col);rr(c,dx-5,-15,10,14,2,col)}break;
+  case 'photos':for(const [dx,dy,col] of [[-10,-22,'#ffd0e0'],[4,-24,'#d0e8ff'],[-4,-8,'#e0ffd0'],[10,-10,'#fff0c0']]){rr(c,dx-6,dy-5,12,10,1,'#fff');rr(c,dx-4.5,dy-3.5,9,7,.5,col);circ(c,dx,dy,1.8,'#c88a5a')}break;
+  case 'petbed':ell(c,0,5,17,9,0,'#7fc8a0');ell(c,0,3,12,6,0,'#e8fff0');circ(c,-4,2,1.4,'#fff');heart(c,6,-6,2.5,'#ff7a9a');break;
+  case 'bath':ell(c,0,2,19,11,0,'#ffffff');ell(c,0,0,15,7,0,'#9adfff');for(let q=0;q<4;q++)circ(c,-8+q*5,-3+Math.sin(t*3+q),2.4,'#fff');rr(c,12,-12,3,8,1,'#c8ccd4');break;
+  case 'minihouse':rr(c,-14,-12,28,24,2,'#e07a5a');tri(c,-18,-12,18,-12,0,-28,'#8a3a2a');c.beginPath();c.arc(0,12,7,Math.PI,TAU);c.fillStyle='#3a2220';c.fill();rr(c,-6,-22,12,5,1,'#fff6e0');break;
+  case 'balloons':for(const [dx,dy,col] of [[-7,-24,'#ff5a8a'],[0,-30,'#ffd23a'],[7,-24,'#5aa0ff']]){lineP(c,[[0,8],[dx,dy+6]],'#888',.6);ell(c,dx,dy+Math.sin(t*2+dx)*1.5,5,6.5,0,col)}rr(c,-3,6,6,4,1,'#c8a06a');break;
+  case 'cake':rr(c,-13,-6,26,16,3,'#ffd0e0');rr(c,-13,-6,26,5,2,'#fff');rr(c,-9,-16,18,10,2,'#ff9ab8');for(const dx of [-5,0,5]){rr(c,dx-1,-22,2,6,.5,'#9adfff');ell(c,dx,-24,1.2,2,0,'#ffd23a')}circ(c,-8,2,1.6,'#e0303a');circ(c,8,2,1.6,'#e0303a');break;
+  case 'snowman':circ(c,0,4,10,'#fff');circ(c,0,-10,7,'#fff');circ(c,-2.5,-11,1,'#2a2220');circ(c,2.5,-11,1,'#2a2220');tri(c,0,-9,0,-7,5,-8,'#ff8a2a');rr(c,-6,-6,12,3,1.5,'#e04a4a');rr(c,-5,-21,10,6,1,'#2a2228');break;
+  default:rr(c,-12,-10,24,20,3,'#ccc')}
+ c.restore()}
+
+/* buildings */
+function drawBld(c,n,t){const b=n.b;if(!b)return;const x=n.x,y=n.y-26;
+ if(b.k==='house'){const w=b.w,h=b.h;shadow(c,x,y+4,w*.55,10);rr(c,x-w/2,y-h,w,h,4,b.wall);c.beginPath();c.moveTo(x-w/2-10,y-h+4);c.lineTo(x+w/2+10,y-h+4);c.lineTo(x+w/2-8,y-h-h*.55);c.lineTo(x-w/2+8,y-h-h*.55);c.closePath();c.fillStyle=b.roof;c.fill();
+   for(let q=1;q<4;q++)lineP(c,[[x-w/2-10+q*3,y-h+4-q*h*.14],[x+w/2+10-q*3,y-h+4-q*h*.14]],shade(b.roof,-.15),1.2);
+   rr(c,x-11,y-30,22,30,6,'#8a5a3a');circ(c,x+6,y-15,1.6,'#f5c542');for(const dx of [-w*.32,w*.32]){rr(c,x+dx-11,y-h*.7,22,18,3,'#9adfff');lineP(c,[[x+dx,y-h*.7],[x+dx,y-h*.7+18]],'#fff',1.4);lineP(c,[[x+dx-11,y-h*.7+9],[x+dx+11,y-h*.7+9]],'#fff',1.4);rr(c,x+dx-13,y-h*.7+17,26,4,2,'#ff8ab0')}
+   if(b.sign){c.font='900 13px "Noto Sans TC",sans-serif';const sw=c.measureText(b.sign).width+16;rr(c,x-sw/2,y-h-16,sw,20,6,'#fff6e0');c.strokeStyle='#8a5a3a';c.lineWidth=2;c.strokeRect&&0;c.fillStyle='#6a3a1a';c.textAlign='center';c.textBaseline='middle';c.fillText(b.sign,x,y-h-6);c.textBaseline='alphabetic'}}
+ else if(b.k==='gate'){shadow(c,x,y+6,110,14);for(const dx of [-80,80]){rr(c,x+dx-16,y-130,32,134,4,'#a8a29a');rr(c,x+dx-20,y-140,40,14,3,'#8a8478');circ(c,x+dx,y-150,8,'#e04a4a')}c.beginPath();c.moveTo(x-80,y-118);c.quadraticCurveTo(x,y-176,x+80,y-118);c.lineWidth=18;c.strokeStyle='#b8b2a8';c.stroke();
+   c.save();c.globalAlpha=.35+.15*Math.sin(t*3);ell(c,x,y-50,52,58,0,'#9adfff');c.restore();for(let q=0;q<6;q++){const a=t*1.5+q;c.globalAlpha=.7;starP(c,x+Math.cos(a)*40,y-50+Math.sin(a*1.3)*44,2.4,'#fff');}c.globalAlpha=1;
+   c.font='900 14px "Noto Sans TC",sans-serif';c.textAlign='center';rr(c,x-34,y-170,68,22,6,'#fff6e0');c.fillStyle='#6a3a1a';c.fillText('冒險之門',x,y-154)}
+ else if(b.k==='tower'){shadow(c,x,y+4,50,10);rr(c,x-38,y-b.h,76,b.h,6,b.wall);for(let q=0;q<5;q++)rr(c,x-38,y-b.h+q*34+20,76,3,1,shade(b.wall,-.12));c.beginPath();c.moveTo(x-46,y-b.h+4);c.lineTo(x+46,y-b.h+4);c.lineTo(x,y-b.h-70);c.closePath();c.fillStyle=b.roof;c.fill();lineP(c,[[x,y-b.h-70],[x,y-b.h-92]],'#555',2);tri(c,x,y-b.h-92,x+18+Math.sin(t*5)*2,y-b.h-86,x,y-b.h-80,'#ffd23a');
+   for(const dy of [60,110])rr(c,x-8,y-b.h+dy,16,20,8,'#ffe27a');rr(c,x-12,y-32,24,32,10,'#4a3a6a');c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';rr(c,x-30,y-b.h-8,60,20,6,'#fff6e0');c.fillStyle='#4a2a7a';c.fillText('無限之塔',x,y-b.h+7)}
+ else if(b.k==='cave'){shadow(c,x,y+4,85,12);c.beginPath();c.ellipse(x,y,82,86,0,Math.PI,TAU);c.fillStyle='#7a7468';c.fill();for(const [dx,dy,r] of [[-50,-40,18],[30,-62,20],[55,-25,15],[-20,-70,16]])circ(c,x+dx,y+dy,r,'#8a8478');c.beginPath();c.ellipse(x,y,32,44,0,Math.PI,TAU);c.fillStyle='#1a1418';c.fill();c.globalAlpha=.35+.2*Math.sin(t*2);c.beginPath();c.ellipse(x,y,28,38,0,Math.PI,TAU);c.fillStyle='#b08aff';c.fill();c.globalAlpha=1;
+   c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';rr(c,x-30,y-104,60,20,6,'#fff6e0');c.fillStyle='#3a2a5a';c.fillText('副本地城',x,y-89)}
+ else if(b.k==='tent'){shadow(c,x,y+4,80,12);c.beginPath();c.ellipse(x,y,72,70,0,Math.PI,TAU);c.fillStyle='#ffe8b0';c.fill();for(let q=-3;q<=3;q++){c.beginPath();c.moveTo(x,y-70);c.lineTo(x+q*24,y);c.strokeStyle='#ffb46a';c.lineWidth=3;c.stroke()}c.beginPath();c.arc(x,y,20,Math.PI,TAU);c.fillStyle='#8a5a3a';c.fill();
+   for(const [dx,col] of [[-50,'#ff9ad0'],[50,'#9adfff'],[-38,'#fff27a'],[38,'#b8ff9a']]){ell(c,x+dx,y-6-(Math.abs(dx)<45?10:0),6,8,0,col);circ(c,x+dx-2,y-9-(Math.abs(dx)<45?10:0),1.4,'#fff')}c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';rr(c,x-30,y-90,60,20,6,'#fff6e0');c.fillStyle='#8a4a1a';c.fillText('孵蛋小屋',x,y-75)}
+ else if(b.k==='board'){shadow(c,x,y+4,40,8);rr(c,x-30,y-4,4,8,1,'#6a4020');rr(c,x+26,y-4,4,8,1,'#6a4020');rr(c,x-36,y-56,72,52,4,'#a8703a');rr(c,x-32,y-52,64,44,2,'#d8b07a');for(const [dx,dy,col] of [[-20,-46,'#fff'],[0,-48,'#fff6c0'],[18,-44,'#ffe0ec'],[-14,-28,'#e0f0ff'],[10,-26,'#fff']]){rr(c,x+dx-8,y+dy,16,14,1,col);circ(c,x+dx,y+dy+2,1.4,'#e04a4a')}
+   if(achReady().length||questReady()){c.font='900 20px Fredoka,sans-serif';c.textAlign='center';c.fillStyle='#ff4a5a';c.fillText('!',x+34,y-58+Math.sin(t*6)*2)}}
+ else if(b.k==='stall'){shadow(c,x,y+4,55,10);rr(c,x-46,y-30,92,30,3,'#c8904a');for(let q=0;q<6;q++)rr(c,x-50+q*17,y-64,17,14,0,q%2?'#fff':'#e04a4a');for(let q=0;q<6;q++)c.beginPath(),c.arc(x-41.5+q*17,y-50,8.5,0,Math.PI),c.fillStyle=q%2?'#fff':'#e04a4a',c.fill();rr(c,x-46,y-66,3,40,1,'#8a5a3a');rr(c,x+43,y-66,3,40,1,'#8a5a3a');for(const [dx,col] of [[-30,'#ff5a5a'],[-14,'#ffd23a'],[4,'#7fe36b'],[22,'#ffb43a']])circ(c,x+dx,y-34,6,col)}
+ else if(b.k==='mailbox'){shadow(c,x+24,y+4,10,4);rr(c,x+22,y-26,4,30,1,'#6a4020');rr(c,x+12,y-44,26,20,6,'#e04a4a');rr(c,x+16,y-38,18,3,1,'#2a2228')}
+ else if(b.k==='myhouse'){drawMyHouse(c,x,y+26,t)}}
+function drawMyHouse(c,x,y,t){const lv=homeData().lv;shadow(c,x,y+4,80,12);
+ if(lv===0){rr(c,x-50,y-56,100,56,3,'#c8a06a');tri(c,x-50,y-56,x-28,y-82,x+6,y-56,'#d8b07a');tri(c,x+50,y-56,x+22,y-82,x-6,y-56,'#b8904a');c.beginPath();c.arc(x,y,18,Math.PI,TAU);c.fillStyle='#3a2a1a';c.fill()}
+ else{const w=[0,120,150,190][lv],h=[0,70,84,100][lv],wall=['','#d8b088','#f6e8d0','#fff6ec'][lv],roof=['','#8a5a3a','#d0443a','#3a6ad0'][lv];
+   if(lv>=3){rr(c,x-w/2-40,y-20,w+80,24,4,'#7fc060');for(let q=0;q<9;q++)rr(c,x-w/2-40+q*(w+80)/8,y-30,4,30,1,'#fff')}
+   rr(c,x-w/2,y-h,w,h,5,wall);c.beginPath();c.moveTo(x-w/2-12,y-h+4);c.lineTo(x+w/2+12,y-h+4);c.lineTo(x,y-h-h*.7);c.closePath();c.fillStyle=roof;c.fill();
+   c.beginPath();c.arc(x,y,20,Math.PI,TAU);c.fillStyle='#4a2a1a';c.fill();rr(c,x-w*.36-10,y-h*.72,20,18,3,'#9adfff');rr(c,x+w*.36-10,y-h*.72,20,18,3,'#9adfff');
+   if(lv>=2){circ(c,x,y-h-h*.3,8,'#fff6e0');heart(c,x,y-h-h*.3,4,'#ff7a9a')}if(lv>=3)for(const dx of [-w/2-26,w/2+26]){circ(c,x+dx,y-14,6,'#ff8ab8');circ(c,x+dx+8,y-12,5,'#ffd23a')}}
+ c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';const nm=`${SKM[curSkin()].n}的家`;const sw=c.measureText(nm).width+16;rr(c,x-sw/2,y-150,sw,20,6,'#fff6e0');c.fillStyle='#6a3a1a';c.fillText(nm,x,y-135)}
+function drawFountain(c,t){ell(c,0,10,96,46,0,'#9a948a');ell(c,0,6,88,40,0,'#7fc8ef');c.globalAlpha=.5;for(let q=0;q<3;q++){const r=Math.max(.5,((t*20+q*25)%70+70)%70);c.strokeStyle='#fff';c.lineWidth=1;c.beginPath();c.ellipse(0,6,r,r*.45,0,0,TAU);c.stroke()}c.globalAlpha=1;rr(c,-10,-40,20,46,6,'#b8b2a8');ell(c,0,-40,26,9,0,'#b8b2a8');ell(c,0,-42,20,6,0,'#7fc8ef');
+ for(let q=0;q<8;q++){const a=q/8*TAU,ph=(t*1.6+q*.37)%1;circ(c,Math.cos(a)*ph*26,-46+ph*44-Math.sin(ph*Math.PI)*28,2.2,'rgba(220,245,255,.9)')}}
+function drawTree(c,x,y,s){shadow(c,x,y+4,16*s,5*s);rr(c,x-4*s,y-18*s,8*s,22*s,2,'#7a4a2a');for(const [dx,dy,r,col] of [[0,-34,16,'#3f8a3a'],[-11,-24,12,'#4f9a3a'],[11,-24,12,'#4f9a3a'],[-4,-38,8,'#6ab04a']])circ(c,x+dx*s,y+dy*s,r*s,col)}
+
+/* town update & render */
+function townTargets(){const o=NPCS.map(n=>({n,x:n.x,y:n.y,r:n.b&&n.b.k==='myhouse'?ENTERY:0}));const d=digToday();for(let i=0;i<DIGS.length;i++)if(!d.got.includes(i))o.push({dig:i,x:DIGS[i][0],y:DIGS[i][1]});for(const dg of TDOGS)o.push({dog:dg,x:dg.x,y:dg.y});return o}
+function digToday(){const td=new Date().toDateString();if(!SV.dig||SV.dig.d!==td)SV.dig={d:td,got:[]};return SV.dig}
+function actLabel(a){return a.n?`${a.n.r}`:a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
+function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
+ if(a.n){if(a.n.id==='home'){enterHouse();return}a.n.open();return}
+ if(a.dig!==undefined){const d=digToday();if(d.got.includes(a.dig))return;d.got.push(a.dig);const h=homeData(),r=Math.random(),st=SV.stage||0;let msg;
+   if(r<.08){SV.bones++;msg='挖到 1 根狗骨頭！'}else if(r<.55){const k=['wood','cloth','stone'][Math.floor(Math.random()*3)],v=2+Math.floor(Math.random()*3)+st;h.mat[k]+=v;msg=`挖到 ${MATN[k]} ×${v}！`}else{const z=Math.round((80+Math.random()*120)*(1+st));SV.zeny+=z;msg=`挖到 ${z} 金幣！`}
+   save();sfx('coin');townFx.push({x:DIGS[a.dig][0],y:DIGS[a.dig][1]-30,s:msg,life:2.2});for(let q=0;q<14;q++)townFx.push({p:1,x:DIGS[a.dig][0],y:DIGS[a.dig][1],vx:R(-60,60),vy:R(-120,-40),life:.7});renderTownUI();return}
+ if(a.dog){a.dog.heart=1.6;a.dog.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:a.dog.x,y:a.dog.y-40,s:'♥',life:1.2})}}
+const townFx=[];
+function camOf(){if(inHouse)return [0,0];const vw=W/S/2,vh=H/S/2;return [Math.max(TOWN.x0+vw,Math.min(TOWN.x1-vw,TP.x)),Math.max(TOWN.y0+vh,Math.min(TOWN.y1-vh,TP.y))].map((v,i)=>{const span=i?TOWN.y1-TOWN.y0:TOWN.x1-TOWN.x0,view=i?H/S:W/S;return span<view?(i?(TOWN.y0+TOWN.y1)/2:(TOWN.x0+TOWN.x1)/2):v})}
+function houseBounds(){const L=HOUSE_LV[homeData().lv],T=44;return {L,T,x0:-L.w*T/2,y0:-L.h*T/2,x1:L.w*T/2,y1:L.h*T/2}}
+function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;
+ let ix=(keys.has('d')||keys.has('arrowright'))-(keys.has('a')||keys.has('arrowleft')),iy=(keys.has('s')||keys.has('arrowdown'))-(keys.has('w')||keys.has('arrowup'));
+ if(ix||iy){TP.go=null;TP.tgt=null}
+ let tx=null,ty=null;if(TP.go){tx=TP.go.x;ty=TP.go.y+(TP.go.n?TP.go.r||30:18)}else if(TP.tgt){tx=TP.tgt[0];ty=TP.tgt[1]}
+ if(tx!==null&&!ix&&!iy){const dx=tx-TP.x,dy=ty-TP.y,d=Math.hypot(dx,dy);if(d<8){if(TP.go){const g=TP.go;TP.go=null;doAct(g)}TP.tgt=null}else{ix=dx/d;iy=dy/d}}
+ const m=Math.hypot(ix,iy);TP.mv=m>0;if(m){const sp=(inHouse?140:190)*dt/m;TP.x+=ix*sp;TP.y+=iy*sp;if(ix)TP.face=ix>0?1:-1;TP.idle=0}else TP.idle+=dt;
+ if(inHouse){const hb=houseBounds();TP.x=Math.max(hb.x0+14,Math.min(hb.x1-14,TP.x));TP.y=Math.max(hb.y0+12,Math.min(hb.y1-8,TP.y));if(TP.y>hb.y1-12&&Math.abs(TP.x)<22&&iy>0&&!houseEdit)leaveHouse()}
+ else{TP.x=Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,TP.x));TP.y=Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,TP.y));
+   for(const dg of TDOGS){dg.heart=Math.max(0,dg.heart-dt);dg.w-=dt;if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
+     if(dg.tx){const dx=dg.tx-dg.x,dy=dg.ty-dg.y,d=Math.hypot(dx,dy);if(d<6){dg.tx=0;dg.w=2+Math.random()*5;dg.mv=false}else{dg.x+=dx/d*60*dt;dg.y+=dy/d*60*dt;dg.face=dx>0?1:-1;dg.mv=true}}}}
+ TP.heart=Math.max(0,TP.heart-dt);
+ for(let i=townFx.length-1;i>=0;i--){const f=townFx[i];f.life-=dt;if(f.p){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=300*dt}else f.y-=18*dt;if(f.life<=0)townFx.splice(i,1)}
+ let near=null;if(!inHouse){let bd=1e9;for(const a of townTargets()){const ay=a.y+(a.n?(a.r||30):10),d=Math.hypot(a.x-TP.x,ay-TP.y);if(d<(a.dog?50:72)&&d<bd){bd=d;near=a}}}
+ else if(!houseEdit){const hb=houseBounds();if(TP.y>hb.y1-50&&Math.abs(TP.x)<40)near={exit:1}}
+ if(near!==TP.near||(near&&near.dog)){TP.near=near;const tb=$('talkb');if(near){tb.textContent=near.exit?'出門':actLabel(near);tb.classList.remove('hide')}else tb.classList.add('hide')}
+}
+function townInteract(){const n=TP.near;if(!n)return;if(n.exit){leaveHouse();return}doAct(n)}
+function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const [cx,cy]=camOf();
+ if(inHouse){renderHouse(c,t);return}
+ c.fillStyle='#6aaa50';c.fillRect(0,0,W,H);c.save();c.translate(W/2,H/2);c.scale(S,S);c.translate(-cx,-cy);
+ const vw=W/S/2+260,vh=H/S/2+260;for(let x=Math.floor((cx-vw)/256)*256;x<cx+vw;x+=256)for(let y=Math.floor((cy-vh)/256)*256;y<cy+vh;y+=256)c.drawImage(tiles[0],x,y,257,257);
+ // paths & plaza
+ c.fillStyle='#e6d3a6';rr(c,-34,-430,68,880,20,'#e6d3a6');rr(c,-760,-34,1560,68,20,'#e6d3a6');rr(c,-480,-210,960,40,16,'#ead9b0');rr(c,-480,240,960,40,16,'#ead9b0');rr(c,-490,-210,40,500,16,'#ead9b0');rr(c,450,-210,40,500,16,'#ead9b0');
+ ell(c,0,0,200,150,0,'#d8c49a');ell(c,0,0,186,138,0,'#e8d8b4');for(let q=0;q<24;q++){const a=q/24*TAU;circ(c,Math.cos(a)*170,Math.sin(a)*126,3,'#c8b48a')}
+ // park
+ rr(c,-940,-300,400,600,30,'#7cbc5c');c.strokeStyle='#fff';c.lineWidth=3;c.setLineDash([10,8]);c.strokeRect(-930,-290,380,580);c.setLineDash([]);
+ c.font='900 14px "Noto Sans TC",sans-serif';c.textAlign='center';rr(c,-790,-318,100,22,8,'#fff6e0');c.fillStyle='#3a6a2a';c.fillText('狗狗公園',-740,-302);
+ rr(c,-760,180,70,10,3,'#a8703a');rr(c,-756,190,6,12,1,'#7a4a2a');rr(c,-700,190,6,12,1,'#7a4a2a');
+ const dd=digToday();DIGS.forEach(([x,y],i)=>{if(dd.got.includes(i)){ell(c,x,y,14,5,0,'#8a6a4a');return}ell(c,x,y,16,7,0,'#9a7048');circ(c,x-5,y-3,3,'#b08058');circ(c,x+6,y-2,2.4,'#b08058');c.globalAlpha=.5+.5*Math.sin(t*4+i);starP(c,x+8,y-12,3,'#fff6b0',t);c.globalAlpha=1});
+ for(const [x,y,col] of FLOWERS){if(Math.abs(x)<210&&Math.abs(y)<160)continue;circ(c,x,y,2.2,col);circ(c,x,y,1,'#ffe27a')}
+ c.save();c.translate(0,-6);drawFountain(c,t);c.restore();
+ // drawables sorted by y
+ const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(1.15,1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore()}})}
+ for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
+ for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
+ ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
+ ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
+ // labels
+ c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
+   const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
+ for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26)}
+ for(const f of townFx){c.globalAlpha=Math.min(1,f.life);if(f.p)circ(c,f.x,f.y,3,'#9a7048');else{c.font='900 14px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(f.s,f.x,f.y);c.fillStyle=f.s==='♥'?'#ff5a7a':'#fff6b0';c.fillText(f.s,f.x,f.y)}c.globalAlpha=1}
+ if(TP.near&&!TP.near.exit){const a=TP.near;c.globalAlpha=.5+.3*Math.sin(t*6);c.strokeStyle='#fff6b0';c.lineWidth=3;c.beginPath();c.ellipse(a.x,a.y+(a.n?(a.r||0):0)+4,26,9,0,0,TAU);c.stroke();c.globalAlpha=1}
+ if(TP.tgt){c.globalAlpha=.6;c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.ellipse(TP.tgt[0],TP.tgt[1],10,4,0,0,TAU);c.stroke();c.globalAlpha=1}
+ c.restore()}
+function drawTownPlayer(c,t){c.save();c.translate(TP.x,TP.y);c.scale(1.2,1.2);drawDog(c,curSkin(),SV.job,0,0,t,TP.face,TP.mv,SV.wear);c.restore();
+ if(SV.pet&&PM[SV.pet]){TP.px=(TP.px===undefined?TP.x:TP.px)+((TP.x-TP.face*26)-(TP.px===undefined?TP.x:TP.px))*.08;TP.py=(TP.py===undefined?TP.y:TP.py)+((TP.y+8)-(TP.py===undefined?TP.y:TP.py))*.08;drawPet(c,SV.pet,TP.px,TP.py,t)}
+ if(TP.heart>0){c.globalAlpha=Math.min(1,TP.heart);heart(c,TP.x,TP.y-34-(1.2-TP.heart)*10,4,'#ff5a7a');c.globalAlpha=1}
+ if(inHouse&&TP.idle>2.5){c.font='900 12px Fredoka,sans-serif';c.fillStyle='#fff';c.textAlign='center';c.globalAlpha=.6+.4*Math.sin(t*2);c.fillText('z z z',TP.x+12,TP.y-28-Math.sin(t)*3);c.globalAlpha=1}}
+const petWander={};
+function renderHouse(c,t){const h=homeData(),hb=houseBounds(),T=hb.T,wall=(WALLS.find(w=>w[0]===h.wall)||WALLS[0])[2],floor=(FLOORS.find(f=>f[0]===h.floor)||FLOORS[0])[2];
+ c.fillStyle='#2a1e18';c.fillRect(0,0,W,H);const sc=Math.min(S*1.25,(W-20)/(hb.x1-hb.x0+40),(H-150)/(hb.y1-hb.y0+110));c.save();c.translate(W/2,H/2+30);c.scale(sc,sc);
+ rr(c,hb.x0-12,hb.y0-90,hb.x1-hb.x0+24,90,8,wall);for(let q=hb.x0;q<hb.x1;q+=22)rr(c,q,hb.y0-90,2,90,0,shade(wall,-.04));rr(c,hb.x0-12,hb.y0-8,hb.x1-hb.x0+24,8,2,shade(wall,-.25));
+ for(const dx of [hb.x0+T*1.5,hb.x1-T*1.5]){rr(c,dx-24,hb.y0-74,48,40,4,'#fff');rr(c,dx-21,hb.y0-71,42,34,3,'#bfe6ff');lineP(c,[[dx,hb.y0-71],[dx,hb.y0-37]],'#fff',2);lineP(c,[[dx-21,hb.y0-54],[dx+21,hb.y0-54]],'#fff',2);ell(c,dx-10,hb.y0-64,8,4,0,'rgba(255,255,255,.7)')}
+ rr(c,hb.x0,hb.y0,hb.x1-hb.x0,hb.y1-hb.y0,4,floor);for(let gx=0;gx<hb.L.w;gx++)for(let gy=0;gy<hb.L.h;gy++)if((gx+gy)%2)rr(c,hb.x0+gx*T,hb.y0+gy*T,T,T,0,'rgba(0,0,0,.05)');
+ rr(c,-24,hb.y1-4,48,14,3,'#8a5a3a');c.font='900 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='#fff6e0';c.fillText('門口',0,hb.y1+7);
+ if(houseEdit){c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;for(let gx=0;gx<=hb.L.w;gx++)lineP(c,[[hb.x0+gx*T,hb.y0],[hb.x0+gx*T,hb.y1]],'rgba(255,255,255,.35)',1);for(let gy=0;gy<=hb.L.h;gy++)lineP(c,[[hb.x0,hb.y0+gy*T],[hb.x1,hb.y0+gy*T]],'rgba(255,255,255,.35)',1)}
+ const ds=[];for(const it of h.items){if(!FM[it.f])continue;const fx=hb.x0+(it.x+.5)*T,fy=hb.y0+(it.y+.5)*T;ds.push({y:fy-(it.f.startsWith('rug')?100:0),f:()=>drawFurn(c,it.f,fx,fy,t)})}
+ const pets=Object.keys(SV.pets||{}).filter(id=>PM[id]&&id!==SV.pet).slice(0,4);pets.forEach((id,i)=>{const w=petWander[id]=petWander[id]||{x:R(hb.x0+20,hb.x1-20),y:R(hb.y0+20,hb.y1-20),tx:0,ty:0,w:0};w.w-=1/60;if(w.w<=0){w.tx=R(hb.x0+20,hb.x1-20);w.ty=R(hb.y0+20,hb.y1-20);w.w=2+Math.random()*4}const dx=w.tx-w.x,dy=w.ty-w.y,d=Math.hypot(dx,dy);if(d>2){w.x+=dx/d*.6;w.y+=dy/d*.6}ds.push({y:w.y,f:()=>drawPet(c,id,w.x,w.y,t+i)})});
+ ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
+ if(houseEdit&&houseSel&&townPtr&&townPtr.hover){const [gx,gy]=townPtr.hover;c.globalAlpha=.55;drawFurn(c,houseSel,hb.x0+(gx+.5)*T,hb.y0+(gy+.5)*T,t);c.globalAlpha=1}
+ c.restore();HS.sc=sc}
+const HS={sc:1};
+function screenToWorld(px,py){if(inHouse){return [(px-W/2)/HS.sc,(py-H/2-30)/HS.sc]}const [cx,cy]=camOf();return [(px-W/2)/S+cx,(py-H/2)/S+cy]}
+function townDown(e){if(state!=='town'&&state!=='house')return;const r=cv.getBoundingClientRect(),[wx,wy]=screenToWorld(e.clientX-r.left,e.clientY-r.top);
+ if(inHouse&&houseEdit){const hb=houseBounds(),gx=Math.floor((wx-hb.x0)/hb.T),gy=Math.floor((wy-hb.y0)/hb.T);if(gx<0||gy<0||gx>=hb.L.w||gy>=hb.L.h)return;const h=homeData(),idx=h.items.findIndex(it=>it.x===gx&&it.y===gy);
+   if(houseSel){if(idx>=0)return;if((h.inv[houseSel]||0)<=0){houseSel=null;renderTownUI();return}h.inv[houseSel]--;h.items.push({f:houseSel,x:gx,y:gy});sfx('drop');if(h.inv[houseSel]<=0)houseSel=null}
+   else if(idx>=0){const it=h.items.splice(idx,1)[0];h.inv[it.f]=(h.inv[it.f]||0)+1;houseSel=it.f;sfx('ui')}
+   save();renderTownUI();return}
+ let hit=null;if(!inHouse){for(const a of townTargets()){const ay=a.y-(a.n&&a.n.b&&a.n.b.k!=='myhouse'?40:a.n&&a.n.b?10:12);if(Math.abs(wx-a.x)<(a.n&&a.n.b?Math.max(40,(a.n.b.w||120)*.45):26)&&Math.abs(wy-ay)<(a.n&&a.n.b?60:28)){hit=a;break}}}
+ if(hit){TP.go=hit;TP.tgt=null;sfx('ui');return}
+ TP.go=null;TP.tgt=[wx,wy];townPtr={id:e.pointerId};try{cv.setPointerCapture(e.pointerId)}catch(err){}}
+function townMove(e){if(state!=='town'&&state!=='house')return;const r=cv.getBoundingClientRect(),[wx,wy]=screenToWorld(e.clientX-r.left,e.clientY-r.top);
+ if(inHouse&&houseEdit){const hb=houseBounds();townPtr=townPtr||{};townPtr.hover=[Math.floor((wx-hb.x0)/hb.T),Math.floor((wy-hb.y0)/hb.T)];return}
+ if(townPtr&&townPtr.id===e.pointerId)TP.tgt=[wx,wy]}
+function townUp(e){if(townPtr&&townPtr.id===e.pointerId)townPtr=null}
+function townBtn(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
+ else if(d.tw==='edit'){houseEdit=!houseEdit;houseSel=null;renderTownUI()}else if(d.tw==='shop')openPanel('home');else if(d.tw==='out')leaveHouse();
+ else if(d.fsel){houseSel=houseSel===d.fsel?null:d.fsel;renderTownUI()}}
 
 /* ---------- loop ---------- */
 function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(.8,Math.min(1.15,Math.min(W,H)/480))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;flash=Math.max(0,flash-dt);
-  if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
-  render();requestAnimationFrame(loop)}
+  if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
+  {const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv)renderTownUI()}}
+  if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
 resize();buildDex();
 buildChangelog();
 if(window.DogCloud){DogCloud.onChange(acctBtnTxt);DogCloud.init().then(()=>{acctBtnTxt();if(DogCloud.status().loggedIn)syncAfterLogin().then(()=>{if(!$('acctov').classList.contains('hide'))renderAcct()})}).catch(()=>{})}
 acctBtnTxt();
-if(SV.breed){renderHub();show('hub');idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}offerResume()}else{SV.newsSeen=VERSION;openBreeds('new')}
+if(SV.breed){goTown();idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}offerResume()}else{SV.newsSeen=VERSION;openBreeds('new')}
 requestAnimationFrame(loop);
 }
 </script>
