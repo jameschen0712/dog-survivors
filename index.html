@@ -249,7 +249,7 @@ const SBK=['atk','crit','spd','hp','cd','area','exp','zeny'],SBV={atk:[0,1,2.5,5
 {const ctr=[0,0,0,0];for(const r of SKINS){const sk=SKM[r[0]];if(sk.rar){const k=SBK[(ctr[sk.rar]++ + sk.rar*3)%8];sk.bon=[k,SBV[k][sk.rar]]}}}
 const STAR_MAX=3,starMul=n=>1+.35*(n||0),SET_BONUS=1.5;
 function skinBonus(id){const sk=SKM[id];if(!sk.bon)return null;const v=sk.bon[1]*starMul((SV.star||{})[id]);return [sk.bon[0],Math.round(v*10)/10]}
-function collectionMods(){const m={};for(const id of SV.owned){const b=skinBonus(id);if(b)m[b[0]]=(m[b[0]]||0)+b[1]}const sets=Object.keys(B).filter(bk=>SKINS.filter(r=>r[1]===bk).every(r=>owns(r[0])));if(sets.length)m.atk=(m.atk||0)+sets.length*SET_BONUS;for(const k in m)m[k]=Math.round(m[k]*10)/10;return{m,sets}}
+function collectionMods(){const m={};for(const id of SV.owned){const b=skinBonus(id);if(b)m[b[0]]=(m[b[0]]||0)+b[1]}const sets=Object.keys(B).filter(bk=>SKINS.filter(r=>r[1]===bk).every(r=>owns(r[0])));if(sets.length)m.atk=(m.atk||0)+sets.length*SET_BONUS;if(SV.cown){for(const id of SV.cown)if(CSM[id]){const b=cosBonus(id);m[b[0]]=(m[b[0]]||0)+b[1]}const cs=cosSets();if(cs.length)m.atk=(m.atk||0)+cs.length*CSET_BONUS}for(const k in m)m[k]=Math.round(m[k]*10)/10;return{m,sets}}
 const SRAR=[{n:'基本',c:'#a8a8a8'},{n:'R',c:'#3d8fe0'},{n:'SR',c:'#9a5ae0'},{n:'SSR',c:'#f08a1a'}];
 const FXC={sakura:['#ffb3cc','#ffffff'],gold:['#ffe27a','#fff6c0'],candy:['#ffb3d9','#a8d8ff','#fff27a'],star:['#ffffff','#bfcfff'],fiesta:['#ff5a5a','#5ad0ff','#fff27a','#7fe36b'],frost:['#c8ecff','#ffffff'],aurora:['#7fffd0','#b08aff']};
 
@@ -419,7 +419,7 @@ const ACH=[
  ['a_job1','完成一轉',()=>JM[SV.job].tier>=1,5],['a_job2','完成二轉',()=>JM[SV.job].tier>=2,10],['a_job3','完成進階二轉',()=>JM[SV.job].tier>=3,15],['a_job4','完成三轉',()=>JM[SV.job].tier>=4,30],
  ['a_t10','無限之塔 10 層',()=>(SV.towerBest||0)>=10,5],['a_t30','無限之塔 30 層',()=>(SV.towerBest||0)>=30,15],['a_t60','無限之塔 60 層',()=>(SV.towerBest||0)>=60,30],
  ['a_card5','收集 5 種卡片',()=>Object.keys(SV.cardSeen||{}).length>=5,5],['a_card15','收集 15 種卡片',()=>Object.keys(SV.cardSeen||{}).length>=15,15],
- ['a_skin10','收集 10 款造型',()=>SV.owned.length>=10,10],['a_skin30','收集 30 款造型',()=>SV.owned.length>=30,30],
+ ['a_skin10','收集 10 款造型',()=>SV.owned.length>=10,10],['a_skin30','收集 30 款造型',()=>SV.owned.length>=30,30],['a_cos20','收集 20 件時裝',()=>(SV.cown||[]).length>=20,15],['a_cos80','收集 80 件時裝',()=>(SV.cown||[]).length>=80,40],['a_cosset','集滿一整套時裝',()=>cosSets().length>=1,20],
  ['a_blv20','Base Lv 20',()=>SV.blv>=20,5],['a_blv50','Base Lv 50',()=>SV.blv>=50,15],
  ['a_boss10','打倒 10 隻魔王或守衛',()=>(SV.st||{}).bosses>=10,10],['a_dung5','完成 5 次副本',()=>(SV.st||{}).dungeons>=5,10],['a_pet3','擁有 3 隻寵物',()=>Object.keys(SV.pets||{}).length>=3,5]];
 /* daily & weekly quests */
@@ -437,7 +437,7 @@ const achReady=()=>ACH.filter(a=>!(SV.ach||{})[a[0]]&&a[2]());
 
 /* ---------- save ---------- */
 const SAVE_KEY='dog-save-v1';
-function defSave(){return{v:1,autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
+function defSave(){return{v:1,cown:[],wear:{},cstar:{},cpity:0,petMode:'atk',autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
 function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';for(const it of [...o.inv,...Object.values(o.eq)])if(it)fixItem(it);o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
 let SV=loadSave();
 function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}if(window.DogCloud)DogCloud.queue(SV)}
@@ -564,7 +564,170 @@ const ACC={
  mask:(c,hx,hy,hr)=>{rr(c,hx-hr+1,hy-3.5,hr*2-1,4,2,'#2a2a2a');circ(c,hx+2.5,hy-1.5,1.2,'#fff');tri(c,hx-hr+1,hy-3,hx-hr-6,hy-5,hx-hr-5,hy,'#2a2a2a')},
  hood:(c,hx,hy,hr,j)=>{c.beginPath();c.arc(hx-1,hy-1,hr+1.5,Math.PI*.8,TAU-.6);c.lineTo(hx-4,hy+1);c.lineTo(hx-hr,hy+6);c.closePath();c.fillStyle='#2a2236';c.fill();tri(c,hx-6,hy+5,hx+4,hy+7,hx-8,hy+11,j.c)}};
 
-function drawDog(c,skid,jid,x,y,t,face,mv){
+/* ---------- costumes (時裝) ---------- */
+const CSLOT=[['head','頭飾'],['face','臉部'],['neck','頸部'],['back','背部'],['aura','特效']];
+function heart(c,x,y,s,f){c.beginPath();c.moveTo(x,y+s*.9);c.bezierCurveTo(x-s*1.3,y,x-s*.9,y-s,x,y-s*.35);c.bezierCurveTo(x+s*.9,y-s,x+s*1.3,y,x,y+s*.9);c.fillStyle=f;c.fill()}
+function starP(c,x,y,r,f,rot){c.beginPath();for(let q=0;q<10;q++){const rr2=q%2?r*.45:r,a=(rot||0)-Math.PI/2+q*Math.PI/5;c.lineTo(x+Math.cos(a)*rr2,y+Math.sin(a)*rr2)}c.closePath();c.fillStyle=f;c.fill()}
+function lineP(c,pts,col,w){c.strokeStyle=col;c.lineWidth=w||1;c.lineCap='round';c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke()}
+const dome=(c,L,f,ex)=>{c.beginPath();c.arc(L.hx,L.hy-1,L.hr+(ex||.8),Math.PI*1.02,TAU-.02);c.closePath();c.fillStyle=f;c.fill()};
+const CD={
+ /* head */
+ bow:(c,L,a,b)=>{const x=L.hx-4,y=L.hy-9;tri(c,x,y,x-7,y-5,x-6,y+4,a);tri(c,x,y,x+7,y-5,x+6,y+4,a);tri(c,x,y,x-4,y-2,x-4,y+2,shade(a,-.2));circ(c,x,y,2,b)},
+ crown:(c,L,a,b)=>{const x=L.hx,y=L.hy-8;rr(c,x-7,y-4,14,5,1,a);for(const dx of [-6,0,6])tri(c,x+dx-3,y-3,x+dx+3,y-3,x+dx,y-11,a);for(const dx of [-6,0,6])circ(c,x+dx,y-10,1.4,'#fff6c0');circ(c,x,y-1.5,1.8,b);circ(c,x-4.5,y-1.5,1.2,b);circ(c,x+4.5,y-1.5,1.2,b)},
+ party:(c,L,a,b)=>{const x=L.hx,y=L.hy-7;tri(c,x-5,y,x+5,y,x+1,y-15,a);lineP(c,[[x-3,y-4],[x+3.5,y-6]],b,1.4);lineP(c,[[x-1.5,y-9],[x+2.5,y-10]],b,1.4);circ(c,x+1,y-16,2.6,b)},
+ beanie:(c,L,a,b)=>{dome(c,L,a,1.2);rr(c,L.hx-L.hr-.5,L.hy-6,L.hr*2+1,3.2,1.5,b);circ(c,L.hx-1,L.hy-L.hr-4,3.2,b)},
+ bunny:(c,L,a,b,t)=>{const w=Math.sin(t*3)*.08;ell(c,L.hx-5,L.hy-17,2.8,8,-.25+w,a);ell(c,L.hx-5,L.hy-17,1.4,6,-.25+w,b);ell(c,L.hx+1,L.hy-18,2.8,8,.2-w,a);ell(c,L.hx+1,L.hy-18,1.4,6,.2-w,b)},
+ catears:(c,L,a,b)=>{tri(c,L.hx-8,L.hy-5,L.hx-6,L.hy-15,L.hx-1,L.hy-8,a);tri(c,L.hx-6.5,L.hy-7,L.hx-5.6,L.hy-12.5,L.hx-2.5,L.hy-8,b);tri(c,L.hx-1,L.hy-8,L.hx+3,L.hy-15,L.hx+6,L.hy-6,a);tri(c,L.hx+.5,L.hy-8.5,L.hx+3,L.hy-12.5,L.hx+4.6,L.hy-7,b)},
+ bearears:(c,L,a,b)=>{for(const dx of [-6,3]){circ(c,L.hx+dx,L.hy-8,4,a);circ(c,L.hx+dx,L.hy-8,2,b)}},
+ flowercrown:(c,L,a,b)=>{for(let k=0;k<6;k++){const an=Math.PI*1.1+k*Math.PI*.16,x=L.hx+Math.cos(an)*(L.hr+.5),y=L.hy-1+Math.sin(an)*(L.hr+.5);ell(c,x-2,y+1,2,1,an,'#6ab04a');for(let q=0;q<5;q++)circ(c,x+Math.cos(q*1.256)*1.7,y+Math.sin(q*1.256)*1.7,1.4,k%2?a:b);circ(c,x,y,1,'#ffe27a')}},
+ chef:(c,L,a,b)=>{rr(c,L.hx-6,L.hy-12,12,6,1,a);for(const [dx,r] of [[-4,4],[0,5],[4,4]])circ(c,L.hx+dx,L.hy-15,r,a);rr(c,L.hx-6.5,L.hy-8,13,2,1,b)},
+ witch:(c,L,a,b)=>{ell(c,L.hx,L.hy-7,13,3,-.05,a);c.beginPath();c.moveTo(L.hx-6,L.hy-8);c.quadraticCurveTo(L.hx-2,L.hy-20,L.hx-11,L.hy-27);c.quadraticCurveTo(L.hx+3,L.hy-20,L.hx+6,L.hy-8);c.closePath();c.fillStyle=a;c.fill();rr(c,L.hx-6,L.hy-10,12,2.4,1,b);starP(c,L.hx+1,L.hy-15,2.2,b)},
+ santa:(c,L,a,b)=>{tri(c,L.hx-7,L.hy-8,L.hx+6,L.hy-8,L.hx-11,L.hy-19,a);rr(c,L.hx-8,L.hy-9.5,15,3.5,1.7,b);circ(c,L.hx-11,L.hy-19,2.8,b)},
+ frog:(c,L,a,b)=>{dome(c,L,a,1.3);for(const dx of [-4,3]){circ(c,L.hx+dx,L.hy-11,3.6,a);circ(c,L.hx+dx,L.hy-11.5,2.3,'#fff');circ(c,L.hx+dx+.6,L.hy-11.5,1.2,'#1a1414')}circ(c,L.hx+5,L.hy-4,1,b);circ(c,L.hx-5,L.hy-5,1,b)},
+ strawberry:(c,L,a,b)=>{dome(c,L,a,1.3);for(const [dx,dy] of [[-5,-5],[-1,-8],[3,-5],[-3,-2],[5,-2]])ell(c,L.hx+dx,L.hy+dy,.6,1,0,'#fff27a');for(let k=-1;k<=1;k++)ell(c,L.hx+k*3,L.hy-L.hr-2,1.6,3.5,k*.6,b);rr(c,L.hx-.6,L.hy-L.hr-6,1.2,3,.5,shade(b,-.3))},
+ antenna:(c,L,a,b)=>{lineP(c,[[L.hx-3,L.hy-7],[L.hx-6,L.hy-14],[L.hx-8,L.hy-17]],'#2a2220',1.2);lineP(c,[[L.hx+1,L.hy-8],[L.hx+2,L.hy-15],[L.hx+4,L.hy-18]],'#2a2220',1.2);circ(c,L.hx-8,L.hy-17,2.4,a);circ(c,L.hx+4,L.hy-18,2.4,a);circ(c,L.hx-8.6,L.hy-17.6,.8,b);circ(c,L.hx+3.4,L.hy-18.6,.8,b)},
+ sprout:(c,L,a,b,t)=>{const s=Math.sin(t*3)*.15;lineP(c,[[L.hx-1,L.hy-8],[L.hx-1,L.hy-14]],shade(a,-.3),1.3);ell(c,L.hx-4,L.hy-15,3.5,1.7,-.4+s,a);ell(c,L.hx+2,L.hy-16,3.5,1.7,.4+s,b)},
+ tiara:(c,L,a,b)=>{c.strokeStyle=a;c.lineWidth=1.4;c.beginPath();c.arc(L.hx,L.hy-1,L.hr-.5,Math.PI*1.2,Math.PI*1.8);c.stroke();tri(c,L.hx-3,L.hy-8.5,L.hx+3,L.hy-8.5,L.hx,L.hy-14,a);circ(c,L.hx,L.hy-10.5,1.6,b);circ(c,L.hx-5,L.hy-7.5,1,b);circ(c,L.hx+5,L.hy-7.5,1,b)},
+ pirate:(c,L,a,b)=>{ell(c,L.hx,L.hy-8,13,3.2,0,a);c.beginPath();c.arc(L.hx,L.hy-8,8,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();rr(c,L.hx-8,L.hy-9.5,16,1.6,.8,'#f5c542');circ(c,L.hx,L.hy-12,2,b);lineP(c,[[L.hx-1.6,L.hy-9.6],[L.hx+1.6,L.hy-9.6]],b,.9)},
+ gradcap:(c,L,a,b,t)=>{dome(c,L,a,.6);c.beginPath();c.moveTo(L.hx-11,L.hy-9);c.lineTo(L.hx+1,L.hy-14);c.lineTo(L.hx+11,L.hy-9);c.lineTo(L.hx-1,L.hy-5);c.closePath();c.fillStyle=a;c.fill();const sw=Math.sin(t*3)*1.2;lineP(c,[[L.hx,L.hy-9.5],[L.hx-8,L.hy-8],[L.hx-9+sw,L.hy-2]],b,1);circ(c,L.hx-9+sw,L.hy-1.5,1.4,b)},
+ sunhat:(c,L,a,b)=>{ell(c,L.hx,L.hy-6,15,3.5,-.05,a);c.beginPath();c.arc(L.hx,L.hy-6,7,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();rr(c,L.hx-7,L.hy-8,14,2.2,1,b);ell(c,L.hx-8,L.hy-6,3,1.5,.5,b)},
+ mushroom:(c,L,a,b)=>{c.beginPath();c.ellipse(L.hx,L.hy-6,12,9,0,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();for(const [dx,dy,r] of [[-6,-9,2],[0,-12,2.4],[6,-8,1.8],[-2,-7,1.2]])circ(c,L.hx+dx,L.hy+dy,r,b)},
+ unicorn:(c,L,a,b)=>{tri(c,L.hx+1,L.hy-6,L.hx+6,L.hy-7,L.hx+6,L.hy-21,a);lineP(c,[[L.hx+2.5,L.hy-9],[L.hx+6,L.hy-10]],b,1);lineP(c,[[L.hx+3.5,L.hy-13],[L.hx+6,L.hy-14]],b,1);for(const [dx,col] of [[-5,'#ffb3d9'],[-7,'#b3d9ff'],[-9,'#fff2a8']])ell(c,L.hx+dx,L.hy-4,2.2,5,.4,col)},
+ horns:(c,L,a,b)=>{tri(c,L.hx-6,L.hy-6,L.hx-2,L.hy-7,L.hx-7,L.hy-14,a);tri(c,L.hx+1,L.hy-7,L.hx+5,L.hy-6,L.hx+5,L.hy-14,a);circ(c,L.hx-7,L.hy-14,1,b);circ(c,L.hx+5,L.hy-14,1,b)},
+ halo:(c,L,a,b,t)=>{c.save();c.globalAlpha=.35;c.beginPath();c.ellipse(L.hx,L.hy-L.hr-5+Math.sin(t*3),8,2.4,0,0,TAU);c.strokeStyle=b;c.lineWidth=4;c.stroke();c.restore();c.beginPath();c.ellipse(L.hx,L.hy-L.hr-5+Math.sin(t*3),7.5,2.1,0,0,TAU);c.strokeStyle=a;c.lineWidth=1.8;c.stroke()},
+ pumpkin:(c,L,a,b)=>{c.beginPath();c.ellipse(L.hx,L.hy-6,10,8,0,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();for(const dx of [-4,0,4])lineP(c,[[L.hx+dx,L.hy-6],[L.hx+dx*1.1,L.hy-13]],shade(a,-.25),1);rr(c,L.hx-1,L.hy-17,2.4,4,1,b);ell(c,L.hx+3,L.hy-15,2.5,1.2,-.3,b)},
+ headphones:(c,L,a,b)=>{c.strokeStyle=a;c.lineWidth=2.2;c.beginPath();c.arc(L.hx-1,L.hy-1,L.hr+1.5,Math.PI*1.05,TAU-.3);c.stroke();rr(c,L.hx-5,L.hy-5,5,7,2,a);rr(c,L.hx-4,L.hy-4,3,5,1.5,b)},
+ cherry:(c,L,a,b)=>{lineP(c,[[L.hx-4,L.hy-12],[L.hx-6,L.hy-7]],'#4a8a3a',1);lineP(c,[[L.hx-4,L.hy-12],[L.hx-2,L.hy-7]],'#4a8a3a',1);ell(c,L.hx-3,L.hy-12.5,2,1,.4,'#6ab04a');circ(c,L.hx-6,L.hy-6,2.2,a);circ(c,L.hx-2,L.hy-6,2.2,a);circ(c,L.hx-6.6,L.hy-6.6,.6,b);circ(c,L.hx-2.6,L.hy-6.6,.6,b)},
+ starclip:(c,L,a,b,t)=>{starP(c,L.hx-3,L.hy-9,4,a,Math.sin(t*2)*.2);circ(c,L.hx-3,L.hy-9,1.2,b)},
+ reindeer:(c,L,a,b)=>{for(const [x0,s] of [[L.hx-4,-1],[L.hx+2,1]]){lineP(c,[[x0,L.hy-7],[x0+s*2,L.hy-14],[x0+s*1,L.hy-19]],a,1.6);lineP(c,[[x0+s*2,L.hy-14],[x0+s*5,L.hy-16]],a,1.4);lineP(c,[[x0+s*1.4,L.hy-17],[x0-s*2,L.hy-19]],a,1.2)}circ(c,L.hx-7,L.hy-6,1.3,b)},
+ propeller:(c,L,a,b,t)=>{dome(c,L,a,.8);rr(c,L.hx-.8,L.hy-13,1.6,4,.5,'#555');const k=Math.cos(t*22);ell(c,L.hx,L.hy-13.5,7*Math.abs(k)+.6,1.4,0,b);circ(c,L.hx,L.hy-13.5,1.2,'#f5c542')},
+ sailor:(c,L,a,b)=>{ell(c,L.hx,L.hy-8,8,3,0,a);c.beginPath();c.ellipse(L.hx,L.hy-8,6.5,4.5,0,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();rr(c,L.hx-7,L.hy-9,14,2,1,b);tri(c,L.hx-7,L.hy-8,L.hx-11,L.hy-6,L.hx-10,L.hy-3,b)},
+ spacehelm:(c,L,a,b,t)=>{c.save();c.globalAlpha=.22;circ(c,L.hx+1,L.hy,L.hr+5,a);c.globalAlpha=1;c.strokeStyle=b;c.lineWidth=1.5;c.beginPath();c.arc(L.hx+1,L.hy,L.hr+5,0,TAU);c.stroke();c.globalAlpha=.7;ell(c,L.hx+5,L.hy-7,2.5,1.2,-.6,'#fff');c.restore();circ(c,L.hx-4,L.hy-L.hr-6,1.2,b);lineP(c,[[L.hx-3,L.hy-L.hr-4],[L.hx-4,L.hy-L.hr-6]],b,1)},
+ dhorns:(c,L,a,b)=>{c.fillStyle=a;for(const [x0,k] of [[L.hx-5,1],[L.hx+1,1.15]]){c.beginPath();c.moveTo(x0-2,L.hy-6);c.quadraticCurveTo(x0-2,L.hy-12*k,x0-8,L.hy-15*k);c.quadraticCurveTo(x0+1,L.hy-12*k,x0+2,L.hy-7);c.closePath();c.fill()}for(const dy of [-2,2,6])tri(c,L.hx-L.hr+1,L.hy+dy-2,L.hx-L.hr+1,L.hy+dy+2,L.hx-L.hr-3,L.hy+dy,b)},
+ /* face */
+ roundglasses:(c,L,a)=>{c.save();c.globalAlpha=.25;circ(c,L.ex+.5,L.ey,3.2,'#cfefff');c.restore();c.strokeStyle=a;c.lineWidth=1.1;c.beginPath();c.arc(L.ex+.5,L.ey,3.2,0,TAU);c.stroke();lineP(c,[[L.ex-2.7,L.ey-.5],[L.hx-6,L.ey-2]],a,1)},
+ sunglasses:(c,L,a,b)=>{rr(c,L.ex-3,L.ey-2.4,7,4.4,1.8,a);rr(c,L.ex-1.6,L.ey-1.8,2.4,1,.5,b);lineP(c,[[L.ex-3,L.ey-1.5],[L.hx-6,L.ey-2.5]],a,1.1)},
+ heartglasses:(c,L,a,b)=>{heart(c,L.ex+.5,L.ey,3.6,a);circ(c,L.ex-.4,L.ey-1,.8,b);lineP(c,[[L.ex-3,L.ey-1],[L.hx-6,L.ey-2.5]],shade(a,-.3),1)},
+ starglasses:(c,L,a,b)=>{starP(c,L.ex+.5,L.ey,4.2,a);circ(c,L.ex+.5,L.ey,1.3,b);lineP(c,[[L.ex-3,L.ey-1],[L.hx-6,L.ey-2.5]],shade(a,-.3),1)},
+ blush:(c,L,a)=>{c.save();c.globalAlpha=.55;ell(c,L.hx+1.5,L.hy+2.5,2.5,1.4,0,a);c.restore()},
+ monocle:(c,L,a)=>{c.strokeStyle=a;c.lineWidth=1.2;c.beginPath();c.arc(L.ex+.5,L.ey,3,0,TAU);c.stroke();lineP(c,[[L.ex-1,L.ey+3],[L.ex-3,L.hy+7]],a,.8)},
+ mustache:(c,L,a)=>{const x=L.nx-1,y=L.hy+3.8;ell(c,x-2.5,y,3,1.4,.3,a);ell(c,x+2,y,3,1.4,-.3,a)},
+ bandaid:(c,L,a,b)=>{c.save();c.translate(L.hx-1,L.hy+1);c.rotate(-.5);rr(c,-3.5,-1.3,7,2.6,1.2,a);rr(c,-1.2,-1.3,2.4,2.6,.5,b);c.restore()},
+ eyepatch:(c,L,a)=>{ell(c,L.ex+.5,L.ey,2.8,2.4,0,a);lineP(c,[[L.ex-2,L.ey-1.5],[L.hx-6,L.hy-6]],a,1)},
+ tongue:(c,L,a,t)=>{ell(c,L.nx-3,L.hy+6.5+Math.sin(t*6)*.4,1.8,2.8,.2,a)},
+ sparkleeye:(c,L,a,b,t)=>{const s=.7+.3*Math.sin(t*6);starP(c,L.ex+4,L.ey-4,2.4*s,a);starP(c,L.ex+6,L.ey,1.4*s,b)},
+ clownnose:(c,L,a)=>{circ(c,L.nx,L.hy+1.2,2.8,a);circ(c,L.nx-.8,L.hy+.4,.8,'#fff')},
+ bone:(c,L,a)=>{const x=L.nx-2,y=L.hy+5;rr(c,x-5,y-.9,10,1.8,.9,a);for(const dx of [-5,5])for(const dy of [-1.2,1.2])circ(c,x+dx,y+dy,1.4,a)},
+ rose:(c,L,a,b)=>{const x=L.nx-2,y=L.hy+5;lineP(c,[[x-6,y+1],[x+4,y-1]],'#4a8a3a',1);ell(c,x-2,y+1.5,1.8,.9,.4,'#6ab04a');circ(c,x+5,y-1.5,2.4,a);circ(c,x+5,y-1.5,1.2,b)},
+ whiskers:(c,L,a)=>{for(const dy of [-1,1])lineP(c,[[L.nx-3,L.hy+3],[L.nx+3,L.hy+3+dy*2]],a,.6)},
+ fangs:(c,L,a)=>{tri(c,L.nx-4,L.hy+4.5,L.nx-2.6,L.hy+4.5,L.nx-3.3,L.hy+7,a);tri(c,L.nx-1.5,L.hy+4.5,L.nx-.1,L.hy+4.5,L.nx-.8,L.hy+6.5,a)},
+ goggles2:(c,L,a,b)=>{rr(c,L.hx-L.hr,L.ey-1.8,L.hr*2,2.2,1,a);circ(c,L.ex+.5,L.ey,3.2,a);circ(c,L.ex+.5,L.ey,2.2,b)},
+ /* neck */
+ bowtie:(c,L,a,b)=>{const x=L.nkx+2,y=L.nky;tri(c,x,y,x-4,y-3,x-4,y+3,a);tri(c,x,y,x+4,y-3,x+4,y+3,a);circ(c,x,y,1.4,b)},
+ bell:(c,L,a,b)=>{c.strokeStyle=a;c.lineWidth=2.4;c.beginPath();c.arc(L.hx-1,L.hy+1,L.hr-.5,.35,1.9);c.stroke();circ(c,L.nkx+2,L.nky+1.5,2.4,b);rr(c,L.nkx+.8,L.nky+1.8,2.4,.6,.3,shade(b,-.4))},
+ pearl:(c,L,a)=>{for(let k=0;k<7;k++){const an=.3+k*.24;circ(c,L.hx-1+Math.cos(an)*(L.hr-.5),L.hy+1+Math.sin(an)*(L.hr-.5),1.2,a)}},
+ scarf:(c,L,a,b,t)=>{c.strokeStyle=a;c.lineWidth=3;c.beginPath();c.arc(L.hx-1,L.hy+1,L.hr-1,.3,2);c.stroke();const w=Math.sin(t*8)*1.5;c.beginPath();c.moveTo(L.nkx-2,L.nky);c.lineTo(L.nkx-12,L.nky+1+w);c.lineTo(L.nkx-12,L.nky+4+w);c.lineTo(L.nkx-1,L.nky+3);c.closePath();c.fillStyle=a;c.fill();lineP(c,[[L.nkx-6,L.nky+.6+w*.5],[L.nkx-6,L.nky+3.4+w*.5]],b,1);lineP(c,[[L.nkx-9,L.nky+.8+w*.8],[L.nkx-9,L.nky+3.8+w*.8]],b,1)},
+ lei:(c,L,a,b)=>{for(let k=0;k<7;k++){const an=.2+k*.27;circ(c,L.hx-1+Math.cos(an)*(L.hr),L.hy+1+Math.sin(an)*(L.hr),1.9,k%2?a:b)}},
+ medal:(c,L,a,b)=>{lineP(c,[[L.nkx-3,L.nky-3],[L.nkx+1,L.nky+3],[L.nkx+5,L.nky-3]],a,1.6);circ(c,L.nkx+1,L.nky+4.5,2.6,b);starP(c,L.nkx+1,L.nky+4.5,1.4,shade(b,-.3))},
+ ruffle:(c,L,a,b)=>{for(let k=0;k<6;k++){const an=.25+k*.3;circ(c,L.hx-1+Math.cos(an)*(L.hr+.5),L.hy+1+Math.sin(an)*(L.hr+.5),2.2,k%2?a:b)}},
+ tie:(c,L,a,b)=>{const x=L.nkx+2,y=L.nky;tri(c,x-1.6,y-1,x+1.6,y-1,x,y+1.5,a);c.beginPath();c.moveTo(x-1,y+1);c.lineTo(x+1,y+1);c.lineTo(x+2,y+7);c.lineTo(x,y+9);c.lineTo(x-2,y+7);c.closePath();c.fillStyle=a;c.fill();lineP(c,[[x-1.4,y+4],[x+1.4,y+3]],b,.8)},
+ bib:(c,L,a,b)=>{c.beginPath();c.ellipse(L.nkx+2,L.nky+1,5,5,0,0,Math.PI);c.closePath();c.fillStyle='#fffaf0';c.fill();c.strokeStyle=a;c.lineWidth=1;c.stroke();heart(c,L.nkx+2,L.nky+3,1.6,b)},
+ hearttag:(c,L,a,b)=>{c.strokeStyle=a;c.lineWidth=2;c.beginPath();c.arc(L.hx-1,L.hy+1,L.hr-.5,.35,1.9);c.stroke();heart(c,L.nkx+2,L.nky+3,2.4,b)},
+ bandana:(c,L,a,b)=>{tri(c,L.hx-8,L.hy+5,L.hx+4,L.hy+7,L.hx-3,L.hy+13,a);for(const [dx,dy] of [[-4,7],[0,8],[-3,10]])circ(c,L.hx+dx,L.hy+dy,.8,b)},
+ spikes:(c,L,a,b)=>{c.strokeStyle=a;c.lineWidth=2.4;c.beginPath();c.arc(L.hx-1,L.hy+1,L.hr-.5,.35,1.9);c.stroke();for(let k=0;k<4;k++){const an=.5+k*.38,x=L.hx-1+Math.cos(an)*(L.hr+1),y=L.hy+1+Math.sin(an)*(L.hr+1);tri(c,x-1,y,x+1,y,x+Math.cos(an)*2,y+Math.sin(an)*2.6,b)}},
+ /* back (behind body) */
+ angel:(c,L,a,b,t)=>{const f=Math.sin(t*6)*.25;c.save();c.translate(-2,L.by-6);c.rotate(-.5+f);for(let k=0;k<3;k++)ell(c,-4-k*3,-5+k*2,6-k,2.4,-.3,k?shade(a,-.06*k):a);c.restore();c.save();c.globalAlpha=.4;c.translate(2,L.by-7);c.rotate(-.7-f);for(let k=0;k<3;k++)ell(c,-4-k*3,-5+k*2,6-k,2.4,-.3,b);c.restore()},
+ batw:(c,L,a,b,t)=>{const f=Math.sin(t*8)*3;c.beginPath();c.moveTo(-2,L.by-5);c.lineTo(-10,L.by-17-f);c.lineTo(-16,L.by-11-f);c.quadraticCurveTo(-13,L.by-9,-14,L.by-6);c.quadraticCurveTo(-10,L.by-7,-9,L.by-3);c.closePath();c.fillStyle=a;c.fill();lineP(c,[[-3,L.by-5],[-10,L.by-16-f]],b,.8)},
+ butterfly:(c,L,a,b,t)=>{const f=.6+.4*Math.abs(Math.sin(t*5));c.save();c.translate(-3,L.by-7);c.scale(f,1);ell(c,-5,-6,6,4.5,-.5,a);ell(c,-4,1,4,3,.4,shade(a,.15));circ(c,-6,-6,1.6,b);circ(c,-4,1,1.1,b);c.restore()},
+ fairy:(c,L,a,b,t)=>{const f=Math.sin(t*10)*.2;c.save();c.globalAlpha=.55;c.translate(-2,L.by-6);c.rotate(-.9+f);ell(c,0,-7,3,8,0,a);c.rotate(.6);ell(c,0,-5,2.4,6,0,b);c.restore()},
+ balloon:(c,L,a,b,t)=>{const bx=-13+Math.sin(t*1.5)*2,byy=L.by-24+Math.sin(t*2)*1.5;lineP(c,[[-6,L.by-4],[bx,byy+7]],'#888',.6);ell(c,bx,byy,5.5,7,0,a);ell(c,bx-2,byy-2.5,1.4,2.2,-.4,'rgba(255,255,255,.6)');tri(c,bx-1,byy+7,bx+1,byy+7,bx,byy+8.6,b)},
+ dragonw:(c,L,a,b,t)=>{const f=Math.sin(t*6)*3;c.beginPath();c.moveTo(-2,L.by-5);c.lineTo(-6,L.by-20-f);c.lineTo(-18,L.by-14-f);c.lineTo(-13,L.by-10);c.lineTo(-16,L.by-6);c.lineTo(-9,L.by-4);c.closePath();c.fillStyle=b;c.fill();lineP(c,[[-2,L.by-5],[-6,L.by-20-f],[-18,L.by-14-f]],a,1.6);lineP(c,[[-6,L.by-20-f],[-13,L.by-10]],a,1)},
+ /* back (front of body) */
+ backpack:(c,L,a,b)=>{rr(c,-9,L.by-14,12,10,3,a);rr(c,-9,L.by-14,12,4,2,b);circ(c,-3,L.by-10,1,'#f5c542');lineP(c,[[2,L.by-12],[5,L.by-3]],shade(a,-.3),1.2)},
+ strawbag:(c,L,a,b)=>{heart(c,-4,L.by-9,5.5,a);for(const [dx,dy] of [[-6,-10],[-3,-7],[-1,-11],[-6,-6]])ell(c,-4+dx+2,L.by+dy,.5,.8,0,'#fff27a');ell(c,-4,L.by-14,3,1.2,0,b)},
+ cape:(c,L,a,b,t)=>{const w=Math.sin(t*7)*1.5;c.beginPath();c.moveTo(L.hx-6,L.hy+4);c.quadraticCurveTo(-4,L.by-9,-L.bl-6,L.by+2+w);c.lineTo(-L.bl+2,L.by+7);c.quadraticCurveTo(0,L.by,L.hx-6,L.hy+8);c.closePath();c.fillStyle=a;c.fill();c.strokeStyle=b;c.lineWidth=1;c.stroke()},
+ shell:(c,L,a,b)=>{c.beginPath();c.ellipse(-2,L.by-3,L.bl-3,8,0,Math.PI,TAU);c.closePath();c.fillStyle=a;c.fill();c.strokeStyle=b;c.lineWidth=1;for(const dx of [-8,-2,4]){c.beginPath();for(let q=0;q<6;q++){const an=q*Math.PI/3;c.lineTo(dx+Math.cos(an)*2.8,L.by-6+Math.sin(an)*2.6)}c.closePath();c.stroke()}rr(c,-L.bl+1,L.by-4,L.bl*2-6,1.6,.8,b)},
+ jetpack:(c,L,a,b,t)=>{rr(c,-11,L.by-15,5,11,2,a);rr(c,-6,L.by-15,5,11,2,shade(a,-.15));for(const x of [-8.5,-3.5]){const fl=3+Math.random()*3;tri(c,x-2,L.by-4,x+2,L.by-4,x,L.by-4+fl,b);tri(c,x-1,L.by-4,x+1,L.by-4,x,L.by-4+fl*.6,'#fff6c0')}},
+ teddy:(c,L,a,b)=>{circ(c,-6,L.by-10,5,a);circ(c,-10,L.by-15,2,a);circ(c,-2,L.by-15,2,a);ell(c,-6,L.by-8.5,2.2,1.6,0,b);circ(c,-8,L.by-11,.7,'#1a1414');circ(c,-4,L.by-11,.7,'#1a1414')},
+ float:(c,L,a,b)=>{c.save();c.lineWidth=4;c.strokeStyle=a;c.beginPath();c.ellipse(0,L.by+1,L.bl+2,5,0,0,TAU);c.stroke();c.strokeStyle=b;c.setLineDash([4,4]);c.stroke();c.restore()},
+ sack:(c,L,a,b)=>{ell(c,-6,L.by-10,6,6.5,0,a);rr(c,-8,L.by-17,4,2.4,1,b);lineP(c,[[-6,L.by-15],[-6,L.by-17]],b,1.2);starP(c,-6,L.by-9,2,b)},
+ book:(c,L,a,b)=>{rr(c,-10,L.by-15,11,10,1.5,a);rr(c,-9,L.by-14,2,8,.5,b);rr(c,-6,L.by-12,5,1,.5,b);rr(c,-6,L.by-10,5,1,.5,b)},
+ /* aura */
+ aura:(c,L,a,b,t,kind)=>{const cols=[a,b];for(let i=0;i<5;i++){const an=t*1.2+i*TAU/5,px=Math.cos(an)*19,py=-8+Math.sin(an)*12,al=.6+.4*Math.sin(t*5+i);c.globalAlpha=al;const col=cols[i%2];
+   switch(kind){case 'hearts':heart(c,px,py,2.6,col);break;case 'stars':starP(c,px,py,3.2,col,t);break;case 'bubbles':c.strokeStyle=col;c.lineWidth=.8;c.beginPath();c.arc(px,py,2.6,0,TAU);c.stroke();circ(c,px-.8,py-.8,.6,'#fff');break;
+     case 'notes':circ(c,px,py+2,1.6,col);lineP(c,[[px+1.4,py+2],[px+1.4,py-3],[px+3.4,py-2]],col,.9);break;case 'petals':ell(c,px,py,3,1.6,an,col);break;case 'leaves':ell(c,px,py,3,1.5,an,col);lineP(c,[[px-2,py],[px+2,py]],shade(col,-.3),.5);break;
+     case 'snow':c.strokeStyle=col;c.lineWidth=.9;c.beginPath();for(let q=0;q<3;q++){const qa=q*Math.PI/3;c.moveTo(px-Math.cos(qa)*3,py-Math.sin(qa)*3);c.lineTo(px+Math.cos(qa)*3,py+Math.sin(qa)*3)}c.stroke();break;
+     case 'flame':ell(c,px,py,2,3.2,0,col);ell(c,px,py+.8,1,1.8,0,'#fff6c0');break;case 'coins':ell(c,px,py,2.6*Math.abs(Math.cos(t*4+i))+.4,2.6,0,col);break;
+     case 'candy':circ(c,px,py,2,col);tri(c,px-2,py,px-4,py-1.6,px-4,py+1.6,col);tri(c,px+2,py,px+4,py-1.6,px+4,py+1.6,col);break;
+     case 'confetti':c.save();c.translate(px,py);c.rotate(t*4+i);rr(c,-1.6,-.8,3.2,1.6,.4,[a,b,'#7fe36b','#5ad0ff','#fff27a'][i]);c.restore();break;
+     case 'bats':tri(c,px,py,px-4,py-2.4,px-1.5,py+1,col);tri(c,px,py,px+4,py-2.4,px+1.5,py+1,col);circ(c,px,py,1,col);break;
+     case 'ghosts':c.beginPath();c.arc(px,py,2.6,Math.PI,TAU);c.lineTo(px+2.6,py+3);c.lineTo(px+1,py+2);c.lineTo(px,py+3);c.lineTo(px-1,py+2);c.lineTo(px-2.6,py+3);c.closePath();c.fillStyle=col;c.fill();circ(c,px-.9,py-.4,.5,'#333');circ(c,px+.9,py-.4,.5,'#333');break;
+     case 'moon':if(i===0){circ(c,px,py,3.4,a);circ(c,px+1.6,py-1,3,'rgba(0,0,0,0)');c.globalCompositeOperation='destination-out';circ(c,px+1.8,py-1.2,2.8,'#000');c.globalCompositeOperation='source-over'}else starP(c,px,py,2,b,t);break;
+     case 'feathers':ell(c,px,py,1.4,3.6,an,col);break;case 'butterflies':{const fw=1+Math.abs(Math.sin(t*9+i));ell(c,px-fw,py,fw*1.4,1.8,0,col);ell(c,px+fw,py,fw*1.4,1.8,0,col);break}
+     case 'rainbow':if(i===0){c.globalAlpha=.55;['#ff6b6b','#ffb43a','#fff27a','#7fe36b','#5ad0ff','#b08aff'].forEach((rc,k)=>{c.strokeStyle=rc;c.lineWidth=1.3;c.beginPath();c.arc(0,4,22-k*1.4,Math.PI*1.08,TAU-.08);c.stroke()})}else starP(c,px,py,1.8,'#fff',t);break;
+     case 'zap':lineP(c,[[px-1,py-3],[px+1,py-.5],[px-1,py+.5],[px+1,py+3]],col,1.2);break;
+     default:starP(c,px,py,2.4,col,t)}}c.globalAlpha=1}
+};
+const CBACK={angel:1,batw:1,butterfly:1,fairy:1,balloon:1,dragonw:1};
+/* sets: [setId, setName, head, face, neck, back, aura(kind), colA, colB, rarity per slot string] */
+const CSETS=[
+ ['berry','草莓甜心',['strawberry','#ff4a5a','#5aa83a'],['blush','#ff7a9a'],['bowtie','#ff4a5a','#fff'],['strawbag','#ff4a5a','#5aa83a'],['hearts','#ff7a9a','#ff4a5a']],
+ ['bee','小蜜蜂',['antenna','#ffd23a','#fff'],['roundglasses','#3a2a1c'],['bowtie','#ffd23a','#2a2220'],['fairy','#eaf6ff','#ffffff'],['petals','#ffd23a','#fff6a8']],
+ ['xmas','聖誕快樂',['santa','#e0303a','#ffffff'],['clownnose','#ff2a2a'],['bell','#2f8f4e','#f5c542'],['sack','#c8302a','#f5c542'],['snow','#ffffff','#cfefff']],
+ ['angel','小天使',['halo','#ffe27a','#fff6c0'],['sparkleeye','#ffffff','#ffe27a'],['pearl','#fffaf0'],['angel','#ffffff','#fff6c0'],['feathers','#ffffff','#fff3c8']],
+ ['devil','小惡魔',['horns','#c0304a','#ffb3c0'],['fangs','#ffffff'],['spikes','#2a2230','#d8d8e0'],['batw','#4a2a5a','#8a5aa8'],['bats','#5a3a7a','#2a1a3a']],
+ ['pirate','海盜船長',['pirate','#2a2228','#ffffff'],['eyepatch','#1a1414'],['bandana','#d0303a','#ffffff'],['cape','#2a2228','#f5c542'],['coins','#f5c542','#ffe27a']],
+ ['magical','魔法少女',['tiara','#ffd0e8','#ff7ab8'],['starglasses','#ff9ad0','#fff'],['ruffle','#ffd0e8','#ffffff'],['fairy','#ffc8ec','#d8b8ff'],['stars','#ffb3e0','#fff6a8']],
+ ['galaxy','星空魔導',['witch','#2a2a6a','#ffe27a'],['starglasses','#ffe27a','#2a2a6a'],['scarf','#2a2a6a','#ffe27a'],['cape','#1a1a4a','#b8a8ff'],['moon','#fff6c0','#ffe27a']],
+ ['sakura','櫻花祭',['flowercrown','#ffb3cc','#ffffff'],['blush','#ff9ab8'],['lei','#ffb3cc','#ffffff'],['butterfly','#ffc0d8','#ffffff'],['petals','#ffb3cc','#ffffff']],
+ ['pumpkin','南瓜派對',['pumpkin','#ff8a2a','#4a8a3a'],['fangs','#ffffff'],['ruffle','#ff8a2a','#2a2228'],['sack','#ff8a2a','#2a2228'],['ghosts','#ffffff','#f0f0ff']],
+ ['chef','小小主廚',['chef','#ffffff','#e0303a'],['mustache','#3a2a1c'],['bib','#e0303a','#ff7a9a'],['backpack','#d8a060','#a8642a'],['candy','#ffb3d9','#a8d8ff']],
+ ['grad','畢業典禮',['gradcap','#2a2a3a','#f5c542'],['roundglasses','#5a3c24'],['tie','#3d4f9e','#ffffff'],['book','#3d4f9e','#f5c542'],['confetti','#ff7a9a','#ffe27a']],
+ ['beach','夏日海灘',['sunhat','#f3dca0','#ff7a5a'],['sunglasses','#2a2a2a','#7fd6ff'],['lei','#ff7a5a','#ffe27a'],['float','#ff5a5a','#ffffff'],['bubbles','#9adfff','#ffffff']],
+ ['frog','青蛙池塘',['frog','#6ac04a','#2a5a1a'],['tongue','#ff7a8a'],['bandana','#6ac04a','#ffffff'],['shell','#5a9a3a','#c8e88a'],['leaves','#7fd05a','#c8e88a']],
+ ['unicorn','夢幻獨角獸',['unicorn','#fff2a8','#ffb3d9'],['sparkleeye','#ffb3d9','#b3d9ff'],['bowtie','#b3d9ff','#ffb3d9'],['fairy','#ffd0f0','#c8e8ff'],['rainbow','#ffffff','#ffffff']],
+ ['rock','搖滾巨星',['headphones','#2a2a2a','#ff3a6a'],['sunglasses','#111111','#ff3a6a'],['spikes','#2a2a2a','#d8d8e0'],['cape','#2a2a2a','#ff3a6a'],['notes','#ff3a6a','#ffffff']],
+ ['dragon','小火龍',['dhorns','#e8d8a8','#5aa83a'],['fangs','#ffffff'],['scarf','#ff6a2e','#ffe27a'],['dragonw','#3a8a4a','#8ad07a'],['flame','#ff7a2e','#ffd23a']],
+ ['snow','雪人冬日',['beanie','#5a8ad0','#ffffff'],['blush','#ff9ab8'],['scarf','#e04a4a','#ffffff'],['backpack','#5a8ad0','#ffffff'],['snow','#ffffff','#cfefff']],
+ ['gummy','小熊軟糖',['bearears','#c88a5a','#ffcfa8'],['blush','#ff7a9a'],['hearttag','#ff7ab8','#ffd23a'],['teddy','#c88a5a','#ffcfa8'],['candy','#ff9ad0','#9ad8ff']],
+ ['space','太空探險',['spacehelm','#cfefff','#ffffff'],['goggles2','#8a8e96','#7fd6ff'],['medal','#3d6fd6','#f5c542'],['jetpack','#c8ccd4','#ff8a2a'],['stars','#ffffff','#bfcfff']],
+ ['sailor','小小水手',['sailor','#ffffff','#2a3f7a'],['whiskers','#3a2a1c'],['tie','#d0303a','#ffffff'],['backpack','#2a3f7a','#ffffff'],['bubbles','#9adfff','#ffffff']],
+ ['fair','遊樂園',['propeller','#ff5a5a','#5ad0ff'],['clownnose','#ff3a3a'],['bowtie','#5ad0ff','#ffe27a'],['balloon','#ff5a8a','#ff5a8a'],['confetti','#ff5a5a','#5ad0ff']],
+ ['bunnyset','兔兔派對',['bunny','#ffffff','#ffc0d0'],['blush','#ffa8c0'],['bowtie','#ffa8c0','#ffffff'],['backpack','#ffc0d0','#ffffff'],['hearts','#ffc0d0','#ffffff']],
+ ['kitty','貓咪咖啡',['catears','#5a5a5a','#ffc0d0'],['whiskers','#2a2a2a'],['bell','#e04a4a','#f5c542'],['backpack','#8a5a3a','#f3dca0'],['butterflies','#ffd0e8','#c8e8ff']],
+ ['king','國王陛下',['crown','#f5c542','#e0303a'],['monocle','#f5c542'],['medal','#e0303a','#f5c542'],['cape','#b0203a','#f5c542'],['coins','#f5c542','#fff6c0']],
+ ['deer','麋鹿雪橇',['reindeer','#8a5a3a','#e0303a'],['clownnose','#ff2a2a'],['bell','#e0303a','#f5c542'],['sack','#8a5a3a','#f5c542'],['zap','#ffe27a','#ffffff']]
+];
+/* standalone colour variants: [drawer, slot, name, colA, colB] */
+const CSOLO=[
+ ['bow','head','粉紅蝴蝶結','#ff8ab8','#ffffff'],['bow','head','紅色蝴蝶結','#e0303a','#ffffff'],['bow','head','天藍蝴蝶結','#7fc8ff','#ffffff'],['bow','head','薄荷蝴蝶結','#7fe0c0','#ffffff'],['bow','head','紫色蝴蝶結','#b08aff','#ffffff'],['bow','head','黃色蝴蝶結','#ffd23a','#ffffff'],
+ ['party','head','派對帽・藍','#5a9aff','#ffe27a'],['party','head','派對帽・粉','#ff8ab8','#ffffff'],['party','head','派對帽・綠','#6ac04a','#ffe27a'],
+ ['beanie','head','毛線帽・紅','#e04a4a','#ffffff'],['beanie','head','毛線帽・黃','#ffc83a','#ffffff'],['beanie','head','毛線帽・灰','#8a8e96','#ffffff'],
+ ['catears','head','黑貓耳','#2a2a2a','#ff9ab8'],['catears','head','橘貓耳','#ff9a4a','#ffd0b0'],['bunny','head','灰兔耳','#a8a8b0','#ffc0d0'],['bunny','head','巧克力兔耳','#6a4030','#e8b8a8'],
+ ['bearears','head','白熊耳','#f8f8f8','#ffc0d0'],['bearears','head','熊貓耳','#2a2a2a','#555555'],['sprout','head','嫩芽','#6ac04a','#8ad85a'],['sprout','head','櫻花芽','#ff9ab8','#ffc0d0'],
+ ['cherry','head','櫻桃髮夾','#e0303a','#ffffff'],['starclip','head','星星髮夾・金','#f5c542','#ffffff'],['starclip','head','星星髮夾・粉','#ff9ad0','#ffffff'],['mushroom','head','紅蘑菇帽','#e0303a','#ffffff'],['mushroom','head','藍蘑菇帽','#3d6fd6','#ffffff'],
+ ['crown','head','銀色皇冠','#d8dce4','#5ad0ff'],['headphones','head','耳機・白','#f8f8f8','#7fc8ff'],['sunhat','head','草帽','#e8c878','#3d6fd6'],
+ ['sunglasses','face','墨鏡・紅框','#c0303a','#ffffff'],['sunglasses','face','墨鏡・愛心粉','#ff7ab8','#ffffff'],['heartglasses','face','愛心眼鏡・紅','#ff3a5a','#ffffff'],['heartglasses','face','愛心眼鏡・粉','#ff9ad0','#ffffff'],
+ ['roundglasses','face','圓框眼鏡・金','#f5c542'],['bandaid','face','OK 繃','#f3c8a0','#e8a878'],['bone','face','叼骨頭','#fbf7ef'],['rose','face','叼玫瑰','#e0303a','#a8102a'],['blush','face','橘色腮紅','#ffa060'],
+ ['bowtie','neck','紅色領結','#e0303a','#ffffff'],['bowtie','neck','黑色領結','#2a2a2a','#888888'],['bowtie','neck','點點領結','#5ad0ff','#ffffff'],['bell','neck','藍色鈴鐺項圈','#3d6fd6','#f5c542'],['bell','neck','粉色鈴鐺項圈','#ff8ab8','#f5c542'],
+ ['bandana','neck','藍色三角巾','#3d6fd6','#ffffff'],['bandana','neck','黃色三角巾','#ffc83a','#ffffff'],['hearttag','neck','愛心名牌・藍','#3d6fd6','#ff7ab8'],['scarf','neck','條紋圍巾','#7fc8ff','#ffffff'],['pearl','neck','粉紅珍珠','#ffd0e0'],
+ ['backpack','back','紅色小背包','#e04a4a','#ffd23a'],['backpack','back','黃色小背包','#ffc83a','#ff7a5a'],['backpack','back','綠色小背包','#6ac04a','#ffffff'],['backpack','back','紫色小背包','#9a6ae0','#ffd0f0'],
+ ['balloon','back','紅氣球','#ff3a3a','#ff3a3a'],['balloon','back','黃氣球','#ffd23a','#ffd23a'],['balloon','back','藍氣球','#5aa0ff','#5aa0ff'],['balloon','back','愛心氣球','#ff7ab8','#ff7ab8'],
+ ['teddy','back','白熊背包','#f8f8f8','#ffd0e0'],['butterfly','back','藍蝴蝶翅膀','#7fc8ff','#ffffff'],['cape','back','英雄披風','#e0303a','#ffe27a'],
+ ['aura','aura','星星環繞・金','#ffe27a','#fff6c0','stars'],['aura','aura','泡泡環繞','#bfefff','#ffffff','bubbles'],['aura','aura','音符環繞','#5a9aff','#ff7ab8','notes'],['aura','aura','落葉環繞','#ff9a3a','#ffd23a','leaves'],['aura','aura','閃電環繞','#9adfff','#ffffff','zap'],['aura','aura','愛心環繞・紅','#ff3a5a','#ff9ab8','hearts']
+];
+const COS=[],CSM={};
+{const SR=['head','back'];CSETS.forEach((s,si)=>{const parts=s.slice(2);CSLOT.forEach(([slot],k)=>{const p=parts[k],aura=slot==='aura';const rar=aura?(si%3===2?2:3):SR.includes(slot)?2:1;
+   const o={id:'cs_'+s[0]+'_'+slot,slot,d:aura?'aura':p[0],kind:aura?p[0]:null,a:aura?p[1]:p[1],b:aura?p[2]:(p[2]||p[1]),rar,set:s[0],n:s[1]+'・'+(CSLOT[k][1])};COS.push(o);CSM[o.id]=o})});
+ CSOLO.forEach((r,i)=>{const o={id:'cx_'+i,slot:r[1],d:r[0],a:r[3],b:r[4]||r[3],kind:r[5]||null,rar:1,n:r[2]};if(['cape','teddy','crown','headphones','heartglasses'].includes(r[0]))o.rar=2;COS.push(o);CSM[o.id]=o})}
+{const ctr=[0,0,0,0];for(const o of COS){const k=SBK[(ctr[o.rar]++ + o.rar*5)%8];o.bon=[k,Math.round(SBV[k][o.rar]*.5*10)/10]}}
+const CSET_BONUS=1;
+function cosBonus(id){const o=CSM[id];return [o.bon[0],Math.round(o.bon[1]*starMul((SV.cstar||{})[id])*10)/10]}
+const cosOwn=id=>(SV.cown||[]).includes(id);
+function cosSets(){return CSETS.filter(s=>CSLOT.every(([slot])=>cosOwn('cs_'+s[0]+'_'+slot))).map(s=>s[1])}
+function drawCos(c,L,id,t,layer){const o=CSM[id];if(!o)return;if(o.slot==='back'&&(layer==='behind')!==!!CBACK[o.d])return;const f=CD[o.d];if(f)f(c,L,o.a,o.b,t,o.kind)}
+
+function drawDog(c,skid,jid,x,y,t,face,mv,wear){
   const sk=SKM[skid]||SKM.shiba0,j=JM[jid],[,ear,sn,tail,sz0,o]=B[sk.b],f=sk.f,f2=sk.f2,pat=sk.pat,sz=Math.sqrt(sz0);
   const light=lum(f)>.6,dk=shade(f,-.22),TAN='#b5682f',hc=pat==='tri'&&light?TAN:f;
   const ec=pat==='tri'?(light?shade(TAN,-.15):f):(pat==='mask'||pat==='patch'||pat==='merle')?f2:shade(hc,-.12);
@@ -573,6 +736,9 @@ function drawDog(c,skid,jid,x,y,t,face,mv){
   c.save();c.translate(x,y);c.scale(face*sz,sz);
   if(j.tier>=4){c.globalAlpha=.2+.08*Math.sin(t*4);circ(c,0,-4,24,j.c);c.globalAlpha=1}
   const lh=o.short?5:8,bl=o.long?16:12,by=12-lh-6+bob,hx=bl-1,hy=by-8,hr=8.5;
+  const W2=wear||{},L={hx,hy,hr,by,bl,ex:hx+2.5,ey:hy-1.5,nkx:hx-3,nky:hy+7,nx:hx+8};
+  if(W2.aura&&CSM[W2.aura]&&CSM[W2.aura].kind==='rainbow')drawCos(c,L,W2.aura,t,'behind');
+  if(W2.back)drawCos(c,L,W2.back,t,'behind');
   c.save();c.translate(-bl+1,by-3);c.rotate(Math.sin(t*(mv?16:5))*.3);c.lineCap='round';c.strokeStyle=f;c.fillStyle=f;
   if(tail==='curl'){c.lineWidth=4;c.beginPath();c.arc(-2,-5,4.5,.2,TAU-.9);c.stroke()}
   else if(tail==='straight'){c.lineWidth=3.5;c.beginPath();c.moveTo(0,0);c.lineTo(-8,-8);c.stroke();if(pat==='tri')circ(c,-8,-8,2,'#fbf7ef')}
@@ -591,6 +757,7 @@ function drawDog(c,skid,jid,x,y,t,face,mv){
   if(o.silky){c.fillStyle=f;for(let i=-bl+3;i<bl-2;i+=4){c.beginPath();c.moveTo(i,by+4);c.lineTo(i+2,by+10);c.lineTo(i+4,by+4);c.fill()}}
   if(o.curly)for(let i=0;i<6;i++)circ(c,-bl+3+i*(bl*2-6)/5,by-6,3,shade(f,.1));
   if(j.tier>=2){c.beginPath();c.moveTo(bl-5,by-6);c.quadraticCurveTo(-2,by-9,-bl-1,by+3);c.lineTo(-bl+3,by+7);c.quadraticCurveTo(0,by+1,bl-7,by-1);c.closePath();c.fillStyle=shade(j.c,-.3);c.fill();if(j.tier>=3){c.strokeStyle='#f5c542';c.lineWidth=1.3;c.stroke()}}
+  if(W2.back)drawCos(c,L,W2.back,t,'front');
   if(o.fluff)for(const [dx,dy] of [[-4,4],[0,6],[3,3],[-6,0]])circ(c,hx+dx,hy+dy,5,shade(f,.06));
   if(ear==='up'){tri(c,hx-1,hy-4,hx+2,hy-14,hx+5,hy-5,shade(ec,-.15));tri(c,hx-6,hy-4,hx-3,hy-15,hx+1,hy-6,ec);tri(c,hx-4.5,hy-6,hx-3,hy-12,hx-.5,hy-6,'#f2a7a0')}
   if(ear==='fold'){tri(c,hx-5,hy-5,hx-2,hy-12,hx+2,hy-6,ec);tri(c,hx-2,hy-12,hx+2,hy-6,hx+3.5,hy-9,shade(ec,-.18))}
@@ -609,9 +776,13 @@ function drawDog(c,skid,jid,x,y,t,face,mv){
   if(pat==='tan'||o.beard)rr(c,hx+1,hy-5.2,3.5,1.6,1,f2);
   if(ear==='flop')ell(c,hx-4,hy+1,3.8,6.5,.3,ec);
   if(ear==='long')ell(c,hx-4,hy+4,4.2,o.silky?11:9,.15,ec);
-  ACC[j.acc](c,hx,hy,hr,j,t);
+  L.nx=sx+sl-1;
+  if(W2.neck)drawCos(c,L,W2.neck,t);
+  const neckAcc=j.acc==='bandana'||j.acc==='scarf';if(W2.head&&CSM[W2.head]){if(neckAcc&&!W2.neck)ACC[j.acc](c,hx,hy,hr,j,t);drawCos(c,L,W2.head,t)}else if(!(neckAcc&&W2.neck&&CSM[W2.neck]))ACC[j.acc](c,hx,hy,hr,j,t);
+  if(W2.face)drawCos(c,L,W2.face,t);
   if(sk.fx){const cols=FXC[sk.fx];for(let i=0;i<5;i++){const a=t*1.4+i*TAU/5,px=Math.cos(a)*18,py=-6+Math.sin(a)*11,al=.55+.45*Math.sin(t*5+i);c.globalAlpha=al;const col=cols[i%cols.length];
     if(sk.fx==='sakura'||sk.fx==='candy')ell(c,px,py,3,1.8,a,col);else if(sk.fx==='frost'){c.strokeStyle=col;c.lineWidth=1;c.beginPath();for(let q=0;q<3;q++){const qa=q*Math.PI/3;c.moveTo(px-Math.cos(qa)*3,py-Math.sin(qa)*3);c.lineTo(px+Math.cos(qa)*3,py+Math.sin(qa)*3)}c.stroke()}else if(sk.fx==='fiesta')rr(c,px-1.5,py-1,3,2,.5,col);else{c.beginPath();for(let q=0;q<8;q++){const r=q%2?1:3.2,qa=q*Math.PI/4;c.lineTo(px+Math.cos(qa)*r,py+Math.sin(qa)*r)}c.closePath();c.fillStyle=col;c.fill()}}c.globalAlpha=1}
+  if(W2.aura&&CSM[W2.aura]&&CSM[W2.aura].kind!=='rainbow')drawCos(c,L,W2.aura,t);
   c.restore();
 }
 
@@ -854,7 +1025,10 @@ function update(dt){
   {const db=$('dashb');const ready=(G.dashCd||0)<=0;if(db.disabled===ready)db.disabled=!ready;}
   if(p.mv){const sp=p.spd*G.st.spd*dt*(p.slow>0?.55:1);p.x+=ix*sp;p.y+=iy*sp;const n=Math.hypot(ix,iy);p.fx=ix/n;p.fy=iy/n;if(Math.abs(ix)>.1)p.face=Math.sign(ix)}
   p.inv-=dt;if(G.st.regen)heal(G.st.regen*dt);
-  if(G.pet){const pt=G.pet,tx=p.x-p.face*26,ty=p.y+8;pt.x+=(tx-pt.x)*Math.min(1,dt*5);pt.y+=(ty-pt.y)*Math.min(1,dt*5);pt.cd-=dt;if(pt.cd<=0){const t=nearestN(pt.x,pt.y,1,220)[0];if(t){pt.cd=.9;const a=Math.atan2(t.y-pt.y,t.x-pt.x);G.P.push({k:'bolt',x:pt.x,y:pt.y-4,vx:Math.cos(a)*380,vy:Math.sin(a)*380,r:5,dmg:pt.dmg/ G.st.dmg,pr:0,life:1.2,tg:t,hits:new Set(),c:PM[pt.id].c==='#ffffff'?'#ffd0e0':PM[pt.id].c})}else pt.cd=.3}}
+  if(G.pet){const pt=G.pet;let tx=p.x-p.face*26,ty=p.y+8,fetching=false;
+    if(SV.petMode==='fetch'){if(!pt.tgt||pt.tgt.got||pt.tgt.m){pt.tgt=null;let bd=330*330;for(const j of G.J){if(j.got||j.m)continue;const d2=(j.x-p.x)**2+(j.y-p.y)**2;if(d2<bd){bd=d2;pt.tgt=j}}}
+      if(pt.tgt){fetching=true;const dx=pt.tgt.x-pt.x,dy=pt.tgt.y-pt.y,d=Math.hypot(dx,dy);if(d<14){pt.tgt.m=true;pt.tgt=null}else{const sp=Math.min(d,380*dt);pt.x+=dx/d*sp;pt.y+=dy/d*sp}}}
+    if(!fetching){pt.x+=(tx-pt.x)*Math.min(1,dt*5);pt.y+=(ty-pt.y)*Math.min(1,dt*5)}pt.cd-=dt*(SV.petMode==='fetch'?.5:1);if(pt.cd<=0){const t=nearestN(pt.x,pt.y,1,220)[0];if(t){pt.cd=.9;const a=Math.atan2(t.y-pt.y,t.x-pt.x);G.P.push({k:'bolt',x:pt.x,y:pt.y-4,vx:Math.cos(a)*380,vy:Math.sin(a)*380,r:5,dmg:pt.dmg/ G.st.dmg,pr:0,life:1.2,tg:t,hits:new Set(),c:PM[pt.id].c==='#ffffff'?'#ffd0e0':PM[pt.id].c})}else pt.cd=.3}}
 
   G.spawn-=dt;
   const TT=tE();
@@ -1019,8 +1193,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.11.0';
+const VERSION='0.12.0';
 const NEWS=[
+ {v:'0.12.0',d:'11/24',t:'時裝扭蛋・寵物撿東西',items:[['新增','時裝系統：194 款可愛時裝，分頭飾、臉部、頸部、背部、特效五個部位，穿上後打怪時也看得到'],['新增','26 個主題套裝：草莓甜心、小蜜蜂、聖誕快樂、小天使、小惡魔、海盜船長、魔法少女、星空魔導、櫻花祭、南瓜派對、夢幻獨角獸、小火龍、太空探險……集滿一整套傷害 +1%'],['新增','時裝扭蛋（「時裝」分頁）：用狗骨頭抽，SSR 3%，十連保底 SR，60 抽必中 SSR；每收集一件都會永久加能力，不用穿也有效，重複的會升星'],['新增','寵物可以切換「跟著我攻擊」或「幫我撿東西」：撿東西模式會把附近的寶石、金幣和寶箱叼回來'],['新增','雲端存檔正式開放：點「雲端存檔」註冊帳號，換裝置也能接著玩'],['新增','3 個新成就：收集時裝、集滿套裝']]},
  {v:'0.11.0',d:'11/24',t:'斷線續玩・小地圖・玩法大更新',items:[['新增','斷線、關掉頁面或手機跳出時，會自動記住目前的關卡；下次打開可以選擇「繼續關卡」，等級、技能和撿到的獎勵都會保留'],['新增','小地圖：右上角顯示附近的怪物、菁英、魔王、寶箱和祭壇，可以在暫停選單關閉'],['新增','招式進化：招式練到 Lv5、又有對應的被動，升級時會出現金色的「進化」選項'],['新增','菁英怪會掉寶箱，打開有機會一次拿 1～3 個強化'],['新增','祭壇：大約每 75 秒出現一次，可以選祝福，或用詛咒交換更多獎勵，畫面邊緣有箭頭指路'],['新增','菁英怪詞綴：迅捷、巨大、分裂、護盾、自爆、再生'],['新增','難度挑戰：通關後可以挑戰難度 1～5，獎勵更多，第一次通過還送狗骨頭'],['新增','每日任務、每週任務，完成可以領狗骨頭（「任務」分頁）'],['新增','衝刺：空白鍵／Shift 或右下角「衝」按鈕，衝刺時短暫無敵，冷卻 3 秒'],['新增','打倒魔王後可以從三件裝備裡挑一件帶走'],['調整','後面關卡的怪物血量和攻擊成長變平緩，難度曲線更順'],['調整','爆擊率上限 75%，超過的部分會轉成爆擊傷害']]},
  {v:'0.10.0',d:'11/24',t:'雲端帳號・平衡調整',items:[['新增','帳號＋密碼登入，進度自動存到雲端，換手機、換電腦都能接著玩'],['新增','可以綁定 Email，忘記密碼時收信重設'],['新增','雲端和裝置進度不同時，會讓你選要留哪一份'],['調整','關卡魔王改成 4:00 出現，出現前 15 秒會預告，畫面上方有倒數'],['新增','裝備升星（最多 ★5）：花金幣並消耗一件同部位裝備，每顆星能力 +12%'],['新增','寵物可以用金幣餵點心，一路養到 Lv10'],['調整','背包上限 80 → 120，每局結束可自動賣掉比身上差的普通、精良裝備']]},
  {v:'0.9.3',d:'11/24',t:'更新公告',items:[['新增','城鎮右上角的「最新消息」：每次更新都會列出新增、調整和修正的內容'],['新增','改版後第一次打開遊戲，會自動跳出這次的更新內容'],['新增','網頁下方的「更新紀錄」可以看到所有歷史版本']]},
@@ -1051,7 +1226,7 @@ const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function acctMsg(t,ok){const m=$('acctMsg');m.textContent=t||'';m.style.color=ok?'#2f7a3e':'#b03a3a'}
 function acctBtnTxt(){const b=$('acctBtn');if(!b)return;if(!CLOUD()){b.textContent='雲端存檔';return}const st=DogCloud.status();b.textContent=st.loggedIn?`☁ ${st.username||'已登入'}${st.pending||st.syncing?'（同步中）':''}`:'登入／註冊'}
 function saveSummary(d){if(!d||!d.breed)return '沒有進度';const j=JM[d.job]?JM[d.job].n:'';return `${(SKM[(d.skin||{})[d.breed]]||SKM[BASE[d.breed]]||{n:''}).n}・${j}<br>Base Lv ${d.blv||1}・Job Lv ${d.jlv||1}<br>出戰 ${d.runs||0} 次・金幣 ${(d.zeny||0).toLocaleString()}<br><span class="note">最後更新：${d.seen?new Date(d.seen).toLocaleString():'不明'}</span>`}
-function adoptSave(d){SV=Object.assign(defSave(),d);if(SV.breed&&!B[SV.breed])SV.breed='shiba';for(const it of [...SV.inv,...Object.values(SV.eq)])if(it)fixItem(it);SV.owned=(SV.owned||[]).filter(id=>SKM[id]);try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}buildDex();if(SV.breed){renderHub();show('hub')}else openBreeds('new')}
+function adoptSave(d){SV=Object.assign(defSave(),d);if(SV.breed&&!B[SV.breed])SV.breed='shiba';for(const it of [...SV.inv,...Object.values(SV.eq)])if(it)fixItem(it);SV.owned=(SV.owned||[]).filter(id=>SKM[id]);SV.cown=(SV.cown||[]).filter(id=>CSM[id]);try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}buildDex();if(SV.breed){renderHub();show('hub')}else openBreeds('new')}
 async function syncAfterLogin(){
   let remote;try{remote=await DogCloud.load()}catch(e){acctMsg(e.message);return}
   const local=SV,hasLocal=!!(local.breed&&(local.runs||local.blv>1));
@@ -1101,7 +1276,7 @@ function openAcct(){acctMsg('');renderAcct();$('acctov').classList.remove('hide'
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
-const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['pet','寵物'],['ach','任務'],['shop','商店']];
+const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['cos','時裝'],['pet','寵物'],['ach','任務'],['shop','商店']];
 let insFor=null;
 function renderHub(){
   const j=JM[SV.job],tier=j.tier,cap=JCAP[tier],pts=SV.tpe-tSpent();
@@ -1142,7 +1317,7 @@ function renderHub(){
     H.innerHTML=`<h3>卡片圖鑑（收集 ${have}/${CARDS.length}）</h3><p class="note">打倒怪物有機率掉牠的卡片：一般怪 ${(CARD_RATE.normal*100).toFixed(2)}%、金框菁英怪 ${CARD_RATE.elite*100}%、魔王 ${CARD_RATE.boss*100}%（掉該關卡的魔王卡）。卡片要插在對應部位、而且有空卡槽的裝備上。</p><div class="cards">${CARDS.map(r=>cardHTML(r[0],'',true)).join('')}</div>`;
   }else if(tab==='pet'){
     const own=Object.keys(SV.pets||{});
-    H.innerHTML=`<h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5），也可以用金幣餵點心一路養到 Lv10。</span></h3>
+    H.innerHTML=`<div class="box"><strong>寵物行動</strong>　<button class="btn sm ${SV.petMode!=='fetch'?'':'ghost'}" data-petmode="atk">跟著我攻擊</button><button class="btn sm ${SV.petMode==='fetch'?'':'ghost'}" data-petmode="fetch">幫我撿東西</button><p class="note" style="margin:4px 0 0">「幫我撿東西」：寵物會跑去把附近的經驗寶石、金幣、寶箱叼回來，攻擊速度變一半；沒東西撿時會回來一起打。</p></div><h3>寵物　<span class="note">帶一隻寵物出戰：牠會跟在身邊自動攻擊，並給你一項加成。重複孵到同一隻會升級（最多 Lv5），也可以用金幣餵點心一路養到 Lv10。</span></h3>
       <div class="box"><strong>孵寵物蛋</strong><p class="note">機率：傳說 3%、史詩 12%、稀有 30%、普通 55%</p><button class="btn" data-egg="z" ${SV.zeny<eggZeny()?'disabled':''}>${eggZeny()} 金幣</button><button class="btn" data-egg="b" ${SV.bones<EGG_BONES?'disabled':''}>🦴 ${EGG_BONES}</button><div id="eggRes"></div></div>
       <div class="cards">${PETS.map(r=>{const id=r[0],has=own.includes(id),lv=(SV.pets||{})[id]||0,on=SV.pet===id;return `<div class="cardi${has?'':' no'}"><canvas width="96" height="96" data-pet="${id}" style="width:48px;height:48px"></canvas><div><strong style="color:${PRAR[r[4]].c}">${r[1]}</strong>${has?`<em>Lv ${lv}</em>`:''}<small>${PRAR[r[4]].n} · ${modTxt([has?petBon(id):r[3]])}</small>${has?(on?'<small><b>出戰中</b></small><button class="btn sm ghost" data-petoff="1">收回</button>':`<button class="btn sm" data-peton="${id}">帶出門</button>`)+(lv<PET_MAX?`<button class="btn sm ghost" data-feed="${id}" ${SV.zeny<feedCost(id)?'disabled':''}>餵點心 ${feedCost(id)} 金幣</button>`:'<small class="note">已滿級</small>'):'<small class="note">還沒孵到</small>'}</div></div>`}).join('')}</div>`;
     for(const pc of H.querySelectorAll('canvas[data-pet]')){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,96,96);c.translate(48,52);c.scale(3,3);drawPet(c,pc.dataset.pet,0,0,0)}
@@ -1161,6 +1336,15 @@ function renderHub(){
       <h3>造型收藏（${got}/${total}）　<span class="note">點一下就換上；換別的品種會一起換狗</span></h3>
       ${Object.keys(B).map(bk=>`<div class="skrow"><h4>${B[bk][0]}</h4><div class="skins">${SKINS.filter(r=>r[1]===bk).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}${own?'':' no'}" data-skin="${id}" ${own?'':'disabled'}><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${own?r[2]:'未取得'}${own&&(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${SKM[id].bon?bonTxt(id):'基本款'}</small></button>`}).join('')}</div></div>`).join('')}`;
     for(const pc of H.querySelectorAll('canvas[data-sk]')){portrait(pc,pc.dataset.sk,SV.job);if(!owns(pc.dataset.sk)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}
+  }else if(tab==='cos'){
+    const own=SV.cown||[],w=SV.wear||{},cs=cosSets();
+    H.innerHTML=`<h3>時裝扭蛋　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
+      <div class="box gacha"><p class="note">一共 <b>${COS.length}</b> 款時裝，分成頭飾、臉部、頸部、背部、特效五個部位，每個部位可以穿一件，打怪時也看得到。機率：SSR 3%、SR 17%、R 80%；十連抽保底一個 SR 以上；連續 60 抽沒中 SSR，第 60 抽必中（目前 ${SV.cpity||0} 抽）。跟造型一樣，<b>每收集一件就永久加一點能力，不用穿也有效</b>；重複的會升星（最多 ★3），集滿一整套五件再加傷害 +${CSET_BONUS}%。</p>
+      <button class="btn" data-cpull="1" ${SV.bones<1?'disabled':''}>單抽　🦴1</button><button class="btn" data-cpull="10" ${SV.bones<10?'disabled':''}>十連抽　🦴10</button><button class="btn ghost" data-cwear="clear">全部脫掉</button>
+      <div id="cpullRes" class="pulls"></div></div>
+      <div class="box"><strong>已收集 ${own.length}/${COS.length}　完成套裝 ${cs.length}/${CSETS.length}</strong><p class="note" style="margin:4px 0 0">${cs.length?'已集滿：'+cs.join('、'):'集滿同一套的五件（頭飾、臉部、頸部、背部、特效）就有套裝加成。'}</p></div>
+      ${CSLOT.map(([slot,sn])=>`<div class="skrow"><h4>${sn}　<span class="note">${COS.filter(o=>o.slot===slot&&cosOwn(o.id)).length}/${COS.filter(o=>o.slot===slot).length}</span></h4><div class="skins">${COS.filter(o=>o.slot===slot).sort((a,b)=>cosOwn(b.id)-cosOwn(a.id)||b.rar-a.rar).map(o=>{const has=cosOwn(o.id),on=w[slot]===o.id;return `<button class="sk2${on?' on':''}${has?'':' no'}" data-cwear="${o.id}" ${has?'':'disabled'}><canvas width="160" height="120" data-cs="${o.id}"></canvas><i style="background:${SRAR[o.rar].c}">${SRAR[o.rar].n}</i><small>${has?o.n:'未取得'}${has&&(SV.cstar||{})[o.id]?` ${'★'.repeat(SV.cstar[o.id])}`:''}</small><small class="note">${on?'<b>穿著中（點一下脫掉）</b>':modTxt([cosBonus(o.id)])}</small></button>`}).join('')}</div></div>`).join('')}`;
+    const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
   }else if(tab==='shop'){
     const s=SV.stage,c1=Math.round(250*(1+s*1.8)),c2=Math.round(1800*(1+s*2.2));
     H.innerHTML=`<h3>商店</h3><div class="slots"><div class="box"><strong>冒險寶箱</strong><p class="note">隨機一件「${MAT[s]}」等級的裝備，任何品質都可能。</p><button class="btn" data-buy="0" ${SV.zeny<c1?'disabled':''}>${c1} 金幣</button></div><div class="box"><strong>黃金寶箱</strong><p class="note">至少「稀有」品質，有機會開出史詩、傳說。</p><button class="btn" data-buy="1" ${SV.zeny<c2?'disabled':''}>${c2} 金幣</button></div></div><div id="shopRes"></div>`;
@@ -1181,6 +1365,18 @@ function pull(n){
   for(const pc of $('pullRes').querySelectorAll('canvas[data-pr]'))portrait(pc,pc.dataset.pr,SV.job);
   try{$('pullRes').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}
 }
+function cosPull(n){
+  if(SV.bones<n)return;SV.bones-=n;SV.cown=SV.cown||[];SV.cstar=SV.cstar||{};const res=[];
+  for(let i=0;i<n;i++){SV.cpity=(SV.cpity||0)+1;let r;const x=Math.random();if(SV.cpity>=60)r=3;else r=x<.03?3:x<.2?2:1;
+    if(n===10&&i===n-1&&r<2&&!res.some(o=>CSM[o.id].rar>=2))r=2;if(r===3)SV.cpity=0;
+    const ps=COS.filter(o=>o.rar===r),id=ps[Math.floor(Math.random()*ps.length)].id;let dup=false,star=0;
+    if(SV.cown.includes(id)){dup=true;if((SV.cstar[id]||0)<STAR_MAX)star=SV.cstar[id]=(SV.cstar[id]||0)+1;else{SV.pieces+=[0,1,3,10][r];while(SV.pieces>=10){SV.pieces-=10;SV.bones++}}}else SV.cown.push(id);
+    res.push({id,dup,star})}
+  save();renderHub();const best=Math.max(...res.map(o=>CSM[o.id].rar));sfx(best>=3?'job':best>=2?'drop':'coin');
+  $('cpullRes').innerHTML=res.map(o=>{const k=CSM[o.id];return `<div class="pr r${k.rar}"><canvas width="160" height="120" data-cpr="${o.id}"></canvas><i style="background:${SRAR[k.rar].c}">${SRAR[k.rar].n}</i><small>${k.n}</small><em>${o.dup?(o.star?`升星 ★${o.star}`:'已滿星 → 碎片'):'NEW！'}</em><small class="note">${modTxt([cosBonus(o.id)])}</small></div>`}).join('');
+  for(const pc of $('cpullRes').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{[o.slot]:o.id})}
+  try{$('cpullRes').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}
+}
 const BONE_COST=1000;
 function hubClick(e){
   if(e.target.id==='autoEqChk'){SV.autoEq=e.target.checked;save();return}
@@ -1191,6 +1387,9 @@ function hubClick(e){
   if(d.insx){insFor=null;renderHub();return}
   if(d.ins2){const it=[...SV.inv,...Object.values(SV.eq)].find(x=>x&&x.id===insFor);const c=d.ins2;if(it&&SV.cards[c]>0&&CM[c].slot===it.slot&&it.cards.length<it.slots){it.cards.push(c);SV.cards[c]--;if(!SV.cards[c])delete SV.cards[c];sfx('job')}insFor=null;save();renderHub();return}
   if(d.pull){pull(+d.pull);return}
+  if(d.cpull){cosPull(+d.cpull);return}
+  if(d.cwear){SV.wear=SV.wear||{};if(d.cwear==='clear')SV.wear={};else{const o=CSM[d.cwear];if(o&&cosOwn(o.id)){if(SV.wear[o.slot]===o.id)delete SV.wear[o.slot];else SV.wear[o.slot]=o.id}}save();renderHub();return}
+  if(d.petmode){SV.petMode=d.petmode;save();renderHub();return}
   if(d.egg){const z=d.egg==='z';if(z?SV.zeny<eggZeny():SV.bones<EGG_BONES)return;if(z)SV.zeny-=eggZeny();else SV.bones-=EGG_BONES;let x=Math.random()*100,r=0;for(let i=3;i>=0;i--){const cum=PRAR.slice(i).reduce((a,b)=>a+b.w,0);if(x<cum){r=i;break}}
     const ps=PETS.filter(q=>q[4]===r),id=ps[Math.floor(Math.random()*ps.length)][0];SV.pets=SV.pets||{};const was=SV.pets[id]||0;SV.pets[id]=Math.min(5,was+1);if(!SV.pet)SV.pet=id;save();renderHub();sfx(r>=2?'job':'drop');
     $('eggRes').innerHTML=`<p><b style="color:${PRAR[r].c}">${PRAR[r].n}・${PM[id].n}</b> ${was?(was>=5?'（已滿級）':`升到 Lv ${SV.pets[id]}！`):'NEW！'}</p>`;return}
@@ -1253,7 +1452,7 @@ function drawGem(j,t){const c=ctx,y=j.y+Math.sin(t*4+j.x)*2,pulse=.5+.5*Math.sin
   c.beginPath();c.moveTo(j.x,y-s);c.lineTo(j.x+s*.75,y);c.lineTo(j.x,y+s);c.lineTo(j.x-s*.75,y);c.closePath();c.fillStyle=col;c.fill();
   tri(c,j.x,y-s,j.x-s*.75,y,j.x,y,'rgba(255,255,255,.55)');if(pulse>.85)circ(c,j.x+s*.3,y-s*.4,1.6,'#fff')}
 function drawPlayer(){const p=G.p;
-  ctx.globalAlpha=p.inv>0&&Math.floor(G.t*24)%2?.45:1;ctx.save();ctx.translate(p.x,p.y);ctx.scale(1.3,1.3);drawDog(ctx,G.skin,G.job,0,0,G.t,p.face,p.mv);ctx.restore();ctx.globalAlpha=1;
+  ctx.globalAlpha=p.inv>0&&Math.floor(G.t*24)%2?.45:1;ctx.save();ctx.translate(p.x,p.y);ctx.scale(1.3,1.3);drawDog(ctx,G.skin,G.job,0,0,G.t,p.face,p.mv,SV.wear);ctx.restore();ctx.globalAlpha=1;
   rr(ctx,p.x-18,p.y+26,36,5,2,'rgba(0,0,0,.45)');rr(ctx,p.x-18,p.y+26,36*Math.max(0,p.hp/p.max),5,2,'#ff5a5a')}
 function drawGroundZ(z,t){const c=ctx,k=1-z.life/z.max;
   if(z.k==='pud'){const a=Math.min(1,z.life*2);c.globalAlpha=.32*a;if(z.paint){['#ff9ec4','#8ec5ff','#fff27a','#9be36b'].forEach((col,i)=>ell(c,z.x+Math.cos(i*1.6)*z.R*.35,z.y+Math.sin(i*1.6)*z.R*.2,z.R*.6,z.R*.38,0,col))}else ell(c,z.x,z.y,z.R,z.R*.62,0,z.c);c.globalAlpha=.7*a;for(let i=0;i<4;i++){const bt=(t*1.5+i*.25)%1;circ(c,z.x+Math.cos(i*2.1)*z.R*.5,z.y+Math.sin(i*2.1)*z.R*.3-bt*8,2.5*(1-bt),z.paint?'#fff':z.c)}c.globalAlpha=1}
@@ -1386,7 +1585,7 @@ function hud(){
 }
 
 /* ---------- portraits & dex ---------- */
-function portrait(pc,skid,jid,t,mv){const c=pc.getContext('2d'),w=pc.width,h=pc.height,k=Math.min(w,h)/40;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);c.translate(w/2-3*k,h*.62);c.scale(k,k);drawDog(c,skid||'shiba0',jid,0,0,t||0,1,!!mv)}
+function portrait(pc,skid,jid,t,mv,wear){const c=pc.getContext('2d'),w=pc.width,h=pc.height,k=Math.min(w,h)/40;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);c.translate(w/2-3*k,h*.62);c.scale(k,k);drawDog(c,skid||'shiba0',jid,0,0,t||0,1,!!mv,wear===undefined?SV.wear:wear)}
 function buildDex(){
   const bk=curSkin();
   $('dex').innerHTML=`<div class="line"><h3>起點</h3><div class="grid">${card('novice')}</div></div>`+LINES.map(([ln,name])=>`<div class="line"><h3>${name}</h3><div class="grid">${JOBS.filter(r=>r[2]===ln).map(r=>card(r[0])).join('')}</div></div>`).join('');
