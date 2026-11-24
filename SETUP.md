@@ -24,8 +24,8 @@
    - **Minimum password length**：`8`
    - **Secure email change**：開
 2. **URL Configuration**：
-   - Site URL：`https://jameschen0712.github.io/dog-survivors/`
-   - Redirect URLs：加入 `https://jameschen0712.github.io/dog-survivors/`
+   - Site URL：`https://wangwang-survivors.pages.dev/`
+   - Redirect URLs：加入 `https://wangwang-survivors.pages.dev/**` 和舊網址 `https://jameschen0712.github.io/dog-survivors/**`
 3. **Rate Limits**：維持預設即可（已內建防止暴力猜密碼）。
 
 ## 3.5 線上主城（Realtime）
@@ -61,3 +61,11 @@ Supabase 內建的寄信服務只適合測試，每小時只能寄幾封。正�
   ```
 - 搬到其他 PostgreSQL 主機或自架 Supabase 時，玩家不需要重設密碼。
 - 遊戲跟伺服器溝通的程式都在 `cloud.js`，換平台只要改這個檔案。
+
+
+## 網址與部署
+
+- 正式網址：https://wangwang-survivors.pages.dev/ （Cloudflare Pages 專案 `wangwang-survivors`，連到 GitHub repo `jameschen0712/dog-survivors` 的 `main` 分支；不需要 build，輸出目錄是根目錄）
+- 每次 push 到 `main`，Cloudflare 會自動重新部署（約 30 秒）
+- 舊網址 https://jameschen0712.github.io/dog-survivors/ 仍然開著，但會跳出「搬家了」視窗，可以把這台裝置的本機進度用網址帶到新網址（`#move=` 參數）
+- 本機進度（localStorage）是跟著網址走的，所以換網址時才需要搬；雲端存檔不受影響

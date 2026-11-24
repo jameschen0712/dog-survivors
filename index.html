@@ -199,6 +199,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><button class="btn ghost" id="lowPowBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
+      <div class="ov hide" id="moveov" style="z-index:40"><div class="card" style="max-width:440px"><h2>🏠 汪汪倖存者搬家了！</h2><p>新網址：<br><b style="font-size:1.05em;white-space:nowrap;user-select:all">wangwang-survivors.pages.dev</b></p><p style="font-size:.92em;opacity:.85">按下面的按鈕，會把這台裝置上的進度一起帶過去。<br>有登入雲端存檔的話，到新網址登入同一個帳號也可以。</p><p><button class="btn" id="moveGo">帶著存檔搬過去</button></p><p><button class="btn ghost" id="moveStay" style="font-size:.85em">先留在舊網址</button></p></div></div>
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
       <div class="ov hide" id="acctov" style="z-index:26"><div class="card"><h2 id="acctT">帳號與雲端存檔</h2><div id="acctB" style="text-align:left"></div><p class="note" id="acctMsg" role="status" aria-live="polite" style="min-height:1.4em;text-align:center"></p><button class="btn ghost" id="acctClose">關閉</button></div></div>
       <div class="ov hide" id="resumeov" style="z-index:30"><div class="card"><h2>繼續上一局？</h2><div id="resumeB"></div><button class="btn" id="resumeYes">繼續關卡</button><button class="btn ghost" id="resumeNo">放棄（本局獎勵不會拿到）</button></div></div>
@@ -492,6 +493,14 @@ const achReady=()=>ACH.filter(a=>!(SV.ach||{})[a[0]]&&a[2]());
 const SAVE_KEY='dog-save-v1';
 function defSave(){return{v:1,cown:[],wear:{},cstar:{},cpity:0,petMode:'auto',autoSell:true,pets:{},pet:null,ach:{},st:{},cardSeen:{},tut:{},seen:0,star:{},cards:{},autoEq:true,breed:null,skin:{},owned:[],bones:10,pieces:0,pity:0,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},zeny:0,inv:[],eq:{weapon:null,armor:null,acc:null},stage:0,best:{},runs:0,nid:1}}
 function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&s.v===1){const o=Object.assign(defSave(),s);if(o.breed&&!B[o.breed])o.breed='shiba';for(const it of [...o.inv,...Object.values(o.eq)])if(it)fixItem(it);o.owned=o.owned.filter(id=>SKM[id]);for(const k in o.skin)if(!SKM[o.skin[k]])delete o.skin[k];return o}}catch(e){}return defSave()}
+const NEW_HOME='https://wangwang-survivors.pages.dev/',OLD_SITE=/\.github\.io$/.test(location.hostname);
+const b64e=t=>btoa(unescape(encodeURIComponent(t))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),b64d=t=>decodeURIComponent(escape(atob(t.replace(/-/g,'+').replace(/_/g,'/'))));
+let MOVED=0;
+(function importMove(){const m=location.hash.match(/^#move=([\w-]+)$/);if(!m)return;history.replaceState(null,'',location.pathname+location.search);
+ try{const d=JSON.parse(b64d(m[1]));if(!d||!d.s||d.s.v!==1)return;
+  let cur=null;try{cur=JSON.parse(localStorage.getItem(SAVE_KEY))}catch(e){}
+  if(cur&&cur.breed&&!confirm('這裡已經有一份進度（Lv '+(cur.blv||1)+'）。\n要用舊網址帶來的進度（Lv '+(d.s.blv||1)+'）蓋掉嗎？'))return;
+  localStorage.setItem(SAVE_KEY,JSON.stringify(d.s));if(d.r)localStorage.setItem('dog-run-v1',d.r);else localStorage.removeItem('dog-run-v1');MOVED=1}catch(e){}})();
 let SV=loadSave();
 function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}if(window.DogCloud)DogCloud.queue(SV)}
 const CLOUD=()=>window.DogCloud&&DogCloud.enabled;
@@ -1276,8 +1285,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.18.1';
+const VERSION='0.18.2';
 const NEWS=[
+ {v:'0.18.2',d:'11/24',t:'搬新家',items:[['新增','遊戲搬到新網址 wangwang-survivors.pages.dev，網址更好記，也更適合分享給朋友'],['新增','打開舊網址會跳出「搬家了」視窗，按「帶著存檔搬過去」就會把這台裝置上的進度（包含還沒打完的關卡）一起帶到新網址'],['調整','雲端存檔、線上主城、拜訪狗屋都照常運作；有登入雲端帳號的話，到新網址登入同一個帳號就好']]},
  {v:'0.18.1',d:'11/24',t:'巴塔公主會說話了',items:[['新增','找「公主・巴塔」說話，牠會隨機回你：「嗚嗚～我要找媽媽～」然後加速亂跑跑掉；或是依照你們現在的感情回話（每次找牠說話都會增加，愛心越多越黏你）；或是一臉疑惑「....???」']]},
  {v:'0.18.0',d:'11/24',t:'雙狗互動',items:[['新增','七種兩隻狗一起做的互動：碰鼻子、拔河、追逐玩耍、摔角玩耍、理毛、依偎、擊掌'],['新增','點別的狗，在「一起玩」裡選一種邀請，對方按「好啊」後兩隻狗會自動走到位置、一起做完整套動作'],['新增','拔河會左右拉扯，最後隨機一隻贏走繩子；追逐會繞圈互追；摔角會抱在一起滾、揚起灰塵；理毛是一隻舔另一隻的臉；依偎是靠在一起坐著冒愛心'],['新增','擊掌要好感度到「好朋友」才解鎖：兩隻一起用後腳站起來，前腳「啪」一聲擊掌'],['新增','每次一起玩都會增加好感度，每天第一次還有小獎勵']]},
  {v:'0.17.1',d:'11/24',t:'貓咪重畫',items:[['調整','照著真貓重畫三隻英短：錢錢改成銀色漸層的毛（背上和頭頂顏色比較深），綠色眼睛；阿咪的黑色花紋改成灰色，配上淡橘色斑；小卡改成深灰藍色、黑鼻子，還戴上綠色條紋小圍兜'],['調整','三隻的耳朵都改成英短那種小小圓圓的']]},
@@ -1986,7 +1996,7 @@ function backToTown(){blurActive();show(null);state=inHouse?'house':'town';last=
 function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.add('app');document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI();blurActive();
   showTip('town2','歡迎來到主城！','・<b>走路</b>：電腦用方向鍵／WASD；手機按住畫面拖曳，或點一下想去的地方<br>・<b>使用功能</b>：直接<b>點 NPC</b>，狗狗會自己走過去打開；或走到 NPC 旁邊按下方黃色按鈕（電腦可按 E／空白鍵／Enter）<br>・NPC 頭上的<b>黃色標籤</b>是他負責的功能，有紅色 <b>!</b> 代表有事要處理<br>・不想走路也可以按下方「出戰」「選單」<br>・按 <kbd>Esc</kbd> 可以關掉視窗')}
 function blurActive(){try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()}catch(e){}}
-const MODALS=['acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
+const MODALS=['moveov','acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
 const modalOpen=()=>MODALS.some(id=>{const el=$(id);return el&&!el.classList.contains('hide')});
 function escClose(){if(!$('acctov').classList.contains('hide')){$('acctov').classList.add('hide');return true}if(!$('newsov').classList.contains('hide')){$('newsov').classList.add('hide');return true}if(!$('pullov').classList.contains('hide')){closePull();return true}if(!$('tipov').classList.contains('hide')){closeTip();return true}if(!$('jobov').classList.contains('hide')){show('hub');return true}if(!$('breedov').classList.contains('hide')&&!$('breedCancel').classList.contains('hide')){show('hub');return true}return false}
 function enterHouse(){VISIT=null;loadMyVisits();endWalk(true);inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
@@ -2385,6 +2395,8 @@ resize();buildDex();
 buildChangelog();
 if(window.DogCloud){DogCloud.onChange(acctBtnTxt);DogCloud.init().then(()=>{acctBtnTxt();if(DogCloud.status().loggedIn)syncAfterLogin().then(()=>{if(!$('acctov').classList.contains('hide'))renderAcct()})}).catch(()=>{})}
 acctBtnTxt();
+if(OLD_SITE){$('moveov').classList.remove('hide');$('moveGo').onclick=()=>{save();let r=null;try{r=localStorage.getItem('dog-run-v1')}catch(e){}location.href=NEW_HOME+(SV.breed?'#move='+b64e(JSON.stringify({s:SV,r})):'')};$('moveStay').onclick=()=>$('moveov').classList.add('hide')}
+if(MOVED)setTimeout(()=>showTip('moved','🏠 搬家完成！','舊網址的進度已經帶過來了。<br>以後請用 <b>wangwang-survivors.pages.dev</b> 來玩，可以加到主畫面喔！',true),700);
 if(SV.breed){goTown();idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}offerResume()}else{SV.newsSeen=VERSION;openBreeds('new')}
 requestAnimationFrame(loop);
 }
