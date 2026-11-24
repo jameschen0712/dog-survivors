@@ -188,7 +188,7 @@ const B={
  lab:['拉布拉多','flop',.6,'straight',1.1,{}],
  border:['邊境牧羊犬','fold',.6,'fluff',1,{}],
  husky:['哈士奇','up',.6,'curl',1.1,{husky:1}]};
-const REC={shiba:'幼犬見習生、劍士',corgi:'商人',poodle:'魔法師',dachs:'劍士',chihuahua:'槍手',westie:'超級見習生',golden:'盜賊・流氓',lab:'侍僧',border:'魔法師',husky:'劍士'};
+const REC={shiba:'幼犬見習生、劍士',corgi:'商人',poodle:'魔法師',dachs:'劍士',chihuahua:'槍手',westie:'超級見習生',golden:'盜賊・流氓',lab:'服事',border:'魔法師',husky:'劍士'};
 /* skin: id, breed, name, rarity(0 basic,1 R,2 SR,3 SSR), fur, fur2, pattern, special effect */
 const SKINS=[
 ['shiba0','shiba','赤柴',0,'#d9893d','#fff3e0','chest'],['shiba1','shiba','黑柴',1,'#2a2220','#f0dcc0','tan'],['shiba2','shiba','白柴',1,'#f3ead8','#fffaf0','none'],['shiba3','shiba','胡麻柴',2,'#a8743a','#2a1e16','saddle'],['shiba4','shiba','櫻花柴',3,'#f6b6c8','#fff0f4','chest','sakura'],
@@ -233,7 +233,7 @@ const JOBS=[
 ['dancer','舞者','ar',2,'archer','#ff9ec4','flower',[['旋轉舞步','舞','orb','#ff9ec4',{petal:1}],['飛吻','吻','bolt','#ff6fa8',{heart:1}]]],
 ['diva','舞團首席','ar',3,'dancer','#ff6fa8','flower',[['玫瑰鞭','鞭','wave','#ff5a8a'],['魅惑之舞','魅','aura','#ffb3d9']]],
 ['wander','流浪舞者','ar',4,'diva','#ffc2e0','flower',[['狂想曲','狂','nova','#ffc2e0',{big:1}],['花瓣風暴','花','storm','#ffb3d9',{petal:1}]]],
-['aco','侍僧','ac',1,'novice','#fff6b0','halo',[['治癒術','癒','heal','#7fe3a0'],['聖光術','光','holy','#fff3b0']]],
+['aco','服事','ac',1,'novice','#fff6b0','halo',[['治癒術','癒','heal','#7fe3a0'],['聖光術','光','holy','#fff3b0']]],
 ['priest','祭司','ac',2,'aco','#fff1a8','halo',[['十字驅魔','驅','cross','#fff6c0'],['聖域','域','sanct','#fffbe0']]],
 ['hpriest','大祭司','ac',3,'priest','#fffbe0','mitre',[['大聖域','聖','sanct','#fff3b0',{big:1}],['審判','審','holy','#fff6b0',{big:1}]]],
 ['bishop','聖光主教','ac',4,'hpriest','#fff6b0','mitre',[['審判之光','判','holy','#ffffff',{big:1,n:2}],['神聖結界','界','cross','#fff3b0',{big:1}]]],
@@ -267,7 +267,7 @@ const JM={},SKL={};
 for(const r of JOBS){const j={id:r[0],n:r[1],line:r[2],tier:r[3],p:r[4],c:r[5],acc:r[6]};j.sk=r[7].map((s,i)=>{const o={id:r[0]+'_'+i,n:s[0],g:s[1],k:s[2],c:s[3],x:s[4]||{},m:TM[r[3]],sig:i===0,job:r[0]};SKL[o.id]=o;return o});JM[j.id]=j}
 const kids=id=>JOBS.filter(r=>r[4]===id).map(r=>r[0]);
 function chain(id){const a=[];while(id){a.unshift(id);id=JM[id].p}return a}
-const LINES=[['sw','劍士系'],['mg','魔法師系'],['ar','弓手系'],['ac','侍僧系'],['me','商人系'],['th','盜賊系'],['sn','超級見習生系'],['gs','槍手系']];
+const LINES=[['sw','劍士系'],['mg','魔法師系'],['ar','弓手系'],['ac','服事系'],['me','商人系'],['th','盜賊系'],['sn','超級見習生系'],['gs','槍手系']];
 
 const MECH={
  bash:{b:26,cd:1.0,d:v=>`揮擊最近的敵人與周圍，傷害 ${v}`},
