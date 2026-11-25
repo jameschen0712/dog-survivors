@@ -448,7 +448,7 @@ const MECH={
  cross:{b:32,cd:3.4,d:v=>`以自己為中心展開十字形聖光，傷害 ${v}`},
  breath:{b:8,cd:2.8,d:v=>`朝前方噴出火焰吐息，連續傷害 ${v}`},
  bolt:{b:15,cd:1.1,d:(v,l)=>`發射 ${1+(l>>1)} 發追蹤彈，傷害 ${v}`}};
-const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k)*((G.st&&G.st[s.dt])||1):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
+const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k)*((G.st&&G.st[s.dt==='mag'?'mgc':s.dt])||1):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
 const skX=x=>(x.slow?'，還會讓敵人變慢':'')+(x.rock?'，會把敵人撞飛':'')+(x.fire?'（火屬性）':x.zap?'（雷屬性）':'');
 const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x)+skX(s.x);
 
@@ -669,7 +669,7 @@ function calcStats(){
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
     for(const [k,v] of it.aff)applyMod(st,k,v*(1+.12*(it.star||0)));for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   for(const [k,v] of Object.entries(collectionMods().m))applyMod(st,k,v);
-  {const a=k=>stv(k)-1;st.phy=1+a('str')*.008;st.rng=1+a('dex')*.008;st.mag=1+a('int')*.008;st.spd+=a('agi')*.0025;st.dodge=Math.min(.35,a('agi')*.0015);st.cd*=1-a('agi')*.001;st.hp+=a('vit')*3;st.hpPct+=a('vit')*.006;st.dr+=a('vit')*.001;st.area+=a('int')*.003;st.cd*=1-a('dex')*.0015;st.crit+=a('luk')*.002;st.critD+=a('luk')*.004;st.zeny+=a('luk')*.003}
+  {const a=k=>stv(k)-1;st.phy=1+a('str')*.008;st.rng=1+a('dex')*.008;st.mgc=1+a('int')*.008;st.spd+=a('agi')*.0025;st.dodge=Math.min(.35,a('agi')*.0015);st.cd*=1-a('agi')*.001;st.hp+=a('vit')*3;st.hpPct+=a('vit')*.006;st.dr+=a('vit')*.001;st.area+=a('int')*.003;st.cd*=1-a('dex')*.0015;st.crit+=a('luk')*.002;st.critD+=a('luk')*.004;st.zeny+=a('luk')*.003}
   st.exp+=comfortExp()/100;
   if(SV.pet&&PM[SV.pet]){const [k,v]=petBon(SV.pet);applyMod(st,k,v)}
   st.hp=Math.round(st.hp*(1+st.hpPct));return st;
@@ -1035,7 +1035,7 @@ function newRun(stage,trialJob,o){
   if(mode==='dungeon'){mul={hp:1.4,dmg:1.25,rw:1.5,exp:1,zeny:1,card:1,...DUNG[o.dtype].mul}}
   G={heat,cur:{spawn:1+.12*heat,taken:1,hp:1,drop:1},t:0,mode,floor:o.floor||0,startFloor:o.floor||0,ft:0,dtype:o.dtype,mul,speed:1,bossT:mode==='dungeon'?180:BOSS_T,eliteGap:mode==='dungeon'?30:60,stage,trial:!!trialJob,job,skin:curSkin(),kills:0,lvl:1,xp:0,need:xpNeed(1),pend:0,
     p:{x:0,y:0,r:13,hp:st.hp,max:st.hp,spd:150,fx:1,fy:0,face:1,inv:0,mv:false},
-    st:{dmg:st.dmg,cd:st.cd,area:st.area,mag:st.mag,regen:st.regen,spd:st.spd,crit:st.crit,critD:st.critD,sig:st.sig,dr:st.dr,exp:st.exp,zeny:st.zeny,bossDmg:st.bossDmg,leech:st.leech},
+    st:{dmg:st.dmg,cd:st.cd,area:st.area,mag:st.mag,regen:st.regen,spd:st.spd,crit:st.crit,critD:st.critD,sig:st.sig,dr:st.dr,exp:st.exp,zeny:st.zeny,bossDmg:st.bossDmg,leech:st.leech,phy:st.phy||1,rng:st.rng||1,mgc:st.mgc||1,dodge:st.dodge||0},
     pet:SV.pet&&PM[SV.pet]&&!trialJob?{id:SV.pet,x:-30,y:10,cd:1,dmg:(10+SV.blv*1.2)*(1+.2*((SV.pets[SV.pet]||1)-1))}:null,revive:st.revive,wep:{},pas:{},E:[],P:[],B:[],J:[],Z:[],FX:[],TX:[],spawn:1,eliteT:60,boss:null,bossDone:false,winT:0,shake:0,banner:null,ring2:0,ring4:0,
     rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[],bones:0}};
   const lv0=1+st.bonusLv;
@@ -1442,8 +1442,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.21.1';
+const VERSION='0.21.2';
 const NEWS=[
+ {v:'0.21.2',d:'11/25',t:'緊急修正',items:[['修正','上一版讓戰鬥中「撿寶石的範圍」幾乎變成 0（要走到寶石正上方才撿得到），已經修好'],['修正','基礎屬性的物理／遠程／魔法傷害加成和閃避，之前在戰鬥中沒有生效，現在會正確套用']]},
  {v:'0.21.1',d:'11/25',t:'屬性對應傷害類型',items:[['調整','招式分成物理、遠程、魔法三種傷害（招式說明旁會標出來）：力量加物理、靈巧加遠程、智力加魔法，每點 +0.8%。巫犬系和天使犬路線是魔法；獵犬系、牛仔犬系是遠程；護衛犬系、功夫犬路線、搗蛋犬系大多是物理；跑腿犬系的工匠路線偏物理和遠程、藥劑路線是魔法'],['調整','敏捷多了冷卻 -0.1%、靈巧冷卻改成 -0.15%；智力範圍改成 +0.3%'],['調整','「自動配點」改成看你目前職業主要用哪一種傷害來分配（物理：力量＞體力＞敏捷；遠程：靈巧＞敏捷＞幸運；魔法：智力＞體力＞靈巧）'],['新增','角色數值多了「物理／遠程／魔法」三種傷害加成的顯示']]},
  {v:'0.21.0',d:'11/25',t:'故事模式・基礎屬性・轉生',items:[['新增','故事《彩虹橋的另一邊》：加班到深夜的社畜，在雨夜救了一隻小狗後，醒來發現自己變成了狗，來到彩虹橋的狗狗天堂。人間的煩惱變成灰霧和怪物入侵，你要變強把五個地區搶回來。共有序章、五章和終章，第一次出戰某一關會播放該章開頭，第一次打倒魔王會播放結尾；對話可以點一下跳過打字、也能整段跳過'],['新增','「角色」分頁的「故事回顧」可以重看看過的劇情（已經通關的人可以直接看到對應章節）'],['新增','基礎屬性（參考 RO）：力量、敏捷、體力、智力、靈巧、幸運。每升一級拿屬性點，等級越高拿越多；屬性越高，加一點要花越多點，最高 99。可以照職業自動推薦配點，也能隨時免費重置。已經在玩的人會依目前等級補發點數'],['新增','敏捷會帶來「閃避」，被打中時有機率完全躲掉'],['新增','轉生：Base Lv 99 可以轉生，等級回到 1、屬性點重新分配，但每轉一次永久多 60 點屬性點（最多 5 轉）；職業、天賦、裝備都保留。名字旁會有轉生標記，主城頭上會有彩虹光圈，其他玩家也看得到'],['調整','因為有了屬性點，每升一級原本送的傷害（3%→2.2%）和生命（8→6）稍微降低，改由屬性補上']]},
  {v:'0.20.1',d:'11/25',t:'前期魔王調整',items:[['調整','第一關「古樹王」血量減少 40%、撞人的傷害減少 25%；第二關「巨蛛女王」血量減少 15%。招式沒怎麼升級也來得及在魔王逃走前打倒；難度挑戰的魔王維持原本強度']]},
@@ -1570,7 +1571,7 @@ function renderHub(){
     const st=calcStats(),t=tier;
     const jobBox=t>=4?'<p>已經是三轉職業，恭喜！</p>':kids(SV.job).length?(canJob()?`<p>Job Lv 已經到 ${SV.jlv}，可以轉職了！</p><button class="btn" id="doJob">轉職</button>`:`<p>Job Lv ${JREQ[t]} 才能轉職（目前 ${SV.jlv}）。</p>`):'';
     H.innerHTML=`<h3>${esc(dogName())}・${j.n}　<button class="btn sm ghost" id="renameBtn">改名字</button> <button class="btn sm ghost" id="storyBtn">故事回顧</button></h3><p class="note" style="margin:-6px 0 8px">毛色：${SKM[curSkin()].n}</p>
-      <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>閃避</span><b>${Math.round((st.dodge||0)*1000)/10}%</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>物理／遠程／魔法</span><b>${Math.round(st.phy*100)}／${Math.round(st.rng*100)}／${Math.round(st.mag*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
+      <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>閃避</span><b>${Math.round((st.dodge||0)*1000)/10}%</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>物理／遠程／魔法</span><b>${Math.round(st.phy*100)}／${Math.round(st.rng*100)}／${Math.round(st.mgc*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
       ${statBox()}
       <details class="box bldbox" ${bldOpen?'open':''}><summary><strong>流派：${buildName(SV.job,curBuild())}</strong>　<span class="note">點開看各流派、免費更換</span></summary><p class="note" style="margin:6px 0">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西。</p><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></details>
       <div class="box"><strong>轉職</strong>　<button class="btn sm ghost" id="jobGuide">職業介紹・轉職路線</button>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
