@@ -1117,11 +1117,14 @@ function initLoadout(g,job,bk,lv0){
    for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;if(fav&&jid!==job&&!fav.includes(s.k))continue;g.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}}
   {const bk2=bk,bd=BUILDS[bk];g.build=bk;if(BCAT[bk]){g.bfav=BCAT[bk];g.bdm=bd.dm*(1+.08*Math.max(0,4-buildCount(job,bk)));g.bcd=bd.cd;g.bsk=buildSkill(job,bk);g.wep[g.bsk.id]={l:lv0+1,cd:.5,a:0,tick:0,s:g.bsk};const f2=chain(job).slice().reverse().filter(id=>id!=='novice'||job==='novice').flatMap(id=>JM[id].sk).find(s2=>g.bfav.includes(s2.k)&&!g.wep[s2.id]);if(f2)g.wep[f2.id]={l:lv0,cd:.6,a:0,tick:0,s:f2}}if(bd.perk)bd.perk(g)}
 }
+const GAP_HP=.04,GAP_DMG=.03;
+function applyGap(mul,gap){mul.gap=gap;if(gap>0){mul.hp*=1+GAP_HP*gap;mul.dmg*=1+GAP_DMG*gap}}
 function newRun(stage,trialJob,o){
   o=o||{};const st=calcStats(),job=trialJob||SV.job,mode=o.mode||'stage',heat=mode==='stage'?(o.heat||0):0;
   let mul={hp:1+.35*heat,dmg:1+.2*heat,rw:1+.3*heat,exp:1,zeny:1,card:1};
   if(mode==='tower'){stage=towerStage(o.floor);mul=towerMul(o.floor)}
   if(mode==='dungeon'){mul={hp:1.4,dmg:1.25,rw:1.5,exp:1,zeny:1,card:1,...DUNG[o.dtype].mul}}
+  const gap=(mode==='raid'||mode==='def'||trialJob)?0:Math.max(0,STAGES[mode==='dungeon'?dungStage():stage].rec+(mode==='dungeon'?5:0)-SV.blv);applyGap(mul,gap);
   G={heat,cur:{spawn:1+.12*heat,taken:1,hp:1,drop:1},t:0,mode,floor:o.floor||0,startFloor:o.floor||0,ft:0,dtype:o.dtype,mul,speed:1,bossT:mode==='dungeon'?180:BOSS_T,eliteGap:mode==='dungeon'?30:60,stage,trial:!!trialJob,job,skin:curSkin(),kills:0,lvl:1,xp:0,need:xpNeed(1),pend:0,
     p:{x:0,y:0,r:13,hp:st.hp,max:st.hp,spd:150,fx:1,fy:0,face:1,inv:0,mv:false},
     st:mkRunSt(st),
@@ -1129,6 +1132,7 @@ function newRun(stage,trialJob,o){
     rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[],bones:0}};
   const lv0=1+st.bonusLv;initLoadout(G,job,trialJob?'balance':curBuild(job),lv0);
   if(st.freePick)G.pend=1;
+  if(G.mul.gap>=3)setTimeout(()=>{if(G&&state==='play')banner(`越級挑戰：比推薦低 ${G.mul.gap} 級，怪物血量 ×${(1+GAP_HP*G.mul.gap).toFixed(2)}、攻擊 ×${(1+GAP_DMG*G.mul.gap).toFixed(2)}`)},3200);
   banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
   $('spdb').classList.toggle('hide',!!trialJob||!(mode!=='stage'||(SV.cleared||0)>stage));$('spdb').textContent='×1';
   state='play';show(null);$('pbtn').classList.remove('hide');$('dashb').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
@@ -1597,6 +1601,7 @@ function newCoopRun(o){
   newRun(tier.stage,null,{mode:o.mode==='def'?'def':'raid'});
   G.pet=null;G.bossT=1e9;G.eliteGap=50;G.eliteT=50;
   G.mul.hp*=1+.4*(n-1);G.cur.spawn*=1+.15*(n-1);
+  {const lvs=o.roster.map(r=>numIn((r.pf||{}).lv,1,99,1)),avg=lvs.reduce((a,b)=>a+b,0)/lvs.length;applyGap(G.mul,Math.max(0,Math.round(tier.rec-avg)))}
   const room=o.room||NOROOM;
   G.coop={role:o.role,room,me:room.me,host:o.host||room.me,mates:[],byId:new Map(),emap:new Map(),tsnap:0,hits:[],heal:0,ht:0,pt:0,lv:null,mode:o.mode,tier:o.tier,n,ended:false,wsT:0,since:0};
   G.me={id:G.coop.me,p:G.p,st:G.st,wep:G.wep,pas:G.pas,bfav:G.bfav,bdm:G.bdm,bcd:G.bcd,build:G.build,bsk:G.bsk,vis:false,name:dogName(),sk:G.skin,j:G.job,w:SV.wear||{}};
@@ -2012,8 +2017,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.25.1';
+const VERSION='0.25.2';
 const NEWS=[
+ {v:'0.25.2',d:'11/25',t:'越級挑戰變難・難度倍率看得到',items:[['平衡','越級打怪變難：等級每比關卡推薦等級低 1 級，怪物血量 +4%、攻擊 +3%（例如低 24 級：血量 ×1.96、攻擊 ×1.72）。每日副本、無限之塔也一樣；團隊副本照全隊平均等級算。關卡卡片和開場都會寫出現在的倍率'],['調整','選難度時會直接顯示那一級的倍率：怪物血量、攻擊、數量各變幾倍，獎勵幾倍，第一次通過送幾根骨頭']]},
  {v:'0.25.1',d:'11/25',t:'團隊副本場地邊界看得到了',items:[['修正','團隊副本的場地有邊界，之前是看不到的牆，走到邊緣會突然卡住；現在邊界外面是一圈灰霧，邊緣有虛線，走到邊上會提示'],['調整','團隊副本的場地變大：討伐魔王 1100、守護彩虹橋 760（原本 820、640）']]},
  {v:'0.25.0',d:'11/25',t:'配對等待時間自己選',items:[['新增','團隊副本隨機配對可以自己選最多等多久：不等、15 秒、30 秒、60 秒，時間到湊不滿就補 AI'],['新增','配對中多了「不等了，補 AI 開打」按鈕，隨時可以直接開打']]},
  {v:'0.24.9',d:'11/25',t:'主城狗狗當 AI 隊友・不再黏在一起',items:[['修正','團隊副本的 AI 隊友會互相保持距離、分散在你身邊和魔王周圍不同方向，不會再全部疊在同一個位置'],['新增','AI 隊友改成主城裡的狗狗和 NPC 來幫忙：可能是庫里、巴塔、阿布、大熊、雪球、隊長……，外型和名字都跟主城一樣，同一場不會重複']]},
@@ -2150,7 +2156,7 @@ function renderHub(){
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級，會很難喔</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；獎勵 ×${(1+.3*h).toFixed(1)}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、獎勵 +30%"})()}</small>`:''}`}</div>`}).join('')}</div>
       <h3 style="margin-top:18px">團隊副本　<span class="note">徽章 ${SV.raidTok||0} 個</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><p class="note" style="margin:0;flex:1;min-width:200px">和好友或隨機玩家 2／4／6 人一起打「灰霧大魔王討伐」或「守護彩虹橋」，湊不到人會補 AI 狗狗。</p><button class="btn sm" data-tab="team">前往團隊副本</button></div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
       <div class="box"><p class="note" style="margin-top:0">一路往上爬：每層撐 40 秒後打倒守衛就上樓，招式和強化會一直帶著，每 10 層換一個區域、越爬越難。每通過 5 層多拿 1 根骨頭。每 10 層是存檔點，可以直接從那裡開始。</p><div class="tcp">${(()=>{const cps=[1];for(let f=11;f<=(SV.towerBest||0)+1;f+=10)cps.push(f);return cps.reverse().map((f,i)=>`<button class="btn sm${i?' ghost':''}" data-tower="${f}">第 ${f} 層<small>${STAGES[towerStage(f)].n}${i===0?'・最高':''}</small></button>`).join('')})()}</div><p class="note">每打通 10 層就會解鎖下一個起點，可以直接從那裡開始。塔裡可以按右下角「×1／×2」加速。</p></div>
