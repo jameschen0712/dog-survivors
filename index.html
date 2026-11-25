@@ -2005,8 +2005,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.4';
+const VERSION='0.24.5';
 const NEWS=[
+ {v:'0.24.5',d:'11/25',t:'修正點螢幕會卡一下',items:[['修正','有些手機（尤其 iPhone 開靜音或在 LINE 等 App 裡開）戰鬥中每點一下螢幕，遊戲就會嘗試重新啟動聲音，造成畫面卡一下；現在不會每次點都重試，最多偶爾試一次']]},
  {v:'0.24.4',d:'11/25',t:'兩隻幼犬寵物',items:[['新增','孵蛋婆婆那裡多了兩隻幼犬寵物（史詩）：黃金獵犬幼犬「金金」（傷害 +6%）、瑪爾濟斯幼犬「棉棉」（移動速度 +6%），會跟在狗狗身邊跑']]},
  {v:'0.24.3',d:'11/25',t:'對話按鈕置中',items:[['修正','主城的「跟 ○○ 說話」按鈕有時候會偏到右邊（換成比較長的名字時，iPhone 的動畫會用到舊的寬度），現在固定在正中間']]},
  {v:'0.24.2',d:'11/25',t:'新手目標引導',items:[['新增','主城上方多了「🎯 下一步」目標：告訴你現在該做什麼（出戰、打魔王、點屬性、穿裝備、點天賦、轉職、打第二關），按「帶我去」直接打開；目標 NPC 頭上會有黃色箭頭，每完成一個送 🦴2'],['調整','第一次進主城的說明改短，先講清楚這遊戲在玩什麼：出戰撿寶石升級打魔王 → 回城變強 → 打下一關']]},
@@ -2798,9 +2799,9 @@ function sched(){if(!AU.ctx||!AU.T||AU.ctx.state!=='running')return;const T=AU.T
 for(const name of Object.keys(TRACKS)){try{const a=new Audio();a.preload='auto';a.addEventListener('canplaythrough',()=>{AU.files[name]=a;if(AU.cur===name)playMusic(name,true)},{once:true});a.addEventListener('error',()=>{},{once:true});a.src='audio/'+name+'.mp3'}catch(e){}}
 addEventListener('pointerdown',auInit,true);addEventListener('keydown',auInit,true);addEventListener('touchend',auInit,true);
 /* tab switching: silence while hidden, and make sure sound comes back afterwards (iOS can leave the context 'interrupted') */
-function auWake(){const c=AU.ctx;if(!c||document.hidden)return;
-  if(c.state!=='running'){c.resume().catch(()=>{});clearTimeout(AU.wakeT);AU.wakeT=setTimeout(()=>{if(AU.ctx===c&&c.state!=='running'&&!document.hidden)auRebuild()},400)}
-  if(AU.el&&AU.el.paused)AU.el.play().catch(()=>{})}
+function auWake(){const c=AU.ctx;if(!c||document.hidden)return;const now=performance.now();
+  if(c.state!=='running'){if(now-(AU.wakeAt||-1e9)<2500)return;AU.wakeAt=now;c.resume().catch(()=>{});clearTimeout(AU.wakeT);AU.wakeT=setTimeout(()=>{if(AU.ctx===c&&c.state!=='running'&&!document.hidden&&now-(AU.rebAt||-1e9)>15000&&(AU.rebN=(AU.rebN||0)+1)<=3){AU.rebAt=now;auRebuild()}},600)}
+  if(AU.el&&AU.el.paused&&AU.vol&&AU.vol.on&&now-(AU.elAt||-1e9)>3000){AU.elAt=now;AU.el.play().catch(()=>{})}}
 function auRebuild(){const old=AU.ctx,want=AU.want||AU.cur;try{old&&old.close()}catch(e){}AU.ctx=null;AU.bus=null;AU.cur=null;AU.want=want;auInit()}
 function auHide(){if(AU.el)AU.el.pause();if(AU.ctx&&AU.ctx.state==='running')AU.ctx.suspend().catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)auHide();else auWake()});
