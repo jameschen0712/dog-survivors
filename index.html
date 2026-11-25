@@ -73,7 +73,7 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .tl{stroke:#3a3f55;stroke-width:5;fill:none;stroke-linecap:round}.tl.on{stroke:var(--c);filter:drop-shadow(0 0 4px var(--c))}
 .tnode{cursor:pointer}.tnode .tsh{fill:#1e2236;stroke:#555c7a;stroke-width:3}.tnode.got .tsh{fill:color-mix(in srgb,var(--c) 45%,#1e2236);stroke:var(--c);filter:drop-shadow(0 0 6px var(--c))}.tnode.max .tsh{fill:var(--c);stroke:#fff6c0}.tnode.can .tsh{stroke:#f5c542;stroke-dasharray:4 3}.tnode.lock{opacity:.45}.tnode.sel .tsh{stroke:#fff;stroke-width:4}
 .tg{font:900 16px "Noto Sans TC",sans-serif;fill:#fff;text-anchor:middle;pointer-events:none}.tr{font:700 11px Fredoka,sans-serif;fill:#cfd4ea;pointer-events:none}.tbn{font:900 14px "Noto Sans TC",sans-serif;text-anchor:middle}.troot{fill:#3a2a10;stroke:#f5c542;stroke-width:4;filter:drop-shadow(0 0 8px #f5c542)}
-.tdet{margin-top:10px;background:#fff;border:3px solid #ddd;border-radius:14px;padding:10px 12px}.tdet p{margin:6px 0}
+.tdet{position:sticky;bottom:0;z-index:2;margin-top:8px;background:#fff;border:3px solid #ddd;border-radius:14px;padding:8px 12px;box-shadow:0 -6px 16px rgba(0,0,0,.18)}.tdet p{margin:6px 0}
 #guideBox{position:absolute;left:50%;transform:translateX(-50%);top:74px;width:min(420px,calc(100% - 20px));pointer-events:auto}.guide{background:rgba(255,248,230,.95);color:#3a2a10;border:2px solid #f5c542;border-radius:12px;padding:6px 8px;box-shadow:0 4px 12px rgba(0,0,0,.22);display:grid;grid-template-columns:1fr auto;gap:0 6px;align-items:center}.guide b{font-size:13px;line-height:1.35}.guide small{grid-column:1/-1;font-size:11px;color:#6a5a3a;line-height:1.4}.guide .gbtns{display:flex;gap:4px;grid-row:1;grid-column:2}.guide .btn.sm{padding:4px 8px;font-size:12px;min-height:0}
 .ch.evo{border-color:#f5c542;background:linear-gradient(90deg,#fff8dc,#fff)}
 .ch b,.ico{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:900 22px "Noto Sans TC",sans-serif;color:#1b1408}
@@ -1958,7 +1958,7 @@ async function charClick(v){const [a,x]=v.split(':'),i=+x;
     for(const it of [...Object.values(c.eq||{}),...(c.inv||[])])if(it)SV.stor.push(it);const cur=SV.chars[SV.slot];SV.chars.splice(i,1);SV.slot=SV.chars.indexOf(cur);save();renderHub();return}}
 let talSel=null;
 function talTreeHTML(pts){
-  const W=360,H0=590,cx=[62,180,298],y0=528,dy=56,nodeY=ni=>y0-70-ni*dy;
+  const W=360,H0=500,cx=[62,180,298],y0=452,dy=47,nodeY=ni=>y0-70-ni*dy;
   let lines='',nodes='';
   TB.forEach((br,bi)=>{const sp=brSpent(bi),x=cx[bi];
     const first=(SV.tal[br.nodes[0][0]]||0)>0;
@@ -1976,7 +1976,7 @@ function talTreeHTML(pts){
       <p>${r?'現在：'+n[3](r):'還沒點'}${!mx?`<br><span class="note">點了之後：${n[3](r+1)}</span>`:''}</p>
       ${lock?`<p class="note" style="color:#c0392b">要先在「${br.n}」投滿 ${TREQ[ni]} 點才能點（現在 ${sp} 點）</p>`:''}
       <button class="btn sm" data-tal="${n[0]}" ${lock||mx||pts<=0?'disabled':''}>${mx?'已經點滿':pts<=0?'沒有點數了':'點一下 +1'}</button></div>`}
-  else det='<div class="tdet"><span class="note">點樹上的圖示看說明和加點。越往上越強；每條分支投的點數夠了，上面一格才會打開。菱形是只要 1 點的特殊天賦，最上面的星星沒有上限。</span></div>';
+  else det='<div class="tdet"><span class="note">點一下圖示看說明，<b>再點一下同一個圖示就加 1 點</b>。越往上越強；每條分支投的點數夠了，上面一格才會打開。菱形是只要 1 點的特殊天賦，最上面的星星沒有上限。</span></div>';
   return `<h3>天賦　<span class="note">剩餘 ${pts} 點（每升 1 Job Lv 得 1 點）</span></h3>
   <div class="ttree"><svg viewBox="0 0 ${W} ${H0}" preserveAspectRatio="xMidYMid meet">${lines}${nodes}</svg></div>${det}
   <p><button class="btn sm" id="talAuto" ${pts<=0?'disabled':''}>自動分配剩下的點數</button> <button class="btn sm ghost" id="resetTal">重置天賦（免費）</button></p>`}
@@ -2006,8 +2006,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.7';
+const VERSION='0.24.8';
 const NEWS=[
+ {v:'0.24.8',d:'11/25',t:'天賦樹好點多了',items:[['調整','天賦樹不用再上下滑：樹變矮一點，說明框固定在畫面下方；點一下圖示看說明，再點一下同一個圖示就直接加 1 點']]},
  {v:'0.24.7',d:'11/25',t:'寶箱自動關閉',items:[['調整','戰鬥中開寶箱的結果視窗，幾秒後會自動關掉繼續戰鬥（按鈕上會倒數；有開「自動選強化」的話更快），掛著玩也不會卡住']]},
  {v:'0.24.6',d:'11/25',t:'難度選擇改得更清楚',items:[['調整','難度改成「先選再出發」：關卡下面有「普通、難1～難5」可以點選，選好後「出發」按鈕會寫「出發（難1）」，確定是用那個難度在打；打倒該難度的魔王才會打開下一級，打過的會打勾。之前「出發」永遠是普通難度，黃色的「難1」容易被誤會成已經選好的難度']]},
  {v:'0.24.5',d:'11/25',t:'修正點螢幕會卡一下',items:[['修正','有些手機（尤其 iPhone 開靜音或在 LINE 等 App 裡開）戰鬥中每點一下螢幕，遊戲就會嘗試重新啟動聲音，造成畫面卡一下；現在不會每次點都重試，最多偶爾試一次']]},
@@ -2252,7 +2253,7 @@ const UNCARD=500,BONE_DAY=10;
 function boneBuyN(){const d=new Date().toDateString();if(!SV.boneBuy||SV.boneBuy.d!==d)SV.boneBuy={d,n:0};return SV.boneBuy.n}
 const boneCost=()=>1000*(boneBuyN()+1);
 function hubClick(e){
-  {const g=e.target.closest&&e.target.closest('[data-tsel]');if(g){talSel=g.dataset.tsel===talSel?null:g.dataset.tsel;sfx('ui');renderHub();return}}
+  {const g=e.target.closest&&e.target.closest('[data-tsel]');if(g){const id=g.dataset.tsel;if(id===talSel){const bi=TB.findIndex(x=>x.nodes.some(y=>y[0]===id)),ni=TB[bi].nodes.findIndex(y=>y[0]===id),n=TB[bi].nodes[ni];if(SV.tpe-tSpent()>0&&(SV.tal[id]||0)<n[2]&&brSpent(bi)>=TREQ[ni]){SV.tal[id]=(SV.tal[id]||0)+1;save();sfx('lvl')}else sfx('ui')}else{talSel=id;sfx('ui')}const sc=$('hbody').scrollTop;renderHub();$('hbody').scrollTop=sc;return}}
   if(e.target.id==='autoEqChk'){SV.autoEq=e.target.checked;save();return}
   if(e.target.id==='autoSellChk'){SV.autoSell=e.target.checked;save();return}
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
