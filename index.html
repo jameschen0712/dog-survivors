@@ -38,6 +38,8 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .sub{margin:0 0 12px;color:#6b5a40;font-size:15px}
 .btn{background:var(--gold);color:#2a1a05;border:0;border-radius:12px;padding:11px 20px;font:900 16px "Noto Sans TC",sans-serif;cursor:pointer;min-height:44px;margin:4px;box-shadow:0 4px 0 #b88a1e}
 .tcp{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.tcp .btn{display:flex;flex-direction:column;align-items:center;line-height:1.2;margin:0}.tcp small{font-size:11px;font-weight:400;opacity:.8}
+.intro{background:#fff3d0;border:2px dashed #e0b860;border-radius:12px;padding:8px 12px;margin:0 0 8px;font-size:14px;line-height:1.55;text-align:left;color:#4a3410}
+.bldbox>summary{cursor:pointer;list-style:none}.bldbox>summary::-webkit-details-marker{display:none}.bldbox>summary::before{content:'▸ ';color:#a8741a}.bldbox[open]>summary::before{content:'▾ '}
 .btn.ghost{background:transparent;box-shadow:inset 0 0 0 2px #c9b88a}
 .btn.sm{padding:6px 12px;min-height:36px;font-size:14px;box-shadow:0 3px 0 #b88a1e}
 .btn.sm.ghost{box-shadow:inset 0 0 0 2px #c9b88a}
@@ -214,9 +216,10 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
         <div class="tabs" id="tabs"></div>
         <div class="hbody" id="hbody"></div>
       </div>
-      <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。其他毛色可以在城鎮「造型」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
+      <div class="ov hide" id="nameov" style="z-index:60"><div class="card" style="max-width:400px"><h2 id="nameT">幫你的狗狗取個名字吧</h2><canvas id="nameDog" width="240" height="180" style="width:150px;height:112px"></canvas><p class="note" style="margin:2px 0 8px">名字會顯示在主城裡狗狗的頭上，你的狗屋也會變成「名字的家」。最多 10 個字，之後隨時可以改。</p><div style="display:flex;gap:6px;justify-content:center"><input id="nameIn" maxlength="10" autocomplete="off" aria-label="狗狗的名字" style="font:inherit;font-size:20px;padding:8px 12px;border-radius:12px;border:2px solid #d8c99a;width:180px;text-align:center;background:#fff;color:#2a1a05"><button class="btn sm ghost" id="nameRnd" aria-label="隨機取名">隨機</button></div><p class="note" id="nameMsg" style="min-height:1.2em;margin:6px 0"></p><button class="btn" id="nameOk">就叫這個名字</button></div></div>
+      <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><div class="intro" id="breedIntro"><b>汪汪倖存者</b>是一款打怪生存遊戲：狗狗會<b>自動攻擊</b>，你只要<b>移動閃躲</b>、撿寶石升級挑強化，撐到時間到再打倒魔王！打完回城鎮轉職、換裝備、抽時裝，越來越強。</div><p class="sub">每隻狗只是外表不同，能力都一樣，選你最喜歡的就好（之後也能換）。其他毛色可以在城鎮「毛色」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
       <div class="ov hide" id="jobov"><div class="card wide" style="text-align:left"><h2 id="jobT" style="text-align:center">轉職</h2><p class="note" id="jobSub" style="text-align:center;margin:-6px 0 8px"></p><div id="jobs" class="jobs"></div><div id="jobD" class="jobd"></div><div class="jbtns"><button class="btn" id="jobOk">選這個職業</button><button class="btn ghost" id="jobTry">試玩看看</button><button class="btn ghost" id="jobCancel">先不要</button></div></div></div>
-      <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
+      <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint" id="lvHint">也可以按數字鍵選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><p class="note" style="margin:2px 0 6px;font-size:12px">小地圖：<b style="color:#ffb43a">■</b> 寶箱　<b style="color:#e84a5f">∩</b> 磁鐵　<b style="color:#5fe38a">✚</b> 大骨頭（回血）　<b style="color:#fff6b0">★</b> 祭壇　<b style="color:#ffa53a">●</b> 菁英　<b style="color:#c45aff">●</b> 魔王</p><button class="btn ghost" id="lowPowBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="moveov" style="z-index:40"><div class="card" style="max-width:440px"><h2>🏠 汪汪倖存者搬家了！</h2><p>新網址：<br><b style="font-size:1.05em;white-space:nowrap;user-select:all">wangwang-survivors.pages.dev</b></p><p style="font-size:.92em;opacity:.85">按下面的按鈕，會把這台裝置上的進度一起帶過去。<br>有登入雲端存檔的話，到新網址登入同一個帳號也可以。</p><p><button class="btn" id="moveGo">帶著存檔搬過去</button></p><p><button class="btn ghost" id="moveStay" style="font-size:.85em">先留在舊網址</button></p></div></div>
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
@@ -278,6 +281,7 @@ const B={
  lab:['拉布拉多','flop',.6,'straight',1.1,{}],
  border:['邊境牧羊犬','fold',.6,'fluff',1,{}],
  husky:['哈士奇','up',.6,'curl',1.1,{husky:1}]};
+const BPERS={shiba:'倔強又忠心',corgi:'短腿跑超快',poodle:'聰明愛漂亮',dachs:'長長的好奇寶寶',chihuahua:'小小但很勇敢',westie:'白白蓬蓬開心果',golden:'溫柔的大暖男',lab:'愛吃又愛玩',border:'超聰明工作狂',husky:'愛嚎叫的戲精'};
 const REC={shiba:'幼犬見習生、護衛犬',corgi:'跑腿犬',poodle:'巫犬',dachs:'護衛犬',chihuahua:'牛仔犬',westie:'超級幼犬',golden:'搗蛋犬',lab:'療癒犬',border:'巫犬',husky:'護衛犬'};
 /* skin: id, breed, name, rarity(0 basic,1 R,2 SR,3 SSR), fur, fur2, pattern, special effect */
 const SKINS=[
@@ -508,7 +512,7 @@ const ACH=[
  ['a_job1','完成一轉',()=>JM[SV.job].tier>=1,5],['a_job2','完成二轉',()=>JM[SV.job].tier>=2,10],['a_job3','完成進階二轉',()=>JM[SV.job].tier>=3,15],['a_job4','完成三轉',()=>JM[SV.job].tier>=4,30],
  ['a_t10','無限之塔 10 層',()=>(SV.towerBest||0)>=10,5],['a_t30','無限之塔 30 層',()=>(SV.towerBest||0)>=30,15],['a_t60','無限之塔 60 層',()=>(SV.towerBest||0)>=60,30],
  ['a_card5','收集 5 種卡片',()=>Object.keys(SV.cardSeen||{}).length>=5,5],['a_card15','收集 15 種卡片',()=>Object.keys(SV.cardSeen||{}).length>=15,15],
- ['a_skin10','收集 10 款造型',()=>SV.owned.length>=10,10],['a_skin30','收集 30 款造型',()=>SV.owned.length>=30,30],['a_cos20','收集 20 件時裝',()=>(SV.cown||[]).length>=20,15],['a_cos80','收集 80 件時裝',()=>(SV.cown||[]).length>=80,40],['a_cosset','集滿一整套時裝',()=>cosSets().length>=1,20],
+ ['a_skin10','收集 10 款毛色',()=>SV.owned.length>=10,10],['a_skin30','收集 30 款毛色',()=>SV.owned.length>=30,30],['a_cos20','收集 20 件時裝',()=>(SV.cown||[]).length>=20,15],['a_cos80','收集 80 件時裝',()=>(SV.cown||[]).length>=80,40],['a_cosset','集滿一整套時裝',()=>cosSets().length>=1,20],
  ['a_blv20','Base Lv 20',()=>SV.blv>=20,5],['a_blv50','Base Lv 50',()=>SV.blv>=50,15],
  ['a_boss10','打倒 10 隻魔王或守衛',()=>(SV.st||{}).bosses>=10,10],['a_dung5','完成 5 次副本',()=>(SV.st||{}).dungeons>=5,10],['a_pet3','擁有 3 隻寵物',()=>Object.keys(SV.pets||{}).length>=3,5]];
 /* daily & weekly quests */
@@ -540,9 +544,11 @@ let SV=loadSave();
 function save(){SV.seen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV))}catch(e){}if(window.DogCloud)DogCloud.queue(SV)}
 const CLOUD=()=>window.DogCloud&&DogCloud.enabled;
 function fixItem(it){if(it.slots===undefined)it.slots=Math.min(3,[0,1,1,2,2][it.rar]||0);if(!it.cards)it.cards=[];return it}
+const cleanName=x=>String(x||'').replace(/[\u0000-\u001f\u007f<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,10);
+const dogName=()=>cleanName(SV.name)||SKM[curSkin()].n;
 const curSkin=()=>(SV.skin&&SV.skin[SV.breed])||BASE[SV.breed||'shiba'];
 const owns=id=>SKM[id]&&(SKM[id].rar===0||SV.owned.includes(id));
-const bNeed=l=>Math.floor(42*l**1.5*1.05**Math.max(0,l-40)),jNeed=(l,t)=>Math.floor((16+11*t)*l+12);
+const bNeed=l=>Math.floor(42*l**1.5*1.05**Math.max(0,l-40)),jNeed=(l,t)=>Math.floor((25+22*t)*l**1.5);
 
 /* ---------- talents ---------- */
 const TB=[
@@ -1003,7 +1009,7 @@ function newRun(stage,trialJob,o){
   $('spdb').classList.toggle('hide',!!trialJob||!(mode!=='stage'||(SV.cleared||0)>stage));$('spdb').textContent='×1';
   state='play';show(null);$('pbtn').classList.remove('hide');$('dashb').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
   try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
-  if(!trialJob)showTip('run','怎麼玩',`・<b>移動</b>：WASD／方向鍵，或按住滑鼠讓狗跟著游標走；手機按住畫面拖曳<br>・<b>攻擊</b>：招式會自動瞄準最近的怪物施放<br>・<b>升級</b>：撿寶石累積經驗，升級時三選一強化<br>・<b>紅色磁鐵</b>：撿到會把畫面上的東西全部吸過來<br>・${mode==='tower'?'每層撐 40 秒後打倒守衛就能上樓':'撐到時間到、打倒魔王就通關'}`)
+  if(!trialJob)showTip('run','怎麼玩',`・<b>移動</b>：WASD／方向鍵，或按住滑鼠讓狗跟著游標走；手機按住畫面拖曳<br>・<b>攻擊</b>：招式會自動瞄準最近的怪物施放<br>・<b>升級</b>：撿寶石累積經驗，升級時從幾個強化裡挑一個<br>・<b>紅色磁鐵</b>：撿到會把畫面上的東西全部吸過來<br>・${mode==='tower'?'每層撐 40 秒後打倒守衛就能上樓':'撐到時間到、打倒魔王就通關'}`)
 }
 const xpNeed=l=>Math.floor(3+l*2.5+l*l*.45);
 const fmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
@@ -1043,7 +1049,7 @@ function hurt(e,d,kx,ky,kb,col){
 function kill(e){
   e.dead=true;G.kills++;if(e.elite)G.eliteKills=(G.eliteKills||0)+1;if(e.aff){if(e.aff.includes('split'))for(let i=0;i<4;i++){const s2=spawnEnemy(e.type,false,e.x+R(-20,20),e.y+R(-20,20));s2.hp*=2;s2.max=s2.hp}if(e.aff.includes('boom'))G.Z.push({k:'bz',x:e.x,y:e.y,R:90,life:.9,max:.9,dmg:Math.round(e.dmg*1.2),c:'#ff6a2e'})}if(G.st.leech)heal(G.st.leech);if(e.boss)G.bossKills=(G.bossKills||0)+1;const ec=EC[e.type]||'#e8f5c8';fx({k:'poof',x:e.x,y:e.y,R:e.r*1.8,c:ec,life:.28,max:.28});for(let i=0;i<(e.boss?30:7);i++){const a=R(0,TAU),v=R(80,240);fx({k:'chunk',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-140,s:R(2,4.5)*(e.r/12),c:ec,life:.5,max:.5,g:700})}
   const sg=STAGES[G.stage],xp=e.boss?200:e.elite?20:ET[e.type].xp;
-  const xm=2.25*sg.rw*G.st.exp*Math.min(G.mul.rw,1.6)*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*(e.guard?.4:1);
+  const xm=2.25*sg.rw*G.st.exp*Math.min(G.mul.rw,1.6)*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*.6*(e.guard?.4:1);
   {const zv=Math.round((e.boss?(e.guard?150:600):e.elite?60:R(1,4)/.4)*sg.rw*G.st.zeny*G.mul.rw*G.mul.zeny),nc=e.boss?10:e.elite?5:(Math.random()<.4?1:0);for(let i=0;i<nc;i++)G.J.push({x:e.x+R(-18,18),y:e.y+R(-18,18),v:0,coin:Math.max(1,Math.round(zv/nc)),m:false})}
   if(!G.trial){const cr=(G.dtype==='card'&&e.boss&&!e.guard)?1:(e.boss?(e.guard?.08:CARD_RATE.boss):e.elite?CARD_RATE.elite:CARD_RATE.normal)*G.mul.card*G.cur.drop;if(Math.random()<cr){const cid=e.boss?'c_b'+G.stage:'c_'+e.type;if(CM[cid]){G.rw.cards.push(cid);txt(e.x,e.y-44,`獲得 ${CM[cid].n}！`,'#ff9ec4',true);sfx('job');fx({k:'ring',x:e.x,y:e.y,R:60,c:'#ff9ec4',life:.5,max:.5,fill:1})}}
     if(e.guard){G.rw.items.push(genItem(G.stage,G.floor%10===0?2:G.floor%5===0?1:0))}else if(e.boss){G.bossPick=[genItem(G.stage,2),genItem(G.stage,2),genItem(G.stage,Math.random()<.35?3:2)]}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004*G.cur.drop)G.rw.items.push(genItem(G.stage,0))}
@@ -1131,7 +1137,9 @@ function setTimeout0(delay,fn){G.Z.push({k:'later',life:delay,max:delay||1,fn})}
 function orbN(w){return Math.min(w.evo?8:6,1+(w.evo?8:w.l))}
 function orbPos(w,i){const n=orbN(w),Rr=(70+6*(w.evo?8:w.l))*G.st.area,a=w.a+i*TAU/n;return [G.p.x+Math.cos(a)*Rr,G.p.y+Math.sin(a)*Rr,a]}
 const auraR=w=>(75+8*(w.evo?8:w.l))*G.st.area*(w.s.x.big?1.25:1);
+function bossRoar(){const p=G.p;G.shake=Math.max(G.shake,.35);fx({k:'ring',x:p.x,y:p.y,R:320,c:'#ffe27a',life:.6,max:.6});for(const e of G.E){if(e.dead||e.boss||e.elite)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;if(d<340){e.kx+=dx/d*900;e.ky+=dy/d*900;e.slow=Math.max(e.slow,2)}}}
 function bossAI(e,dt){
+  if(e.ent>0){e.ent-=dt;return}
   e.at-=dt;e.st-=dt;const p=G.p,sd=STAGES[G.stage].dmg*(G.mul?G.mul.dmg:1);
   if(e.type==='spiderq'){if(e.at<=0){e.at=2.6;const a0=Math.atan2(p.y-e.y,p.x-e.x);for(let i=-1;i<=1;i++){const a=a0+i*.3;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*210,vy:Math.sin(a)*210,r:9,dmg:10*sd,life:4,web:1})}}if(e.st<=0){e.st=6;for(let i=0;i<5;i++){const a=i*TAU/5;spawnEnemy('spider',false,e.x+Math.cos(a)*60,e.y+Math.sin(a)*60)}}return}
   if(e.type==='lavagiant'){if(e.at<=0){e.at=2.4;for(let i=0;i<4;i++)G.Z.push({k:'bz',x:p.x+R(-90,90),y:p.y+R(-90,90),R:55,life:1.1,max:1.1,dmg:18*sd,c:'#ff6a2e'})}if(e.st<=0&&e.hp<e.max*.5){e.st=4;const n=16,o=R(0,TAU);for(let i=0;i<n;i++){const a=o+i*TAU/n;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*180,vy:Math.sin(a)*180,r:8,dmg:12*sd,life:4,fire:1})}}return}
@@ -1162,16 +1170,16 @@ function update(dt){
 
   G.spawn-=dt;
   const TT=tE();
-  if(G.spawn<=0){G.spawn=Math.max(.16,(TT<60?1.3:1)-TT/300)*(G.boss?1.6:1);const n=Math.round((1+Math.floor(TT/55))*G.cur.spawn);for(let i=0;i<n&&G.E.length<(IS_TOUCH?260:380);i++)spawnEnemy(pickType(TT))}
+  if(G.spawn<=0){G.spawn=Math.max(.16,.9-TT/330)*(G.boss&&!G.boss.guard?2.2:G.boss?1.6:1);const nf=(1+TT/75)*G.cur.spawn,n=Math.floor(nf)+(Math.random()<nf%1?1:0);for(let i=0;i<n&&G.E.length<(IS_TOUCH?260:380);i++)spawnEnemy(pickType(TT))}
   if(G.t>=G.eliteT){G.eliteT+=G.eliteGap;spawnEnemy(pickType(TT),true)}
-  if(G.mode!=='tower'){const P=STAGES[G.stage].pool;if(!G.ring2&&G.t>=110){G.ring2=1;ring(P[1],28)}if(!G.ring4&&G.t>=220){G.ring4=1;ring(P[2],32)}}
+  if(G.mode!=='tower'){const P=STAGES[G.stage].pool;if(!G.ringW&&G.t>=105){G.ringW=1;banner('小心！怪物要從四面八方包圍過來了')}if(!G.ring2&&G.t>=110){G.ring2=1;ring(P[1],G.stage===0&&!G.heat?18:28)}if(!G.ring4&&G.t>=220){G.ring4=1;ring(P[2],32)}}
   if(G.mode==='tower'){G.ft+=dt;if(!G.boss&&G.ft>=40){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,sg=STAGES[G.stage],hp=4200*sg.hp*G.mul.hp*.16;const e={type:sg.bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:34,hp,max:hp,spd:46,dmg:Math.round(18*sg.dmg*G.mul.dmg),boss:true,guard:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};G.E.push(e);G.boss=e;banner(`第 ${G.floor} 層守衛出現了！`);sfx('bossin');playMusic('boss'+G.stage)}}
   G.shT=(G.shT||70)-dt;if(G.shT<=0&&!G.boss){G.shT=75;const a=R(0,TAU);G.Z.push({k:'shrine',x:p.x+Math.cos(a)*260,y:p.y+Math.sin(a)*260,life:35,max:35});banner('附近出現了祭壇！')}
   if(G.mode!=='tower'&&!G.warned&&G.t>=G.bossT-15){G.warned=1;banner(`${STAGES[G.stage].boss}即將出現！`);sfx('bossin')}
   if(G.mode!=='tower'&&G.boss&&!G.bossDone&&G.t>=G.bossT+BOSS_ESC&&!G.winT){G.escaped=1;sfx('lose');end(false);return}
   if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp;
     const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};
-    G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin')}
+    e.ent=2.5;G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin');bossRoar()}
   if(G.winT>0){G.winT-=dt;if(G.winT<=0){end(true);return}}
 
   buildGrid();
@@ -1210,7 +1218,7 @@ function update(dt){
     else if(z.k==='falcon'){if(z.life<=0){const t=z.t;if(!t.dead){hurt(t,z.dmg,0,-1,80);fx({k:'impact',x:t.x,y:t.y,c:z.c,R:26,life:.2,max:.2});sparks(t.x,t.y,10,'#fff',220);if(z.big)areaHit(t.x,t.y,60,z.dmg*.6,80)}continue}}
     else if(z.k==='pillar'){if(z.life<=0){fx({k:'beam',x:z.x,y:z.y,w:z.R*1.1,c:z.c,life:.45,max:.45});for(let i=0;i<8;i++)fx({k:'plus',x:z.x+R(-12,12),y:z.y,vy:-R(60,140),c:z.fire?'#ffcf4a':'#fff6c0',life:.6,max:.6});areaHit(z.x,z.y,z.R,z.dmg,60);continue}}
     else if(z.k==='shrine'){if(!z.used&&Math.hypot(G.p.x-z.x,G.p.y-z.y)<30){openShrine(z);continue}if(z.life<=0)continue}
-    else if(z.k==='bz'){if(z.life<=0){const pp=G.p;if(Math.hypot(pp.x-z.x,pp.y-z.y)<z.R+pp.r)damageP(z.dmg);fx({k:'ring',x:z.x,y:z.y,R:z.R,c:'#ff2a6a',life:.35,max:.35,fill:1});if(z.zap)lightning(z.x,z.y-320,z.x,z.y,'#d04aff',6);sparks(z.x,z.y,12,'#ff2a6a',220);sfx(z.zap?'zap':'boom',0,.1);continue}}
+    else if(z.k==='bz'){if(z.life<=0){const pp=G.p;if(Math.hypot(pp.x-z.x,pp.y-z.y)<z.R+pp.r){if(!(pp.inv>0))G.lastHit=(G.boss?'魔王':'怪物')+'的範圍攻擊（紅色圈圈）';damageP(z.dmg)}fx({k:'ring',x:z.x,y:z.y,R:z.R,c:'#ff2a6a',life:.35,max:.35,fill:1});if(z.zap)lightning(z.x,z.y-320,z.x,z.y,'#d04aff',6);sparks(z.x,z.y,12,'#ff2a6a',220);sfx(z.zap?'zap':'boom',0,.1);continue}}
     else if(z.k==='coin'){if(z.life<=0){fx({k:'ring',x:z.x,y:z.y,R:z.R,c:'#f5c542',life:.35,max:.35,fill:1});for(let i=0;i<16;i++){const a=R(0,TAU),v=R(80,260);fx({k:'coinp',x:z.x,y:z.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,life:.6,max:.6})}areaHit(z.x,z.y,z.R,z.dmg,140);txt(z.x,z.y-30,'＄','#ffd35a',true);continue}}
     else if(z.k==='asura'){const pp=G.p;if(Math.random()<.8){const a=R(0,TAU),r=R(40,70);fx({k:'pt',x:pp.x+Math.cos(a)*r,y:pp.y+Math.sin(a)*r,vx:-Math.cos(a)*r*3,vy:-Math.sin(a)*r*3,s:3,c:z.c,life:.3,max:.3})}
       if(z.life<=0){sfx('boom');const[a]=aim(500);fx({k:'thrust',x:pp.x,y:pp.y,a,L:z.L,w:z.w,c:z.c,life:.5,max:.5,huge:1});lineHit(pp.x,pp.y,a,z.L,z.w,z.dmg,320);flash=Math.max(flash,.35);G.shake=Math.max(G.shake,.35);txt(pp.x,pp.y-40,'阿修羅！','#9fe0ff',true);continue}}
@@ -1225,14 +1233,14 @@ function update(dt){
     const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1,sp=e.spd*(e.slow>0?.45:1);
     e.x+=(dx/d*sp+e.kx)*dt;e.y+=(dy/d*sp+e.ky)*dt;e.kx*=dec;e.ky*=dec;
     if(Math.abs(dx)>2)e.face=dx<0?-1:1;
-    if(d<e.r+p.r-2)damageP(e.dmg);
+    if(d<e.r+p.r-2&&!(e.ent>0)){if(!(p.inv>0))G.lastHit=e.boss?(e.guard?'守衛':STAGES[G.stage].boss)+'的撞擊':(e.elite?'菁英':'')+(EN[e.type]||'怪物');damageP(e.dmg)}
     if(!e.boss&&d>far*1.7){const a=Math.atan2(p.fy,p.fx)+R(-1,1);e.x=p.x+Math.cos(a)*far;e.y=p.y+Math.sin(a)*far}
     if(e.boss)bossAI(e,dt);
   }
   for(const e of G.E){if(e.dead||e.boss)continue;
     near(e.x,e.y,e.r+M,o=>{if(o===e||o.dead)return;const dx=e.x-o.x,dy=e.y-o.y,d=Math.hypot(dx,dy),mm=e.r+o.r;if(d>0&&d<mm){const k=(mm-d)/d*.25;e.x+=dx*k;e.y+=dy*k;if(!o.boss){o.x-=dx*k;o.y-=dy*k}}})}
   G.E=G.E.filter(e=>!e.dead);
-  for(const b of G.B){b.life-=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.x-p.x,b.y-p.y)<p.r+b.r){b.life=0;damageP(b.dmg);if(b.web){p.slow=1.6;txt(p.x,p.y-40,'被蛛網黏住！','#c8a8ff')}if(b.ice)p.slow=1}}
+  for(const b of G.B){b.life-=dt;b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.x-p.x,b.y-p.y)<p.r+b.r){b.life=0;if(!(p.inv>0))G.lastHit=(G.boss?'魔王':'怪物')+'的子彈';damageP(b.dmg);if(b.web){p.slow=1.6;txt(p.x,p.y-40,'被蛛網黏住！','#c8a8ff')}if(b.ice)p.slow=1}}
   G.B=G.B.filter(b=>b.life>0);
   G.mergeT=(G.mergeT||0)-dt;if(G.mergeT<=0&&G.J.length>140){G.mergeT=1;const cells=new Map();for(const j of G.J){if(j.got||j.m||j.heal||j.chest||j.mag||j.coin)continue;const k=Math.floor(j.x/90)*100003+Math.floor(j.y/90);const h=cells.get(k);if(h){h.v+=j.v;j.got=true}else cells.set(k,j)}G.J=G.J.filter(j=>!j.got)}
   for(const j of G.J){const dx=p.x-j.x,dy=p.y-j.y,d=Math.hypot(dx,dy)||1;
@@ -1271,6 +1279,7 @@ function openLevel(){
     if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
     if(o.t==='e'){const s=o.s;return `<button class="ch evo" data-i="${i}"><span class="num">${i+1}</span><b style="background:linear-gradient(135deg,#ffe27a,#ff9a3a)">${s.g}</b><span><strong>${s.n}・進化</strong><em>進化！</em><small>招式大幅強化：數量、範圍、傷害都提升（Lv5 ＋ ${PD[o.req].n}）</small></span></button>`}
     const s=o.s;return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}</strong><em>${o.l===1?'學會！':'Lv '+o.l} · ${s.bs?'流派招式':JM[s.job].n}</em><small>${skDesc(s,o.l)}</small></span></button>`}).join('');
+  $('lvHint').textContent=IS_TOUCH?'':`也可以按 1～${choicesNow.length} 選擇`;$('lvHint').classList.toggle('hide',IS_TOUCH);
   show('lvlup');
 }
 function choose(i){
@@ -1283,6 +1292,7 @@ function choose(i){
 function end(win){
   if(state==='over')return;state='over';clearRun();const t=Math.floor(G.t),sg=STAGES[G.stage],rw=G.rw;if(win)for(const j of G.J)if(j.coin&&!j.got)rw.zeny+=j.coin;stopMusic();sfx(win?'win':'lose');
   $('ovT').textContent=G.mode==='tower'?`無限之塔：到達第 ${G.floor} 層`:win?`通關！${sg.boss}倒下了`:G.escaped?`時間到，${sg.boss}逃走了`:G.retreat?'撤退回城鎮':'你倒下了';
+  {let cause=$('ovCause');if(!cause){cause=document.createElement('p');cause.id='ovCause';cause.className='note';cause.style.margin='-4px 0 6px';$('ovT').after(cause)}const died=!win&&!G.retreat&&!G.escaped&&G.p.hp<=0;cause.textContent=died&&G.lastHit?`被「${G.lastHit}」打倒了`:'';cause.classList.toggle('hide',!cause.textContent)}
   $('ovS').innerHTML=`<div><b>${fmt(t)}</b><span>存活時間</span></div><div><b>${G.lvl}</b><span>本局等級</span></div><div><b>${G.kills}</b><span>擊倒數</span></div>`;
   let lines=[];
   if(G.trial){lines.push('這是試玩，不會存檔。')}
@@ -1302,7 +1312,9 @@ function end(win){
     lines.push(`<div>Base 經驗 +${bx}${SV.blv>b0?` <b>→ Base Lv ${SV.blv}！</b>`:''}</div>`);
     lines.push(`<div>Job 經驗 +${jx}${SV.jlv>j0?` <b>→ Job Lv ${SV.jlv}！獲得 ${SV.jlv-j0} 天賦點</b>`:''}${SV.jlv>=JCAP[tier]?'（已達上限）':''}</div>`);
     lines.push(`<div>金幣 +${zn}${win?'（通關加成 ×1.3）':''}　🦴 狗骨頭 +${bones}${firstClear?'（首次通關 +10）':''}${heatFirst?`（首次通過難度 ${G.heat} +${5*G.heat}）`:''}</div>`);
-    lines.push(rw.items.length?`<div>獲得裝備：</div>`+rw.items.map(it=>`<div style="display:flex;gap:8px;align-items:center;color:${RAR[it.rar].c};font-weight:700">${(ITEMREF[it.id]=it,'')}<canvas class="iic" style="width:32px;height:32px" width="64" height="64" data-it="${it.id}"></canvas>${RAR[it.rar].n} ${it.n}</div>`).join(''):'<div>這局沒有撿到裝備（打倒金框菁英怪必掉）</div>');
+    {const good=rw.items.filter(it=>it.rar>=2).sort((a,b)=>b.rar-a.rar),cnt=[0,0,0,0,0];for(const it of rw.items)cnt[it.rar]++;
+     const low=[0,1].filter(r=>cnt[r]).map(r=>`<b style="color:${RAR[r].c}">${RAR[r].n} ×${cnt[r]}</b>`).join('、');
+     lines.push(rw.items.length?`<div>獲得裝備 ${rw.items.length} 件${low?`：${low}${good.length?'，還有：':''}`:'：'}</div>`+good.map(it=>`<div style="display:flex;gap:8px;align-items:center;color:${RAR[it.rar].c};font-weight:700">${(ITEMREF[it.id]=it,'')}<canvas class="iic" style="width:32px;height:32px" width="64" height="64" data-it="${it.id}"></canvas>${RAR[it.rar].n} ${it.n}</div>`).join(''):'<div>這局沒有撿到裝備（打倒金框菁英怪必掉）</div>')}
     if(G.matsGot&&Object.keys(G.matsGot).length)lines.push(`<div>狗屋材料：${Object.entries(G.matsGot).map(([k,v])=>`${MATN[k]} +${v}`).join('、')}</div>`);
     if(rw.cards.length)lines.push(`<div><b style="color:#c0407a">獲得卡片：${rw.cards.map(c=>CM[c].n).join('、')}</b>（到城鎮「裝備」頁插到有卡槽的裝備上）</div>`);
     if(autoN)lines.push(`<div>已自動換上 ${autoN} 件更好的裝備。</div>`);
@@ -1317,8 +1329,9 @@ function end(win){
   show('over');$('pbtn').classList.add('hide');$('dashb').classList.add('hide');$('spdb').classList.add('hide');
 }
 let tipPrev=null;
-function showTip(id,title,html,force){if(!force&&(SV.tut||{})[id])return;SV.tut=SV.tut||{};SV.tut[id]=1;save();$('tipT').textContent=title;$('tipB').innerHTML=html;$('tipov').classList.remove('hide');if(state==='play'){tipPrev='play';state='tip';keys.clear()}}
-function closeTip(){$('tipov').classList.add('hide');if(state==='tip'){state='play';last=performance.now()}}
+const TIPQ=[];
+function showTip(id,title,html,force){if(!force&&(SV.tut||{})[id])return;SV.tut=SV.tut||{};SV.tut[id]=1;save();if(!$('tipov').classList.contains('hide')||!$('nameov').classList.contains('hide')){TIPQ.push([id,title,html]);return}$('tipT').textContent=title;$('tipB').innerHTML=html;$('tipov').classList.remove('hide');if(state==='play'){tipPrev='play';state='tip';keys.clear()}}
+function closeTip(){$('tipov').classList.add('hide');if(TIPQ.length){const q=TIPQ.shift();setTimeout(()=>showTip(q[0],q[1],q[2],true),120)}if(state==='tip'){state='play';last=performance.now()}}
 function idleIncome(){if(!SV.breed||!SV.seen)return;const h=Math.min(12,(Date.now()-SV.seen)/3600000);if(h<.25)return;const zn=Math.round(h*120*(1+SV.stage*1.6)*(1+comfortIdle())),bx=Math.round(h*40*(1+SV.stage));SV.zeny+=zn;SV.bxp+=bx;while(SV.bxp>=bNeed(SV.blv)&&SV.blv<99){SV.bxp-=bNeed(SV.blv);SV.blv++}save();
   showTip('idle','狗狗散步回來了！',`你離開的 <b>${h.toFixed(1)} 小時</b>裡，狗狗在城鎮附近散步，撿到了 <b>${zn.toLocaleString()} 金幣</b>和 <b>${bx} Base 經驗</b>。<br><span class="note">離線收益最多累積 12 小時，通關越多關卡撿得越多。</span>`,true)}
 let bossPickOpen=null;
@@ -1386,11 +1399,12 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   if(canJob())showTip('job','可以轉職了！','去找<b>轉職所的教官</b>（頭上有紅色 !），或按「選單」打開「角色」分頁按「轉職」。轉職後會學到新招式，裝扮也會變。');
   else if(SV.tpe-tSpent()>0)showTip('tal','有天賦點可以用','每升 1 Job Lv 會得到 1 點天賦點。去找<b>長老之家的長老</b>，或打開<b>「天賦」</b>分頁把點數點下去，角色會更強，點錯了也可以免費重置。');
   else if(Object.keys(SV.cards||{}).length)showTip('card','拿到卡片了！','卡片要插在<b>有空卡槽</b>的裝備上才有效果。到<b>「裝備」</b>分頁，在裝備旁邊按「插卡」。插錯了也沒關係，花一點金幣就能拿下來換別張。');
-  else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
+  else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.19.2';
+const VERSION='0.20.0';
 const NEWS=[
+ {v:'0.20.0',d:'11/25',t:'新手體驗大整理',items:[['調整','Job 經驗改成 Base 經驗的 6 成，Job 等級越高需要越多經驗：一轉後大約要打 5～8 場才能二轉（以前打一場就跳到 Job 36）'],['修正','手機上戰鬥畫面左上角的職業名稱不會再和「魔王出現」倒數疊在一起，太長會自動換行'],['修正','升級選強化的畫面：手機上不再顯示「按 1、2、3」，電腦上會照選項數量顯示'],['新增','第一次選狗的畫面多了一段遊戲介紹；每隻狗改成顯示個性（能力都一樣，只是外表不同）'],['調整','新手第一次打開「選單」會停在「出戰」分頁；歡迎教學改成先按「出戰」再按「出發」'],['調整','「流派」改成可以收起來的區塊，平常只顯示目前流派，點開才看詳細說明'],['調整','「造型」改名為「毛色」，和「時裝」比較不會搞混；抽毛色有一半機率抽到你現在這隻狗的毛色；新手教學改推薦先抽時裝（每隻狗都能穿）'],['調整','開場怪物出現得比較密，不會再前一分鐘很空、後面突然爆量；被包圍前 5 秒會先提醒，第一關的包圍規模也縮小'],['新增','魔王登場時會大吼一聲把身邊的小怪震開，前 2.5 秒不會攻擊；魔王戰時小怪變少；魔王在畫面外時，畫面邊緣有紫色箭頭指出方向'],['新增','關卡列表會提醒「你現在等級比推薦低 X 級」'],['新增','倒下時結算畫面會寫出是被什麼打倒的'],['調整','結算畫面的裝備改成「普通 ×6、精良 ×2」這樣的摘要，只把稀有以上的列出來'],['調整','沒登入時，主城上方的「登入帳號後…」提示 8 秒後會縮成小小的「單人模式」'],['新增','幫狗狗取名字：選完狗會請你取名（也可以按「隨機」），名字會顯示在主城裡狗狗的頭上，其他玩家也看得到；你的狗屋會變成「名字的家」，朋友來拜訪時也會看到；「角色」分頁可以隨時改名。已經在玩的人下次打開遊戲時會問一次'],['修正','戰鬥中下方的技能圖示太多時會自動換行，不會再被右下角的按鈕蓋住']]},
  {v:'0.19.2',d:'11/25',t:'職業介紹・升級曲線',items:[['新增','轉職畫面重做：點一下職業就會看到牠的大圖、這一系的定位（近戰／遠程／範圍各佔多少）、這個職業的招式、練到三轉會學到的招牌招式、三種流派招式，還有完整的轉職路線圖（每一步都有小圖），確定了再按「選」'],['新增','轉職畫面可以直接「試玩看看」那個職業'],['新增','「角色」分頁多了「職業介紹・轉職路線」按鈕，隨時可以看全部職業，路線裡的每一隻都能點開看；已經到過的轉數可以直接從這裡換職業'],['調整','Base Lv 40 以後升級需要的經驗大幅增加，越接近 99 越難，99 級變成長期目標（已經升上去的等級不會掉）'],['調整','無限之塔高樓層的獎勵倍率只加在金幣和掉寶上，經驗最多 ×1.6，不會再爬幾層就狂升級']]},
  {v:'0.19.1',d:'11/25',t:'結算小動畫',items:[['新增','每場打完的結算畫面上方多了一段小動畫，用你自己的狗狗和身上的時裝：贏了會在彩帶和金骨頭前開心跳跳；輸了會趴在地上、頭上飄著小雨雲；撤退是背著小包袱在夕陽下走回家；魔王逃走時狗狗坐著歪頭冒問號，魔王一溜煙跑掉；無限之塔是坐在樓梯頂端，旁邊插著寫了層數的小旗子']]},
  {v:'0.19.0',d:'11/25',t:'狗狗職業・流派重做',items:[['調整','所有職業改成狗狗職業：護衛犬系、巫犬系、獵犬系、療癒犬系、跑腿犬系、搗蛋犬系、超級幼犬系、牛仔犬系，招式名稱也全部換成狗狗版（例如飛盤盾、臭襪攻擊、舔舔治療、天降大骨頭）；原本的進度、轉職和流派選擇都會保留'],['調整','流派重做：每個職業線的每一種流派都有一招自己的「流派招式」，開場就送（例如護衛犬的飛盤盾連發、巫犬的流星雨、搗蛋犬的臭襪毒霧），以前有些職業選了流派卻沒有對應招式的問題解決了'],['調整','流派差距拉大：近戰／遠程／範圍流派的主打招式傷害 +50～60%、冷卻大幅縮短，其他招式傷害 -25%；開場只帶主打類型的招式，升級時幾乎只出主打類型；近戰更耐打還會吸血、遠程跑更快、範圍招式更大；會心流爆擊更痛但沒爆擊時較弱；招式比較少的流派，主打招式會再額外加強；均衡流全部招式 +10% 而且升級變成四選一'],['新增','小地圖用小圖示標出寶箱、磁鐵、回血大骨頭和祭壇，會閃動比較好找；暫停選單有圖示說明'],['新增','裝備上的卡片可以拿下來了：在裝備旁按「卡片」，花 500 金幣把卡片拔下來放回收藏'],['新增','無限之塔：每打通 10 層解鎖一個新起點，結算畫面可以直接挑戰最高的起點；塔裡和每日副本都可以加速 ×2'],['新增','結算畫面多了「直接挑戰下一關／再挑戰一次」按鈕，不用回城鎮'],['調整','魔王出現後 2 分 30 秒還沒打倒就會逃走並結算（卡片副本等不會再卡住結束不了），魔王血條下方有倒數'],['調整','升級速度放慢：經驗獲得減少，Base／Job 等級越高需要的經驗越多'],['調整','怪物的子彈改成暗紅色、帶尖刺外框，和自己的招式更好分辨'],['修正','招式說明的傷害數字不會再出現一長串小數'],['修正','切到別的 App 或分頁時會靜音，切回來聲音會恢復（以前常常切回來就沒聲音）'],['修正','無限之塔每上一層就立刻記錄最高層數，中途被手機關掉也不會不見；登入雲端時會自動用比較新的那份存檔'],['修正','進塔或關卡後馬上撤退不會再拿到骨頭和任務進度（修正可以無限刷骨頭的問題）']]},
@@ -1492,18 +1506,18 @@ function openAcct(){acctMsg('');renderAcct();$('acctov').classList.remove('hide'
 
 /* ---------- hub ---------- */
 const canJob=()=>{const t=JM[SV.job].tier;return t<4&&SV.jlv>=JREQ[t]&&kids(SV.job).length>0};
-const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','造型'],['cos','時裝'],['pet','寵物'],['ach','任務'],['shop','商店'],['home','狗屋']];
+const TABS=[['go','出戰'],['char','角色'],['tal','天賦'],['eq','裝備'],['card','卡片'],['skin','毛色'],['cos','時裝'],['pet','寵物'],['ach','任務'],['shop','商店'],['home','狗屋']];
 let insFor=null;
 function renderHub(){
   const j=JM[SV.job],tier=j.tier,cap=JCAP[tier],pts=SV.tpe-tSpent();
-  $('hinfo').innerHTML=`<strong>${SKM[curSkin()].n}</strong><small>${TIERN[tier]} · ${j.n}</small>
+  $('hinfo').innerHTML=`<strong>${esc(dogName())}</strong><small>${TIERN[tier]} · ${j.n}</small>
     <div class="blab"><span>Base Lv ${SV.blv}</span><span>${SV.bxp}/${bNeed(SV.blv)}</span></div><div class="bar"><i style="width:${Math.min(100,SV.bxp/bNeed(SV.blv)*100)}%"></i></div>
     <div class="blab"><span>Job Lv ${SV.jlv}/${cap}</span><span>${SV.jlv>=cap?'MAX':SV.jxp+'/'+jNeed(SV.jlv,tier)}</span></div><div class="bar j"><i style="width:${SV.jlv>=cap?100:Math.min(100,SV.jxp/jNeed(SV.jlv,tier)*100)}%"></i></div>`;
   $('hzeny').textContent=`${SV.zeny.toLocaleString()} 金幣`;
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small><small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`<button class="btn sm" data-stage="${i}">出發</button>${(SV.cleared||0)>i?`<span class="heat">${[1,2,3,4,5].map(h=>`<button class="btn sm ${h<=((SV.heat||{})[i]||0)+1?'':'ghost'}" data-stage="${i}" data-heat="${h}" ${h>((SV.heat||{})[i]||0)+1?'disabled':''} title="難度 ${h}">難${h}${h<=((SV.heat||{})[i]||0)?'✓':''}</button>`).join('')}</span><small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級，會很難喔</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`<button class="btn sm" data-stage="${i}">出發</button>${(SV.cleared||0)>i?`<span class="heat">${[1,2,3,4,5].map(h=>`<button class="btn sm ${h<=((SV.heat||{})[i]||0)+1?'':'ghost'}" data-stage="${i}" data-heat="${h}" ${h>((SV.heat||{})[i]||0)+1?'disabled':''} title="難度 ${h}">難${h}${h<=((SV.heat||{})[i]||0)?'✓':''}</button>`).join('')}</span><small>難度越高：怪物血量 +35%／攻擊 +20%／數量 +12%（每級），獎勵 +30%；第一次通過該難度送 🦴 5×難度</small>`:''}`}</div>`}).join('')}</div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
       <div class="box"><p class="note" style="margin-top:0">一路往上爬：每層撐 40 秒後打倒守衛就上樓，招式和強化會一直帶著，每 10 層換一個區域、越爬越難。每通過 5 層多拿 1 根骨頭。每 10 層是存檔點，可以直接從那裡開始。</p><div class="tcp">${(()=>{const cps=[1];for(let f=11;f<=(SV.towerBest||0)+1;f+=10)cps.push(f);return cps.reverse().map((f,i)=>`<button class="btn sm${i?' ghost':''}" data-tower="${f}">第 ${f} 層<small>${STAGES[towerStage(f)].n}${i===0?'・最高':''}</small></button>`).join('')})()}</div><p class="note">每打通 10 層就會解鎖下一個起點，可以直接從那裡開始。塔裡可以按右下角「×1／×2」加速。</p></div>
       <h3 style="margin-top:18px" data-anchor="dung">每日副本　<span class="note">今天還剩 ${dailyLeft()} 次（每天 0 點重置）</span></h3>
@@ -1512,9 +1526,9 @@ function renderHub(){
   }else if(tab==='char'){
     const st=calcStats(),t=tier;
     const jobBox=t>=4?'<p>已經是三轉職業，恭喜！</p>':kids(SV.job).length?(canJob()?`<p>Job Lv 已經到 ${SV.jlv}，可以轉職了！</p><button class="btn" id="doJob">轉職</button>`:`<p>Job Lv ${JREQ[t]} 才能轉職（目前 ${SV.jlv}）。</p>`):'';
-    H.innerHTML=`<h3>${SKM[curSkin()].n}・${j.n}</h3>
+    H.innerHTML=`<h3>${esc(dogName())}・${j.n}　<button class="btn sm ghost" id="renameBtn">改名字</button></h3><p class="note" style="margin:-6px 0 8px">毛色：${SKM[curSkin()].n}</p>
       <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
-      <div class="box"><strong>流派</strong>　<span class="note">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西</span><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></div>
+      <details class="box bldbox" ${bldOpen?'open':''}><summary><strong>流派：${buildName(SV.job,curBuild())}</strong>　<span class="note">點開看各流派、免費更換</span></summary><p class="note" style="margin:6px 0">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西。</p><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></details>
       <div class="box"><strong>轉職</strong>　<button class="btn sm ghost" id="jobGuide">職業介紹・轉職路線</button>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
       <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b>（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
       <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
@@ -1545,12 +1559,12 @@ function renderHub(){
     const rd=achReady();H.innerHTML=(rd.length||questReady()?'<p><button class="btn" id="achAll">一鍵領取所有任務與成就</button></p>':'')+qhtml+`<h3>成就　<span class="note">完成後點「領取」拿狗骨頭</span></h3><div class="items">${ACH.map(a=>{const got=(SV.ach||{})[a[0]],ok=a[2]();return `<div class="it" style="border-left-color:${got?'#7fd08a':ok?'#f5c542':'#d8c99a'}"><div class="nm"><strong>${a[1]}</strong><small>獎勵 🦴 ${a[3]}</small></div>${got?'<small class="note">已領取</small>':ok?`<button class="btn sm" data-ach="${a[0]}">領取</button>`:'<small class="note">未完成</small>'}</div>`}).join('')}</div>`;
   }else if(tab==='skin'){
     const total=SKINS.filter(r=>r[3]>0).length,got=SV.owned.length;
-    H.innerHTML=`<h3>抽造型　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
-      <div class="box gacha"><p class="note">造型只改外觀，不影響數值。機率：SSR 3%、SR 17%、R 80%。十連抽保底一個 SR 以上；連續 60 抽沒中 SSR，第 60 抽必中（目前已累積 ${SV.pity} 抽）。每抽到一款造型，就會永久增加一點能力，<b>不用穿上也有效</b>，收越多越強。抽到重複的會讓那款升星（最多 ★3，每顆星加成 +35%）；滿星後再重複才變成碎片，10 個碎片換 1 根骨頭。集滿同一隻狗的所有毛色，額外再加傷害 +1.5%。</p>
+    H.innerHTML=`<h3>抽毛色　<span class="note">🦴 狗骨頭 ${SV.bones}　碎片 ${SV.pieces}/10</span></h3>
+      <div class="box gacha"><p class="note">毛色只改狗狗的花色，一半的機率會抽到你現在這隻狗的毛色。機率：SSR 3%、SR 17%、R 80%。十連抽保底一個 SR 以上；連續 60 抽沒中 SSR，第 60 抽必中（目前已累積 ${SV.pity} 抽）。每抽到一款造型，就會永久增加一點能力，<b>不用穿上也有效</b>，收越多越強。抽到重複的會讓那款升星（最多 ★3，每顆星加成 +35%）；滿星後再重複才變成碎片，10 個碎片換 1 根骨頭。集滿同一隻狗的所有毛色，額外再加傷害 +1.5%。</p>
       <button class="btn" data-pull="1" ${SV.bones<1?'disabled':''}>單抽　🦴1</button><button class="btn" data-pull="10" ${SV.bones<10?'disabled':''}>十連抽　🦴10</button><button class="btn ghost" data-buybone="1" ${SV.zeny<BONE_COST?'disabled':''}>用 ${BONE_COST} 金幣換 1 根骨頭</button>
       <p class="note">骨頭來源：每次出戰 +1、通關 +3、第一次通關一個關卡 +10、每升 1 Base Lv +1、轉職 +5。</p></div>
       ${(()=>{const cm=collectionMods(),ks=Object.keys(cm.m);return `<div class="box"><strong>收藏加成（已經算進角色能力）</strong><p style="margin:4px 0 0;font-size:14px">${ks.length?modTxt(ks.map(k=>[k,cm.m[k]])):'還沒有，抽到造型就會開始累積。'}${cm.sets.length?`<br><span class="note">集滿全套：${cm.sets.map(b=>B[b][0]).join('、')}（每套傷害 +${SET_BONUS}%）</span>`:''}</p></div>`})()}
-      <h3>造型收藏（${got}/${total}）　<span class="note">點一下就換上；換別的品種會一起換狗</span></h3>
+      <h3>毛色收藏（${got}/${total}）　<span class="note">點一下就換上；換別的品種會一起換狗</span></h3>
       <div class="secs">${[['all','全部'],...(lastPull.skin.length?[['new','剛抽到']]:[]),...Object.keys(B).map(bk=>[bk,B[bk][0]])].map(([k,n])=>`<button class="btn sm ${skinSec===k?'':'ghost'}" data-ssec="${k}">${n}</button>`).join('')}</div>
       ${skinSec==='new'?`<div class="skrow"><h4>剛抽到</h4><div class="skins">${[...new Set(lastPull.skin)].map(id=>SKINS.find(r=>r[0]===id)).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}" data-skin="${id}"><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${r[2]}${(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${on?'<b>使用中</b>':'點一下換上'}</small></button>`}).join('')}</div></div>`:''}${Object.keys(B).filter(bk=>skinSec==='all'||skinSec===bk).map(bk=>`<div class="skrow"><h4>${B[bk][0]}</h4><div class="skins">${SKINS.filter(r=>r[1]===bk).map(r=>{const id=r[0],own=owns(id),on=curSkin()===id;return `<button class="sk2${on?' on':''}${own?'':' no'}" data-skin="${id}" ${own?'':'disabled'}><canvas width="160" height="120" data-sk="${id}"></canvas><i style="background:${SRAR[r[3]].c}">${SRAR[r[3]].n}</i><small>${own?r[2]:'未取得'}${own&&(SV.star||{})[id]?` ${'★'.repeat(SV.star[id])}`:''}</small><small class="note">${SKM[id].bon?bonTxt(id):'基本款'}</small></button>`}).join('')}</div></div>`).join('')}`;
     for(const pc of H.querySelectorAll('canvas[data-sk]')){portrait(pc,pc.dataset.sk,SV.job);if(!owns(pc.dataset.sk)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}
@@ -1566,7 +1580,7 @@ function renderHub(){
     const cvs=[...H.querySelectorAll('canvas[data-cs]')];let ci=0;const paint=()=>{for(let n=0;n<24&&ci<cvs.length;n++,ci++){const pc=cvs[ci],id=pc.dataset.cs,o=CSM[id];portrait(pc,curSkin(),SV.job,1.2,false,{...(SV.wear||{}),[o.slot]:id});if(!cosOwn(id)){const c=pc.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(40,40,40,.85)';c.fillRect(0,0,pc.width,pc.height);c.globalCompositeOperation='source-over'}}if(ci<cvs.length)requestAnimationFrame(paint)};paint();
   }else if(tab==='home'){
     const h=homeData(),L=HOUSE_LV[h.lv],nx=HOUSE_LV[h.lv+1],cnt=id=>(h.inv[id]||0)+h.items.filter(it=>it.f===id).length;
-    H.innerHTML=`<h3>我的狗屋　<span class="note">舒適度 ${homeComfort()}：出戰經驗 +${comfortExp().toFixed(1)}%、離線收入 +${Math.round(comfortIdle()*100)}%</span></h3>
+    H.innerHTML=`<h3>${esc(dogName())}的家　<span class="note">舒適度 ${homeComfort()}：出戰經驗 +${comfortExp().toFixed(1)}%、離線收入 +${Math.round(comfortIdle()*100)}%</span></h3>
       <div class="box"><strong>${L.n}</strong>　<span class="note">房間 ${L.w}×${L.h} 格</span><p class="note" style="margin:6px 0">材料：${Object.keys(MATN).map(k=>`${MATN[k]} <b>${h.mat[k]||0}</b>`).join('　')}<br>材料從出戰拿（打越多怪、打倒魔王和菁英越多），也可以在狗狗公園挖到。舒適度：每擺一種家具就加分，同一種重複擺只算一半；狗屋等級越高也會加。</p>
       ${nx?`<button class="btn" data-hup="1" ${canPay(nx.cost.z,{...nx.cost,z:undefined})?'':'disabled'}>升級成「${nx.n}」（${costTxt(nx.cost.z,Object.fromEntries(Object.entries(nx.cost).filter(([k])=>k!=='z')))}）</button>`:'<p><b>已經是最高等級的狗屋了！</b></p>'}<button class="btn ghost" data-enterhome="1">回家擺家具</button></div>
       <h3>家具店</h3><div class="furn">${FURN.map(f=>{const o=FM[f[0]],ok=canPay(o.z,o.m);return `<div class="fc"><canvas width="112" height="112" data-fi="${o.id}"></canvas><strong>${o.n}</strong><small>舒適度 +${o.cf}　擁有 ${cnt(o.id)}</small><small class="note">${costTxt(o.z,o.m)}</small><button class="btn sm" data-fbuy="${o.id}" ${ok?'':'disabled'}>購買</button></div>`}).join('')}</div>
@@ -1584,7 +1598,7 @@ function pull(n){
   if(SV.bones<n)return;SV.bones-=n;const res=[];const pool=r=>SKINS.filter(x=>x[3]===r);
   for(let i=0;i<n;i++){SV.pity++;let r;const x=Math.random();if(SV.pity>=60)r=3;else r=x<.03?3:x<.2?2:1;
     if(n===10&&i===n-1&&r<2&&!res.some(o=>SKM[o.id].rar>=2))r=2;if(r===3)SV.pity=0;
-    const ps=pool(r),id=ps[Math.floor(Math.random()*ps.length)][0];let dup=false;
+    const ps0=pool(r),mine=ps0.filter(q=>q[1]===SV.breed),ps=mine.length&&Math.random()<.5?mine:ps0,id=ps[Math.floor(Math.random()*ps.length)][0];let dup=false;
     let star=0;if(SV.owned.includes(id)){dup=true;SV.star=SV.star||{};if((SV.star[id]||0)<STAR_MAX){star=SV.star[id]=(SV.star[id]||0)+1}else{SV.pieces+=[0,1,3,10][r];while(SV.pieces>=10){SV.pieces-=10;SV.bones++}}}else SV.owned.push(id);
     res.push({id,dup,star})}
   save();renderHub();
@@ -1604,7 +1618,7 @@ function cosPull(n){
   for(const pc of $('pullB').querySelectorAll('canvas[data-cpr]')){const o=CSM[pc.dataset.cpr];portrait(pc,curSkin(),SV.job,1.2,false,{...(SV.wear||{}),[o.slot]:o.id})}
 }
 function openPull(kind,n,html){pullKind=kind;pullN=n;const best=Math.max(...(kind==='skin'?lastPull.skin.map(id=>SKM[id].rar):lastPull.cos.map(id=>CSM[id].rar)));
-  $('pullT').textContent=(kind==='skin'?'造型':'時裝')+(n>1?'十連抽':'單抽')+(best>=3?'・出現 SSR！':best>=2?'・出現 SR！':'');$('pullB').innerHTML=html;
+  $('pullT').textContent=(kind==='skin'?'毛色':'時裝')+(n>1?'十連抽':'單抽')+(best>=3?'・出現 SSR！':best>=2?'・出現 SR！':'');$('pullB').innerHTML=html;
   $('pullAgain').textContent=`再抽一次　🦴${n}（剩 ${SV.bones}）`;$('pullAgain').disabled=SV.bones<n;$('pullov').classList.remove('hide');$('pullB').scrollTop=0}
 function closePull(){$('pullov').classList.add('hide');if(pullKind==='skin')skinSec='new';else cosSec='new';renderHub();toSecs()}
 function toSecs(){const sc=$('hbody').querySelector('.secs');if(sc)try{sc.scrollIntoView({block:'start'})}catch(e){}}
@@ -1647,7 +1661,8 @@ function hubClick(e){
   if(d.dung){if(dailyLeft()<=0)return;SV.daily.n--;save();newRun(dungStage(),null,{mode:'dungeon',dtype:d.dung});return}
   if(b.id==='doJob'){openJob();return}
   if(b.id==='jobGuide'){openJob('browse');return}
-  if(d.build){SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build;sfx('ui');save();renderHub();return}
+  if(b.id==='renameBtn'){openName();return}
+  if(d.build){bldOpen=true;SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build;sfx('ui');save();renderHub();return}
   if(d.swjob){switchJob(d.swjob);return}
   if(b.id==='chgDog'){openBreeds('change');return}
   if(b.id==='expSave'){const code=btoa(unescape(encodeURIComponent(JSON.stringify(SV))));try{navigator.clipboard.writeText(code).then(()=>{$('saveMsg').textContent='已複製存檔碼。'},()=>{$('impTxt').value=code;$('saveMsg').textContent='無法自動複製，請手動複製上方文字框。'})}catch(err){$('impTxt').value=code;$('saveMsg').textContent='請手動複製上方文字框。'}return}
@@ -1670,6 +1685,11 @@ const subTree=id=>{const a=[id];for(const k of kids(id))a.push(...subTree(k));re
 const pathsFrom=id=>{const k=kids(id);if(!k.length)return [[id]];return k.flatMap(c=>pathsFrom(c).map(p=>[id,...p]))};
 function jobMix(id){const ids=subTree(id).filter(x=>x!=='novice'),m={melee:0,ranged:0,area:0};let n=0;for(const x of ids)for(const s of JM[x].sk){for(const c in BCAT)if(BCAT[c].includes(s.k)){m[c]++;n++}}for(const c in m)m[c]=n?m[c]/n:0;return m}
 const skChip=(s,tag)=>`<div class="skc"><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}${tag?`<em>${tag}</em>`:''}</strong>${MECH[s.k].d(skDmg(s,1),1,s.x)+skX(s.x)}</span></div>`;
+let bldOpen=false;
+const RNAMES=['麻糬','布丁','豆花','小米','芝麻','湯圓','可樂','奶茶','饅頭','團子','波波','餅乾','肉鬆','花生','黑糖','雪球','阿福','球球','嘟嘟','皮皮','旺財','咖啡','起司','布朗尼'];
+let nameAfter=null;
+function openName(after){nameAfter=after||null;$('nameIn').value=cleanName(SV.name);$('nameMsg').textContent='';$('nameT').textContent=SV.name?'幫狗狗改名字':'幫你的狗狗取個名字吧';portrait($('nameDog'),curSkin(),SV.job);$('nameov').classList.remove('hide');setTimeout(()=>{try{$('nameIn').focus()}catch(e){}},50)}
+function confirmName(){const v=cleanName($('nameIn').value);if(!v){$('nameMsg').textContent='先輸入一個名字，或按「隨機」';return}SV.name=v;save();$('nameov').classList.add('hide');sfx('lvl');if(state==='hub')renderHub();renderTownUI&&renderTownUI();try{netRetrack();homeSync()}catch(e){}const f=nameAfter;nameAfter=null;if(f)f();if($('tipov').classList.contains('hide')&&TIPQ.length){const q=TIPQ.shift();showTip(q[0],q[1],q[2],true)}}
 let jobSel=0,jobMode='promote',jobView=null;
 function openJob(mode){jobMode=mode||'promote';
   if(jobMode==='promote'){jobsNow=kids(SV.job);const nt=JM[SV.job].tier+1;$('jobT').textContent=`${TIERN[nt]}！選擇你的新職業`;$('jobSub').textContent='點一下職業可以看外型、招式和以後的轉職路線，決定好再按「選」。轉職後已經點過的天賦會保留。'}
@@ -1700,13 +1720,13 @@ function chooseJob(i){const id=jobsNow[i];if(!id)return;sfx('job');SV.jobsGot=SV
 function stashTier(){SV.tierLv=SV.tierLv||{};const t=JM[SV.job].tier;SV.tierLv[t]={lv:SV.jlv,xp:SV.jxp};SV.maxTier=Math.max(SV.maxTier||0,t)}
 function switchJob(id){if(!JM[id]||id===SV.job)return;const t=JM[id].tier;if(t>(SV.maxTier=Math.max(SV.maxTier||0,JM[SV.job].tier)))return;stashTier();const rec=(SV.tierLv||{})[t];SV.job=id;if(rec){SV.jlv=rec.lv;SV.jxp=rec.xp}else{SV.jlv=t<SV.maxTier?JCAP[t]:1;SV.jxp=0}sfx('job');save();renderHub()}
 function openBreeds(mode){
-  breedMode=mode;$('breedCancel').classList.toggle('hide',mode!=='change');
-  $('breeds').innerHTML=Object.keys(B).map(k=>`<button class="br" data-b="${k}"><canvas width="192" height="144" data-br="${k}"></canvas><strong>${B[k][0]}</strong><small>適合：${REC[k]||'都可以'}</small></button>`).join('');
+  breedMode=mode;$('breedCancel').classList.toggle('hide',mode!=='change');$('breedIntro').classList.toggle('hide',mode==='change');
+  $('breeds').innerHTML=Object.keys(B).map(k=>`<button class="br" data-b="${k}"><canvas width="192" height="144" data-br="${k}"></canvas><strong>${B[k][0]}</strong><small>${BPERS[k]||''}</small></button>`).join('');
   for(const pc of $('breeds').querySelectorAll('canvas[data-br]'))portrait(pc,(SV.skin&&SV.skin[pc.dataset.br])||BASE[pc.dataset.br],mode==='change'?SV.job:'novice');
   show('breedov');
 }
 function pickBreed(k){SV.breed=k;save();if(breedMode==='new'){tab='go';goTown()}else{renderHub();show('hub')}buildDex();
-  if(breedMode==='new')showTip('hub','歡迎來到城鎮！','這裡是你的基地：<br>・<b>出戰</b>：選關卡開打，也有無限之塔和每日副本<br>・<b>天賦／裝備／卡片</b>：讓角色變強<br>・<b>造型／寵物</b>：用狗骨頭抽造型、孵寵物<br>・<b>成就</b>：完成目標領骨頭<br>先按「青青草原」的<b>出發</b>試試看吧！送你 10 根狗骨頭，可以先去「造型」十連抽一次。')}
+  if(breedMode==='new'){const tipNow=()=>showTip('hub','歡迎來到城鎮！','這裡是你的基地：<br>・<b>出戰</b>：選關卡開打，也有無限之塔和每日副本<br>・<b>天賦／裝備／卡片</b>：讓角色變強<br>・<b>時裝／毛色／寵物</b>：用狗骨頭抽可愛時裝、新毛色、孵寵物<br>・<b>任務</b>：完成目標領骨頭<br>先按畫面下方的<b>「出戰」</b>，再按「青青草原」的<b>出發</b>試試看吧！<br>送你 10 根狗骨頭，推薦先去<b>「時裝」</b>十連抽一次，每隻狗都能穿。');openName(tipNow)}}
 
 /* ---------- render ---------- */
 const GCACHE={};
@@ -1834,17 +1854,20 @@ function hud(){
   c.textBaseline='top';
   const T=(s,x,y,al,f)=>{c.font=f;c.textAlign=al;c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(s,x,y);c.fillStyle='#fff';c.fillText(s,x,y)};
   T('Lv '+G.lvl,14,16,'left','700 18px Fredoka, sans-serif');
-  T(`${j.n}${G.build&&G.build!=='balance'?'（'+buildName(G.job,G.build)+'）':''} · ${G.heat?`難度${G.heat} `:''}${G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,14,40,'left','700 13px "Noto Sans TC", sans-serif');
+  {const f13='700 13px "Noto Sans TC", sans-serif',a=`${j.n}${G.build&&G.build!=='balance'?'（'+buildName(G.job,G.build)+'）':''}`,b=`${G.heat?`難度${G.heat} `:''}${G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,mw=Math.max(80,W/2-62);
+   c.font=f13;const fit=t=>{if(c.measureText(t).width<=mw)return t;while(t.length>1&&c.measureText(t+'…').width>mw)t=t.slice(0,-1);return t+'…'};
+   if(c.measureText(a+' · '+b).width<=mw)T(a+' · '+b,14,40,'left',f13);else{T(fit(a),14,40,'left',f13);T(fit(b),14,57,'left',f13)}}
   if(G.mode==='tower'&&!G.boss)T(`守衛出現 ${Math.max(0,Math.ceil(40-G.ft))} 秒`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   if(G.mode!=='tower'&&!G.boss&&!G.bossDone)T(`魔王出現 ${fmt(Math.max(0,G.bossT-G.t))}`,W/2,46,'center','700 13px "Noto Sans TC", sans-serif');
   T(fmt(G.t),W/2,14,'center','700 26px Fredoka, sans-serif');
   T('擊倒 '+G.kills,W-62,18,'right','700 16px "Noto Sans TC", sans-serif');
   if(!G.trial)T(W<560?`金${Math.round(G.rw.zeny)} 裝${G.rw.items.length} 卡${G.rw.cards.length}`:`金幣 ${Math.round(G.rw.zeny)}  裝備 ${G.rw.items.length}  卡片 ${G.rw.cards.length}`,W-62,W<560?62:40,'right','700 13px Fredoka, "Noto Sans TC", sans-serif');
-  const items=[...Object.values(G.wep).map(w=>[w.evo?{...w.s,c:'#ffd35a'}:w.s,w.evo?5:w.l]),...Object.keys(G.pas).map(k=>[PD[k],G.pas[k]])],per=Math.max(1,Math.floor((W-20)/36));
+  const items=[...Object.values(G.wep).map(w=>[w.evo?{...w.s,c:'#ffd35a'}:w.s,w.evo?5:w.l]),...Object.keys(G.pas).map(k=>[PD[k],G.pas[k]])],per=Math.max(1,Math.floor((W-20-(state==='play'||state==='pause'?150:0))/36));
   items.forEach(([d,l],i)=>{const x=12+(i%per)*36,y=H-46-Math.floor(i/per)*42;
     rr(c,x,y,30,30,8,'rgba(16,38,26,.82)');c.strokeStyle=d.c;c.lineWidth=2;c.beginPath();if(c.roundRect)c.roundRect(x,y,30,30,8);else c.rect(x,y,30,30);c.stroke();
     c.font='900 15px "Noto Sans TC", sans-serif';c.textAlign='center';c.fillStyle=d.c;c.fillText(d.g,x+15,y+7);
     for(let q=0;q<5;q++)rr(c,x+3+q*5.2,y+33,4,3,1,q<l?d.c:'rgba(255,255,255,.25)')});
+  if(G.boss){const b=G.boss,sxp=W/2+(b.x-G.p.x)*S,syp=H/2+(b.y-G.p.y)*S,m=46;if(sxp<-20||sxp>W+20||syp<-20||syp>H+20){const a=Math.atan2(syp-H/2,sxp-W/2),k=Math.min((W/2-m)/Math.abs(Math.cos(a)||1e-6),(H/2-m)/Math.abs(Math.sin(a)||1e-6)),ax=W/2+Math.cos(a)*k,ay=H/2+Math.sin(a)*k,pu=1+.12*Math.sin(G.t*8);c.save();c.translate(ax,ay);c.rotate(a);c.scale(pu,pu);c.beginPath();c.moveTo(18,0);c.lineTo(-10,-13);c.lineTo(-4,0);c.lineTo(-10,13);c.closePath();c.fillStyle='#c45aff';c.fill();c.lineWidth=3;c.strokeStyle='#fff';c.stroke();c.restore();c.font='900 11px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.6)';c.strokeText('魔王',ax-Math.cos(a)*26,ay-Math.sin(a)*26+4);c.fillStyle='#fff';c.fillText('魔王',ax-Math.cos(a)*26,ay-Math.sin(a)*26+4)}}
   if(G.boss){const bw=Math.min(420,W-40),bx=(W-bw)/2;T(G.boss.guard?`第 ${G.floor} 層守衛・${STAGES[G.stage].boss}`:STAGES[G.stage].boss,W/2,48,'center','900 14px "Noto Sans TC", sans-serif');rr(c,bx,68,bw,10,5,'rgba(0,0,0,.5)');rr(c,bx,68,bw*Math.max(0,G.boss.hp/G.boss.max),10,5,'#9be36b');if(!G.boss.guard){const left=G.bossT+BOSS_ESC-G.t;const tx=`魔王 ${fmt(Math.max(0,left))} 後逃走`;c.font='700 12px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(tx,W/2,94);c.fillStyle=left<30&&Math.floor(G.t*3)%2?'#ff6b6b':'#fff';c.fillText(tx,W/2,94)}}
   for(const z of G.Z)if(z.k==='shrine'&&!z.used){const dx=(z.x-G.p.x)*S,dy=(z.y-G.p.y)*S;if(Math.abs(dx)>W/2-20||Math.abs(dy)>H/2-20){const a=Math.atan2(dy,dx),k=Math.min((W/2-30)/Math.abs(Math.cos(a)||1e-6),(H/2-30)/Math.abs(Math.sin(a)||1e-6)),ax=W/2+Math.cos(a)*k,ay=H/2+Math.sin(a)*k;c.save();c.translate(ax,ay);c.rotate(a);tri(c,12,0,-6,-8,-6,8,'#ffe27a');c.restore()}}
   if(SV.minimap!==false){const ms=Math.round(Math.min(104,W*.24)),mx=W-ms-10,my=(G.boss?88:62)+(W<560?22:0),rad=700,k=ms/2/rad,cx=mx+ms/2,cy=my+ms/2;
@@ -2018,6 +2041,8 @@ addEventListener('pagehide',auHide);addEventListener('pageshow',()=>auWake());
 
 /* ---------- input ---------- */
 $('hub').addEventListener('click',e=>{if(e.target.closest('button'))sfx('ui');hubClick(e)});
+$('nameOk').addEventListener('click',confirmName);$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();confirmName()}});$('nameRnd').addEventListener('click',()=>{$('nameIn').value=RNAMES[Math.floor(Math.random()*RNAMES.length)];$('nameMsg').textContent=''});
+$('hub').addEventListener('toggle',e=>{if(e.target.classList&&e.target.classList.contains('bldbox'))bldOpen=e.target.open},true);
 $('sbtn').addEventListener('click',()=>{auInit();AU.vol.on=!AU.vol.on;auApply()});
 frame.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vol;if(!k)return;AU.vol[k]=+e.target.value;AU.vol.on=true;auApply()});
 $('breeds').addEventListener('click',e=>{const b=e.target.closest('.br');if(b)pickBreed(b.dataset.b)});
@@ -2052,6 +2077,7 @@ $('acctClose').addEventListener('click',()=>$('acctov').classList.add('hide'));
 $('newsClose').addEventListener('click',()=>$('newsov').classList.add('hide'));
 $('newsList').addEventListener('click',e=>{const b=e.target.closest('.nv');if(b){newsSel=+b.dataset.nv;openNews()}});
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+  if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
   if(k==='escape'&&state!=='play'&&state!=='level'&&escClose()){e.preventDefault();return}
   if(k==='enter'&&state!=='tip'&&!$('tipov').classList.contains('hide')){e.preventDefault();closeTip();return}
   if(modalOpen()&&(state==='town'||state==='house'||state==='hub')){return}
@@ -2097,7 +2123,7 @@ const NPCS=[
  {id:'smith',n:'工匠犬・大熊',r:'裝備',x:280,y:-170,skin:'border0',job:'smith',open:panelTab('eq'),b:{k:'house',w:150,h:84,wall:'#d8c8b0',roof:'#5a5a62',sign:'鐵匠鋪'}},
  {id:'elder',n:'長老・白鬍子',r:'天賦',x:-400,y:60,skin:'westie0',job:'sage',open:panelTab('tal'),b:{k:'house',w:136,h:80,wall:'#e8e0f0',roof:'#6a5ab8',sign:'長老之家'}},
  {id:'card',n:'研究員・眼鏡妹',r:'卡片',x:400,y:60,skin:'poodle0',job:'alch',open:panelTab('card'),b:{k:'house',w:136,h:80,wall:'#f0e8f8',roof:'#c8508a',sign:'卡片研究所'}},
- {id:'salon',n:'美容師・可可',r:'造型扭蛋',x:-290,y:270,skin:'poodle2',job:'dancer',open:panelTab('skin'),b:{k:'house',w:150,h:84,wall:'#fff0f4',roof:'#ff8ab0',sign:'狗狗美容院'}},
+ {id:'salon',n:'美容師・可可',r:'毛色扭蛋',x:-290,y:270,skin:'poodle2',job:'dancer',open:panelTab('skin'),b:{k:'house',w:150,h:84,wall:'#fff0f4',roof:'#ff8ab0',sign:'狗狗美容院'}},
  {id:'cos',n:'設計師・咪咪',r:'時裝扭蛋',x:290,y:270,skin:'chi0',job:'bard',open:panelTab('cos'),b:{k:'house',w:150,h:84,wall:'#f0f6ff',roof:'#5a8ae0',sign:'時裝店'}},
  {id:'pet',n:'孵蛋婆婆',r:'寵物',x:0,y:420,skin:'dachs0',job:'priest',open:panelTab('pet'),b:{k:'tent',w:150,h:86}},
  {id:'didi',n:'尿尿小童・DIDI',r:'噴水池吉祥物',x:0,y:-58,skin:'corgi0',job:'novice',open:()=>{const L=['噓～不要一直盯著我看啦！','這座噴水池的水……你懂的 (๑•̀ㅂ•́)و','汪！今天也要加油喔！','我已經站在這裡 87 年了','偷偷告訴你：公園的土堆每天都會長新的寶物'];townFx.push({x:0,y:-110,s:'DIDI：'+L[Math.floor(Math.random()*L.length)],life:2.8});TP.heart=1;sfx('lvl')}},
@@ -2146,17 +2172,17 @@ function backToTown(){blurActive();show(null);state=inHouse?'house':'town';last=
 function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.add('app');document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI();blurActive();
   showTip('town2','歡迎來到主城！','・<b>走路</b>：電腦用方向鍵／WASD；手機按住畫面拖曳，或點一下想去的地方<br>・<b>使用功能</b>：直接<b>點 NPC</b>，狗狗會自己走過去打開；或走到 NPC 旁邊按下方黃色按鈕（電腦可按 E／空白鍵／Enter）<br>・NPC 頭上的<b>黃色標籤</b>是他負責的功能，有紅色 <b>!</b> 代表有事要處理<br>・不想走路也可以按下方「出戰」「選單」<br>・按 <kbd>Esc</kbd> 可以關掉視窗')}
 function blurActive(){try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()}catch(e){}}
-const MODALS=['moveov','acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
+const MODALS=['nameov','moveov','acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
 const modalOpen=()=>MODALS.some(id=>{const el=$(id);return el&&!el.classList.contains('hide')});
 function escClose(){if(!$('acctov').classList.contains('hide')){$('acctov').classList.add('hide');return true}if(!$('newsov').classList.contains('hide')){$('newsov').classList.add('hide');return true}if(!$('pullov').classList.contains('hide')){closePull();return true}if(!$('tipov').classList.contains('hide')){closeTip();return true}if(!$('jobov').classList.contains('hide')){show('hub');return true}if(!$('breedov').classList.contains('hide')&&!$('breedCancel').classList.contains('hide')){show('hub');return true}return false}
 function enterHouse(){VISIT=null;loadMyVisits();endWalk(true);inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
 function leaveHouse(){const wasVisit=!!VISIT;VISIT=null;closeEmoteBar();inHouse=false;state='town';houseEdit=false;TP.x=wasVisit?0:ENTERX;TP.y=wasVisit?110:ENTERY+30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
 function renderTownUI(){const tu=$('townui');if(!tu||!SV.breed)return;const h=homeData();
-  $('tinfo').innerHTML=`<b>${esc(SKM[curSkin()].n)}</b><small>${JM[SV.job].n} · Base Lv ${SV.blv}</small><small>${SV.zeny.toLocaleString()} 金幣　🦴 ${SV.bones}</small>`;
+  $('tinfo').innerHTML=`<b>${esc(dogName())}</b><small>${JM[SV.job].n} · Base Lv ${SV.blv}</small><small>${SV.zeny.toLocaleString()} 金幣　🦴 ${SV.bones}</small>`;
   homeSync();
   $('tbtns').innerHTML=VISIT?`<button class="btn sm" data-tw="foot">留下腳印</button><button class="btn sm ghost" data-tw="out">回主城</button>`:inHouse?`<button class="btn sm" data-tw="edit">${houseEdit?'完成擺放':'擺放家具'}</button><button class="btn sm ghost" data-tw="shop">家具店</button><button class="btn sm ghost" data-tw="vis">訪客${MYVIS&&MYVIS.length?`（${MYVIS.length}）`:''}</button><button class="btn sm ghost" data-tw="out">出門</button>`
     :`<button class="btn sm" data-tw="go">出戰</button><button class="btn sm ghost" data-tw="emote">社交</button><button class="btn sm ghost" data-tw="menu">選單</button><button class="btn sm ghost" data-tw="home">回家</button>`;
-  $('tinfo2').innerHTML=VISIT?`<b>${esc(VISIT.n)} 的家</b><small>${HOUSE_LV[VISIT.h.lv].n}・家具 ${VISIT.h.items.length} 件</small>`:inHouse?`<b>${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
+  $('tinfo2').innerHTML=VISIT?`<b>${esc(VISIT.n)}的家</b><small>${HOUSE_LV[VISIT.h.lv].n}・家具 ${VISIT.h.items.length} 件</small>`:inHouse?`<b>${esc(dogName())}的家・${HOUSE_LV[h.lv].n}</b><small>舒適度 ${homeComfort()}　出戰經驗 +${comfortExp().toFixed(1)}%　離線收入 +${Math.round(comfortIdle()*100)}%</small>`:'';
   $('tinfo2').classList.toggle('hide',!inHouse);
   const eb=$('editbar');eb.classList.toggle('hide',!(inHouse&&houseEdit));
   if(inHouse&&houseEdit){const inv=Object.entries(h.inv).filter(([k,v])=>v>0&&FM[k]);eb.innerHTML=`<p>${houseSel?`<b>${FM[houseSel].n}</b>：點地板上的空格放下`:'選一件家具，再點地板放下；點已經擺好的家具可以拿起來移動'}</p><div class="fchips">${inv.length?inv.map(([k,v])=>`<button class="fchip${houseSel===k?' on':''}" data-fsel="${k}"><canvas width="64" height="64" data-fi="${k}"></canvas><small>${FM[k].n} ×${v}</small></button>`).join(''):'<small class="note">沒有可以擺的家具，去家具店買吧！</small>'}</div>`;for(const pc of eb.querySelectorAll('canvas[data-fi]'))furnIcon(pc,pc.dataset.fi)}}
@@ -2230,7 +2256,7 @@ function drawMyHouse(c,x,y,t){const lv=homeData().lv;shadow(c,x,y+4,80,12);
    rr(c,x-w/2,y-h,w,h,5,wall);c.beginPath();c.moveTo(x-w/2-12,y-h+4);c.lineTo(x+w/2+12,y-h+4);c.lineTo(x,y-h-h*.7);c.closePath();c.fillStyle=roof;c.fill();
    c.beginPath();c.arc(x,y,20,Math.PI,TAU);c.fillStyle='#4a2a1a';c.fill();rr(c,x-w*.36-10,y-h*.72,20,18,3,'#9adfff');rr(c,x+w*.36-10,y-h*.72,20,18,3,'#9adfff');
    if(lv>=2){circ(c,x,y-h-h*.3,8,'#fff6e0');heart(c,x,y-h-h*.3,4,'#ff7a9a')}if(lv>=3)for(const dx of [-w/2-26,w/2+26]){circ(c,x+dx,y-14,6,'#ff8ab8');circ(c,x+dx+8,y-12,5,'#ffd23a')}}
- c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';const nm=`${SKM[curSkin()].n}的家`;const sw=c.measureText(nm).width+16;rr(c,x-sw/2,y-150,sw,20,6,'#fff6e0');c.fillStyle='#6a3a1a';c.fillText(nm,x,y-135)}
+ c.font='900 13px "Noto Sans TC",sans-serif';c.textAlign='center';const nm=`${dogName()}的家`;const sw=c.measureText(nm).width+16;rr(c,x-sw/2,y-150,sw,20,6,'#fff6e0');c.fillStyle='#6a3a1a';c.fillText(nm,x,y-135)}
 function drawFountain(c,t){ell(c,0,10,96,46,0,'#9a948a');ell(c,0,6,88,40,0,'#7fc8ef');c.globalAlpha=.5;for(let q=0;q<3;q++){const r=Math.max(.5,((t*20+q*25)%70+70)%70);c.strokeStyle='#fff';c.lineWidth=1;c.beginPath();c.ellipse(0,6,r,r*.45,0,0,TAU);c.stroke()}c.globalAlpha=1;rr(c,-10,-40,20,46,6,'#b8b2a8');ell(c,0,-40,26,9,0,'#b8b2a8');ell(c,0,-42,20,6,0,'#7fc8ef');
  for(let q=0;q<8;q++){const a=q/8*TAU,ph=(t*1.6+q*.37)%1;circ(c,Math.cos(a)*ph*26,-46+ph*44-Math.sin(ph*Math.PI)*28,2.2,'rgba(220,245,255,.9)')}}
 function drawPee(c,x,y,t){const sx=x-10,sy=y-2;c.save();c.globalAlpha=.95;for(let q=0;q<14;q++){const ph=((t*1.6+q/14)%1),px=sx-ph*34,py=sy+ph*ph*58-ph*12;circ(c,px,py,2.6-ph*.9,'#ffe45a')}c.restore();c.globalAlpha=.5;const r=3+((t*3)%1)*5;c.strokeStyle='#fff8c0';c.lineWidth=1;c.beginPath();c.ellipse(sx-30,sy+38,r,r*.4,0,0,TAU);c.stroke();c.globalAlpha=1}
@@ -2292,13 +2318,13 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
- if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;ds.push({y:p.y,f:()=>{{const du=NET.duo;if(du&&(du.a===p.id||du.b===p.id)){const dp=duoPose(du,du.a===p.id?'a':'b');drawEmoteDog(c,p.sk,p.j,dp.x,dp.y,t+p.x*.01,dp.face,dp.mv,p.w,null,1.2,{pose:dp.P})}else drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit})}if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
+ if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;ds.push({y:p.y,f:()=>{{const du=NET.duo;if(du&&(du.a===p.id||du.b===p.id)){const dp=duoPose(du,du.a===p.id?'a':'b');drawEmoteDog(c,p.sk,p.j,dp.x,dp.y,t+p.x*.01,dp.face,dp.mv,p.w,null,1.2,{pose:dp.P})}else drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit})}if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
  drawBalls(c);duoFxDraw(c,t);
  if(NET.walk){const me=myId(),pos=id=>id===me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(id),L=pos(NET.walk.leader),F=pos(NET.walk.follower);if(L&&F){const ax=L.x+(L.face||1)*8,ay=L.y-6,bx=F.x+(F.face||1)*8,by=F.y-6;c.strokeStyle='#d0503a';c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+16,bx,by);c.stroke()}}
  // labels
- if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
+ if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
  if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=DogCloud.status().username;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
  c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
    const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
@@ -2309,6 +2335,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  c.restore()}
 function drawTownPlayer(c,t){if(NET.duo){const dp=duoPose(NET.duo,NET.duo.a===myId()?'a':'b');drawEmoteDog(c,curSkin(),SV.job,dp.x,dp.y,t,dp.face,dp.mv,SV.wear,null,1.2,{pose:dp.P})}else drawEmoteDog(c,curSkin(),SV.job,TP.x,TP.y,t,TP.face,TP.mv,SV.wear,NET.me.em,1.2,{nap:(NET.me.nap&&!inHouse)||(inHouse&&TP.idle>4),sit:NET.me.sit});if(NET.me.say)drawBubble(c,TP.x,TP.y-40,PHRASES[NET.me.say.k],Math.min(1,(4-NET.me.say.t)*2));
  if(SV.pet&&PM[SV.pet]){TP.px=(TP.px===undefined?TP.x:TP.px)+((TP.x-TP.face*26)-(TP.px===undefined?TP.x:TP.px))*.08;TP.py=(TP.py===undefined?TP.y:TP.py)+((TP.y+8)-(TP.py===undefined?TP.y:TP.py))*.08;drawPet(c,SV.pet,TP.px,TP.py,t)}
+ if(!VISIT||true){c.textAlign='center';c.font='900 12px "Noto Sans TC",sans-serif';const lb=dogName();c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff3a0';c.fillText(lb,TP.x,TP.y-30)}
  if(TP.heart>0){c.globalAlpha=Math.min(1,TP.heart);heart(c,TP.x,TP.y-34-(1.2-TP.heart)*10,4,'#ff5a7a');c.globalAlpha=1}
 }
 const petWander={};
@@ -2333,7 +2360,7 @@ function townDown(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
    if(houseSel){if(idx>=0)return;if((h.inv[houseSel]||0)<=0){houseSel=null;renderTownUI();return}h.inv[houseSel]--;h.items.push({f:houseSel,x:gx,y:gy});sfx('drop');if(h.inv[houseSel]<=0)houseSel=null}
    else if(idx>=0){const it=h.items.splice(idx,1)[0];h.inv[it.f]=(h.inv[it.f]||0)+1;houseSel=it.f;sfx('ui')}
    save();renderTownUI();return}
- if(!inHouse&&!SV.hidePeers){for(const p of NET.peers.values()){if((SV.block||[]).includes(p.n))continue;if(Math.abs(wx-p.x)<24&&Math.abs(wy-(p.y-10))<24){openPeerMenu(p.id);closeEmoteBar();return}}}
+ if(!inHouse&&!SV.hidePeers){for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;if(Math.abs(wx-p.x)<24&&Math.abs(wy-(p.y-10))<24){openPeerMenu(p.id);closeEmoteBar();return}}}
  closePeerMenu();
  let hit=null;if(!inHouse){for(const a of townTargets()){const ay=a.y-(a.n&&a.n.b&&a.n.b.k!=='myhouse'?40:a.n&&a.n.b?10:12);if(Math.abs(wx-a.x)<(a.n&&a.n.b?Math.max(40,(a.n.b.w||120)*.45):26)&&Math.abs(wy-ay)<(a.n&&a.n.b?60:28)){hit=a;break}}}
  if(hit){TP.go=hit;TP.tgt=null;sfx('ui');return}
@@ -2344,7 +2371,7 @@ function townMove(e){if(state!=='town'&&state!=='house')return;const r=cv.getBou
 function townUp(e){if(!townPtr||townPtr.id!==e.pointerId)return;if(townPtr.mode==='wait'&&townPtr.wx!==undefined){TP.go=null;TP.tgt=[townPtr.wx,townPtr.wy]}if(townPtr.mode==='joy'){joy.on=false;joy.x=joy.y=0;$('joy').classList.add('hide')}townPtr=null}
 function townBtn(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.tw==='emote'){openEmoteBar('emote');return}if(d.tw==='foot'){openEmoteBar('foot');return}if(d.tw==='vis'){openEmoteBar('vis');return}closeEmoteBar();
- if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
+ if(d.tw==='go')openPanel('go');else if(d.tw==='menu')openPanel(tab==='go'&&(SV.cleared||0)>0?'char':tab);else if(d.tw==='home'){TP.go={n:NPCS.find(n=>n.id==='home'),x:ENTERX,y:-10,r:ENTERY+10};TP.tgt=null}
  else if(d.tw==='edit'){houseEdit=!houseEdit;houseSel=null;renderTownUI()}else if(d.tw==='shop')openPanel('home');else if(d.tw==='out')leaveHouse();
  else if(d.fsel){houseSel=houseSel===d.fsel?null:d.fsel;renderTownUI()}}
 
@@ -2353,11 +2380,11 @@ const EMOTES=[['wag','搖尾巴'],['sit','坐下'],['roll','打滾'],['spin','�
 const PHRASES=['你好！','好可愛！','一起去打塔嗎？','謝謝！','加油！','我回來了～','好厲害！','等我一下','汪汪！','晚安','要不要去公園挖寶？','掰掰～'];
 const NET={ctl:null,status:'off',err:'',peers:new Map(),retry:0,away:0,sendT:0,lastDest:null,emCd:0,sayCd:0,itCd:0,me:{em:null,say:null},menu:null,busy:false,balls:[],walk:null,inv:null};
 const netCan=()=>!!(window.DogCloud&&DogCloud.townEnabled&&DogCloud.townEnabled()&&DogCloud.status().loggedIn);
-function netMeta(){return{n:(DogCloud.status().username||'').slice(0,16),sk:curSkin(),j:SV.job,w:SV.wear||{},pt:SV.pet||'',lv:SV.blv,tb:SV.towerBest||0,cc:(SV.cown||[]).length,dnd:!!SV.dnd,x:Math.round(TP.x),y:Math.round(TP.y)}}
-function cleanPeer(m){const w={};for(const k in (m.w||{}))if(CSM[m.w[k]]&&CSM[m.w[k]].slot===k)w[k]=m.w[k];return{n:String(m.n||'狗狗').replace(/[^a-z0-9_]/gi,'').slice(0,16)||'狗狗',sk:SKM[m.sk]?m.sk:BASE.shiba,j:JM[m.j]?m.j:'novice',w,pt:PM[m.pt]?m.pt:'',lv:Math.max(1,Math.min(99,m.lv|0)),tb:Math.max(0,m.tb|0),cc:Math.max(0,m.cc|0),dnd:!!m.dnd}}
+function netMeta(){return{n:dogName(),u:(DogCloud.status().username||'').slice(0,16),sk:curSkin(),j:SV.job,w:SV.wear||{},pt:SV.pet||'',lv:SV.blv,tb:SV.towerBest||0,cc:(SV.cown||[]).length,dnd:!!SV.dnd,x:Math.round(TP.x),y:Math.round(TP.y)}}
+function cleanPeer(m){const w={};for(const k in (m.w||{}))if(CSM[m.w[k]]&&CSM[m.w[k]].slot===k)w[k]=m.w[k];return{n:cleanName(m.n)||'狗狗',u:String(m.u||'').replace(/[^a-z0-9_]/gi,'').slice(0,16),sk:SKM[m.sk]?m.sk:BASE.shiba,j:JM[m.j]?m.j:'novice',w,pt:PM[m.pt]?m.pt:'',lv:Math.max(1,Math.min(99,m.lv|0)),tb:Math.max(0,m.tb|0),cc:Math.max(0,m.cc|0),dnd:!!m.dnd}}
 const clampX=v=>Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,+v||0)),clampY=v=>Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,+v||0));
 function netPeers(list){const seen=new Set();let fresh=false;for(const m of list){seen.add(m.id);let p=NET.peers.get(m.id);const c=cleanPeer(m);if(!p){fresh=true;p={id:m.id,x:clampX(m.x),y:clampY(m.y),tx:clampX(m.x),ty:clampY(m.y),face:1,mv:false,em:null,say:null,heart:0};NET.peers.set(m.id,p)}Object.assign(p,c)}for(const id of [...NET.peers.keys()])if(!seen.has(id))NET.peers.delete(id);if(NET.menu&&!NET.peers.has(NET.menu))closePeerMenu();if(fresh&&NET.ctl)NET.force=.3+Math.random()*1.2;netChip()}
-function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.n))return;
+function netEvent(ev,d){const p=NET.peers.get(d.id);if(!p)return;if((SV.block||[]).includes(p.u||p.n))return;
  if(ev==='mv'){const tx=clampX(d.tx),ty=clampY(d.ty);if((p.nap||p.sit)&&Math.hypot(tx-p.x,ty-p.y)>10){p.nap=false;p.sit=false}if(Math.hypot(tx-p.x,ty-p.y)>700){p.x=tx;p.y=ty}p.tx=tx;p.ty=ty}
  else if(ev==='em'&&EMOTES.some(e=>e[0]===d.e&&e[0]!=='ball')){p.em={e:d.e,t:0};emoteSfx(d.e,p.x,p.y);if(d.e==='nap'){p.nap=true;p.sit=false}if(d.e==='sit'){p.sit=true;p.nap=false}if(d.e==='howl'){p.howlT=townT;howlCheck()}}
  else if(ev==='ball'){if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b)){const dd=Math.hypot(p.x-TP.x,p.y-TP.y);if(dd<420)sfx('s_ball',.7*(1-dd/420)+.1,.2)}if(NET.balls.length<20&&!NET.balls.some(b=>b.id===d.b))NET.balls.push({id:String(d.b).slice(0,60),owner:d.id,x0:clampX(d.x),y0:clampY(d.y),tx:clampX(d.tx),ty:clampY(d.ty),t:0,dur:.7,taken:null})}
@@ -2397,14 +2424,14 @@ function interactSpot(p,a){const pf=p.face||1;return a==='sniff'?[p.x-pf*26,p.y+
 function netInteract(id,a,arrived){const p=NET.peers.get(id);if(!p||NET.itCd>0)return;if(p.dnd){townFx.push({x:p.x,y:p.y-46,s:'牠現在想休息',life:1.6});return}const sp=interactSpot(p,a);if(!arrived&&Math.hypot(sp[0]-TP.x,sp[1]-TP.y)>16){NET.pend={id,a,t:6};TP.tgt=sp;TP.go=null;closePeerMenu();return}NET.pend=null;
  NET.itCd=2;TP.face=p.x>TP.x?1:-1;NET.me.em={e:a,t:0};emoteSfx(a);NET.me.sit=false;NET.me.nap=false;p.em={e:a==='pat'?'patted':'sniffed',t:0};sfx('lvl');if(NET.ctl)NET.ctl.send('it',{to:id,a});friendGain(id,p.n,1);closePeerMenu()}
 function netChip(){const el=$('netchip');if(!el)return;const s=NET.status;el.classList.toggle('hide',!(state==='town'));
- el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?'登入帳號後，就能在主城看到其他玩家':s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
-function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.n),fr=(SV.friends||{})[id],L=fr?flv(fr.p):0,walking=NET.walk&&(NET.walk.leader===id||NET.walk.follower===id);
+ el.innerHTML=s==='on'?`<b>●</b> 線上・頻道 ${NET.ctl.room}・${NET.peers.size+1} 隻狗`:s==='connecting'?'連線中…':s==='guest'?((NET.ghT||(NET.ghT=Date.now(),setTimeout(netChip,8200),NET.ghT))&&Date.now()-NET.ghT<8000?'登入帳號後，就能在主城看到其他玩家':'單人模式'):s==='error'?esc(NET.err||'連不上主城'):'離線';el.dataset.s=s}
+function openPeerMenu(id){const p=NET.peers.get(id);if(!p)return;NET.menu=id;const blocked=(SV.block||[]).includes(p.u||p.n),fr=(SV.friends||{})[id],L=fr?flv(fr.p):0,walking=NET.walk&&(NET.walk.leader===id||NET.walk.follower===id);
  $('peerm').innerHTML=`<div class="pmh"><canvas width="120" height="90" id="peerDog"></canvas><div><b>${esc(p.n)}</b><small>${JM[p.j].n}・Base Lv ${p.lv}</small><small>無限之塔 ${p.tb} 層・時裝 ${p.cc} 件</small><small>好感度：${FLV[L][1]} ${'♥'.repeat(L)}${fr?`（${fr.p}）`:''}</small>${p.dnd?'<small>（勿擾中）</small>':''}</div><button class="btn sm ghost" data-pm="x">✕</button></div>
   <div class="pmb"><button class="btn sm" data-pm="sniff" ${p.dnd?'disabled':''}>聞聞</button><button class="btn sm" data-pm="pat" ${p.dnd?'disabled':''}>摸摸頭</button>${walking?'<button class="btn sm" data-pm="unwalk">放開牽繩</button>':`<button class="btn sm" data-pm="walk" ${p.dnd?'disabled':''}>一起散步</button>`}<button class="btn sm" data-pm="gift" ${soc().gift[id]?'disabled':''}>${soc().gift[id]?'今天送過了':'送點心'}</button><button class="btn sm ghost" data-pm="visit">拜訪牠的家</button></div><div class="pmb"><small class="note" style="width:100%">一起玩（對方答應後兩隻狗會一起做）：</small>${Object.entries(DUOS).map(([k,o])=>{const lock=o.fr&&(!fr||fr.p<o.fr);return `<button class="btn sm" data-pm="duo:${k}" ${p.dnd||lock?'disabled':''}>${o.n}${lock?'（好朋友解鎖）':''}</button>`}).join('')}<button class="btn sm ghost" data-pm="block">${blocked?'取消屏蔽':'屏蔽'}</button></div>`;
  $('peerm').classList.remove('hide');portrait($('peerDog'),p.sk,p.j,1,false,p.w)}
 function closePeerMenu(){NET.menu=null;const m=$('peerm');if(m)m.classList.add('hide')}
 function peerMenuClick(e){const b=e.target.closest('button');if(!b||!NET.menu)return;const a=b.dataset.pm,id=NET.menu,p=NET.peers.get(id);
- if(a==='x'){closePeerMenu();return}if(a&&a.startsWith('duo:')){duoInvite(id,a.slice(4));return}if(a==='walk'){walkInvite(id);return}if(a==='unwalk'){endWalk(true);closePeerMenu();return}if(a==='gift'){sendGift(id);return}if(a==='visit'&&p){visitHome(id,p.n);return}if(a==='block'&&p){SV.block=SV.block||[];const i=SV.block.indexOf(p.n);if(i>=0)SV.block.splice(i,1);else SV.block.push(p.n);save();closePeerMenu();return}netInteract(id,a)}
+ if(a==='x'){closePeerMenu();return}if(a&&a.startsWith('duo:')){duoInvite(id,a.slice(4));return}if(a==='walk'){walkInvite(id);return}if(a==='unwalk'){endWalk(true);closePeerMenu();return}if(a==='gift'){sendGift(id);return}if(a==='visit'&&p){visitHome(id,p.n);return}if(a==='block'&&p){SV.block=SV.block||[];const bk=p.u||p.n,i=SV.block.indexOf(bk);if(i>=0)SV.block.splice(i,1);else SV.block.push(bk);save();closePeerMenu();return}netInteract(id,a)}
 let ebMode='emote';
 function openEmoteBar(mode){mode=mode||'emote';const el=$('emoteb');if(!el.classList.contains('hide')&&ebMode===mode){closeEmoteBar();return}ebMode=mode;
  if(mode==='foot'){el.innerHTML=`<p><b>在 ${esc(VISIT?VISIT.n:'')} 家留下腳印</b>　<span class="note">選一句話，主人回家會看到（一天一次）</span></p><div class="emr">${PHRASES.map((t,i)=>`<button class="btn sm ghost" data-foot="${i}">🐾 ${t}</button>`).join('')}</div>`;el.classList.remove('hide');return}
@@ -2446,7 +2473,7 @@ function drawEmoteDog(c,sk,j,x,y,t,face,mv,wear,em,sc,st){if(st&&st.pose){c.save
    c.globalAlpha=1}}
 function drawBubble(c,x,y,txt,al){c.globalAlpha=al;c.font='700 13px "Noto Sans TC",sans-serif';const w=c.measureText(txt).width+16;rr(c,x-w/2,y-22,w,22,10,'#ffffff');tri(c,x-5,y,x+5,y,x,y+6,'#ffffff');c.fillStyle='#3a2a1a';c.textAlign='center';c.fillText(txt,x,y-6);c.globalAlpha=1}
 
-const netKey=()=>JSON.stringify([curSkin(),SV.job,SV.wear||{},SV.pet||'',SV.blv,!!SV.dnd]);
+const netKey=()=>JSON.stringify([dogName(),curSkin(),SV.job,SV.wear||{},SV.pet||'',SV.blv,!!SV.dnd]);
 function netRetrack(){if(!NET.ctl)return;const k=netKey();if(k!==NET.mk){NET.mk=k;const m=netMeta();m.x=Math.round(TP.x);m.y=Math.round(TP.y);NET.ctl.track(m)}}
 
 /* ---------- social: friendship, walk, ball, nap, howl, gifts, visits ---------- */
@@ -2483,12 +2510,12 @@ function friendsHTML(){const fr=Object.entries(SV.friends||{}).sort((a,b)=>b[1].
 /* visiting homes */
 let VISIT=null,MYVIS=null,homeKey='',homeTimer=null;
 const curHome=()=>VISIT?VISIT.h:homeData();
-function homePub(){const h=homeData();return{lv:h.lv,items:h.items.slice(0,80),wall:h.wall,floor:h.floor,sk:curSkin(),j:SV.job,w:SV.wear||{},pets:Object.keys(SV.pets||{}).filter(k=>PM[k]).slice(0,4)}}
+function homePub(){const h=homeData();return{nm:dogName(),lv:h.lv,items:h.items.slice(0,80),wall:h.wall,floor:h.floor,sk:curSkin(),j:SV.job,w:SV.wear||{},pets:Object.keys(SV.pets||{}).filter(k=>PM[k]).slice(0,4)}}
 function homeSync(){if(!netCan()||!DogCloud.putHome)return;const k=JSON.stringify(homePub());if(k===homeKey)return;clearTimeout(homeTimer);homeTimer=setTimeout(()=>{const d=homePub(),kk=JSON.stringify(d);DogCloud.putHome(d).then(()=>{homeKey=kk}).catch(()=>{})},3000)}
 function cleanHome(d){d=d||{};const lv=Math.max(0,Math.min(HOUSE_LV.length-1,d.lv|0)),L=HOUSE_LV[lv],seen=new Set(),items=[];for(const it of (Array.isArray(d.items)?d.items:[]).slice(0,80)){const x=it.x|0,y=it.y|0,k=x+','+y;if(FM[it.f]&&x>=0&&y>=0&&x<L.w&&y<L.h&&!seen.has(k)){seen.add(k);items.push({f:it.f,x,y})}}
  const w={};for(const k in (d.w||{}))if(CSM[d.w[k]]&&CSM[d.w[k]].slot===k)w[k]=d.w[k];return{lv,items,wall:WALLS.some(x=>x[0]===d.wall)?d.wall:'cream',floor:FLOORS.some(x=>x[0]===d.floor)?d.floor:'wood',sk:SKM[d.sk]?d.sk:BASE.shiba,j:JM[d.j]?d.j:'novice',w,pets:(Array.isArray(d.pets)?d.pets:[]).filter(k=>PM[k]).slice(0,4),inv:{},mat:{}}}
 async function visitHome(id,name){if(!netCan())return;closePeerMenu();closeEmoteBar();try{const r=await DogCloud.getHome(id);if(!r||!r.data){townFx.push({x:TP.x,y:TP.y-50,s:`${name} 還沒有布置家`,life:2});return}
-  VISIT={id,n:r.username||name,h:cleanHome(r.data)};inHouse=true;state='house';houseEdit=false;const L=HOUSE_LV[VISIT.h.lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}catch(e){townFx.push({x:TP.x,y:TP.y-50,s:e.message||'讀取失敗',life:2})}}
+  VISIT={id,n:cleanName(r.data&&r.data.nm)||name||r.username,h:cleanHome(r.data)};inHouse=true;state='house';houseEdit=false;const L=HOUSE_LV[VISIT.h.lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}catch(e){townFx.push({x:TP.x,y:TP.y-50,s:e.message||'讀取失敗',life:2})}}
 async function leaveFootprint(k){if(!VISIT)return;closeEmoteBar();try{const r=await DogCloud.addVisit(VISIT.id,k);townFx.push({x:TP.x,y:TP.y-50,s:r==='dup'?'今天已經來過了，明天再來留腳印吧':'留下腳印了！',life:2.2});if(r!=='dup'){sfx('coin');const f=(SV.friends||{})[VISIT.id];friendGain(VISIT.id,VISIT.n,2)}}catch(e){townFx.push({x:TP.x,y:TP.y-50,s:e.message||'留腳印失敗',life:2})}}
 async function loadMyVisits(){MYVIS=null;if(!netCan()||!DogCloud.myVisits)return;try{MYVIS=await DogCloud.myVisits();renderTownUI()}catch(e){MYVIS=null}}
 function visitorsHTML(){if(!MYVIS)return '<p class="note">登入帳號後，可以看到誰來過你家。</p>';if(!MYVIS.length)return '<p class="note">最近 7 天還沒有訪客。邀請朋友來玩吧！</p>';
@@ -2546,6 +2573,7 @@ buildChangelog();
 if(window.DogCloud){DogCloud.onChange(acctBtnTxt);DogCloud.init().then(()=>{acctBtnTxt();if(DogCloud.status().loggedIn)syncAfterLogin(true).then(()=>{if(!$('acctov').classList.contains('hide'))renderAcct()})}).catch(()=>{})}
 acctBtnTxt();
 if(OLD_SITE){$('moveov').classList.remove('hide');$('moveGo').onclick=()=>{save();let r=null;try{r=localStorage.getItem('dog-run-v1')}catch(e){}location.href=NEW_HOME+(SV.breed?'#move='+b64e(JSON.stringify({s:SV,r})):'')};$('moveStay').onclick=()=>$('moveov').classList.add('hide')}
+if(SV.breed&&!SV.name&&!(SV.tut||{}).nameAsk){SV.tut=SV.tut||{};SV.tut.nameAsk=1;save();setTimeout(()=>openName(),1200)}
 if(MOVED)setTimeout(()=>showTip('moved','🏠 搬家完成！','舊網址的進度已經帶過來了。<br>以後請用 <b>wangwang-survivors.pages.dev</b> 來玩，可以加到主畫面喔！',true),700);
 if(SV.breed){goTown();idleIncome();if(SV.newsSeen!==VERSION){SV.newsSeen=VERSION;save();newsSel=0;openNews()}offerResume()}else{SV.newsSeen=VERSION;openBreeds('new')}
 requestAnimationFrame(loop);
