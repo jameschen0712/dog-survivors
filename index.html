@@ -49,6 +49,7 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .stbox.narr{background:#2a2438;border-color:#8a7ab8;color:#f0eaff}.stt{flex:1;min-width:0}.stt b{display:inline-block;background:#5a3410;color:#fff3d0;border-radius:8px;padding:1px 10px;font-size:14px}.stt p{margin:6px 0 0;font-size:17px;line-height:1.6;white-space:pre-wrap;color:#2a1a05}
 #storyov .card,#storyov *{opacity:1}#stSkip{color:#fff3d0;border-color:#fff3d0;background:transparent}
 .stbox.narr .stt p{font-size:16px;color:#f0eaff}.stbar{display:flex;justify-content:space-between;align-items:center}.stbar .note{color:#d8d0f0}
+.dtag{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;border-radius:6px;padding:0 5px;margin-left:2px;vertical-align:1px;line-height:1.5;font-style:normal}
 .btn.ghost{background:transparent;box-shadow:inset 0 0 0 2px #c9b88a}
 .btn.sm{padding:6px 12px;min-height:36px;font-size:14px;box-shadow:0 3px 0 #b88a1e}
 .btn.sm.ghost{box-shadow:inset 0 0 0 2px #c9b88a}
@@ -399,6 +400,17 @@ const BSK={nov:{melee:['小狗猛撲','撲','bash','#ffd35a',{big:1}],ranged:['�
  sn:{melee:['超級幼犬拳','拳','asura','#ffe27a'],ranged:['萬能星星彈','星','bolt','#ffe27a'],area:['奇蹟之光','奇','holy','#fff6b0',{n:2}]},
  gs:{melee:['近身散射','散','burst','#ffb347'],ranged:['神槍連射','神','arrow','#ffcf7a',{n:3,bullet:1}],area:['炸藥桶','炸','trap','#ff8a3d',{big:1}]}};
 for(const j of Object.values(JM))for(const b of ['melee','ranged','area']){const r=BSK[j.line][b],o={id:j.id+'_b'+b[0],n:r[0],g:r[1],k:r[2],c:r[3],x:r[4]||{},m:TM[j.tier],sig:false,job:j.id,bs:b};SKL[o.id]=o}
+/* damage types: 物理 phy (STR) / 遠程 rng (DEX) / 魔法 mag (INT) */
+const DTN={phy:['物理','#c8502a','力量'],rng:['遠程','#2a78c8','靈巧'],mag:['魔法','#8a4ad8','智力']};
+const dtTag=s=>s&&s.dt?`<span class="dtag" style="background:${DTN[s.dt][1]}" title="受${DTN[s.dt][2]}加成">${DTN[s.dt][0]}</span>`:'';
+const MAGK=['holy','sanct','lov','meteor','storm','orb','ball','aura','flask','rain','nova'],PRIEST=['aco','priest','hpriest','bishop'];
+function skType(o){const j=JM[o.job],ln=j?j.line:'nov',k=o.k,rngK=BCAT.ranged.includes(k)||k==='ball'||k==='trap';
+  if(ln==='mg')return 'mag';if(ln==='ar'||ln==='gs')return 'rng';if(ln==='sw')return 'phy';
+  if(ln==='ac')return PRIEST.includes(o.job)?'mag':'phy';
+  if(ln==='th')return rngK?'rng':'phy';
+  if(ln==='me'){if(k==='coin'||k==='burst')return 'phy';if(['alch','creator','genetic'].includes(o.job))return 'mag';return rngK||k==='orb'?'rng':'phy'}
+  if(['holy','sanct','lov','meteor','orb','aura'].includes(k))return 'mag';return rngK?'rng':'phy'}
+for(const j of Object.values(JM))for(const sk of j.sk)sk.dt=skType(sk);for(const o of Object.values(SKL))if(!o.dt)o.dt=skType(o);
 const buildSkill=(jid,b)=>BCAT[b]?SKL[jid+'_b'+b[0]]:null;
 const buildName=(jid,b)=>b==='balance'||!BUILDS[b]?'均衡流':(BNAME[JM[jid].line]||BNAME.nov)[b];
 const buildCount=(jid,b)=>BCAT[b]?chain(jid).filter(id=>id==='novice'?jid==='novice':1).reduce((a,id)=>a+JM[id].sk.filter(s=>BCAT[b].includes(s.k)).length,0)+1:99;
@@ -436,7 +448,7 @@ const MECH={
  cross:{b:32,cd:3.4,d:v=>`以自己為中心展開十字形聖光，傷害 ${v}`},
  breath:{b:8,cd:2.8,d:v=>`朝前方噴出火焰吐息，連續傷害 ${v}`},
  bolt:{b:15,cd:1.1,d:(v,l)=>`發射 ${1+(l>>1)} 發追蹤彈，傷害 ${v}`}};
-const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
+const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k)*((G.st&&G.st[s.dt])||1):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
 const skX=x=>(x.slow?'，還會讓敵人變慢':'')+(x.rock?'，會把敵人撞飛':'')+(x.fire?'（火屬性）':x.zap?'（雷屬性）':'');
 const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x)+skX(s.x);
 
@@ -637,7 +649,7 @@ function drawCard(pc,cid){const c=pc.getContext('2d'),w=pc.width,h=pc.height,cd=
   c.font='700 11px "Noto Sans TC", sans-serif';c.fillStyle='#8a6a3a';c.fillText(SLOTN[cd.slot]+'卡',w/2,h*.91)}
 function paintItems(root){for(const pc of (root||document).querySelectorAll('canvas[data-card]'))drawCard(pc,pc.dataset.card);for(const pc of (root||document).querySelectorAll('canvas[data-it]')){const it=ITEMREF[pc.dataset.it];if(it)drawItemIcon(pc,it)}}
 /* ---------- base stats (RO-style) ---------- */
-const STATS=[['str','力量','STR','招式傷害 +0.5%'],['agi','敏捷','AGI','移動速度 +0.25%、閃避 +0.15%'],['vit','體力','VIT','生命 +3 和 +0.6%、受到傷害 -0.1%'],['int','智力','INT','招式範圍 +0.4%、經驗 +0.2%'],['dex','靈巧','DEX','招式冷卻 -0.25%'],['luk','幸運','LUK','爆擊率 +0.2%、爆擊傷害 +0.4%、金幣 +0.3%']];
+const STATS=[['str','力量','STR','物理招式傷害 +0.8%'],['agi','敏捷','AGI','移動速度 +0.25%、閃避 +0.15%、冷卻 -0.1%'],['vit','體力','VIT','生命 +3 和 +0.6%、受到傷害 -0.1%'],['int','智力','INT','魔法招式傷害 +0.8%、範圍 +0.3%'],['dex','靈巧','DEX','遠程招式傷害 +0.8%、冷卻 -0.15%'],['luk','幸運','LUK','爆擊率 +0.2%、爆擊傷害 +0.4%、金幣 +0.3%']];
 const STAT_MAX=99,REB_MAX=5,REB_PTS=60;
 const statCost=x=>Math.floor((x-1)/10)+2;
 const stv=k=>Math.max(1,Math.min(STAT_MAX,((SV.stats||{})[k])|0||1));
@@ -646,7 +658,9 @@ function statSpent(){let s=0;for(const [k] of STATS)for(let x=1;x<stv(k);x++)s+=
 const statLeft=()=>statTotal()-statSpent();
 function statAdd(k,n){SV.stats=SV.stats||{};let added=0;for(let i=0;i<n;i++){const v=stv(k);if(v>=STAT_MAX||statLeft()<statCost(v))break;SV.stats[k]=v+1;added++}return added}
 const STAT_REC={nov:{str:2,vit:2,agi:2},sw:{str:3,vit:2,agi:1},mg:{int:3,dex:2,vit:1},ar:{dex:3,agi:2,luk:1},ac:{vit:2,int:2,dex:2},me:{luk:3,str:2,vit:1},th:{agi:3,luk:2,str:1},sn:{str:1,agi:1,vit:1,int:1,dex:1,luk:1},gs:{dex:3,agi:2,luk:1}};
-function statAuto(){const w=STAT_REC[JM[SV.job].line]||STAT_REC.nov;let guard=2000;while(guard--){let best=null,bs=1e9;for(const k in w){const v=stv(k);if(v>=STAT_MAX||statLeft()<statCost(v))continue;const sc=v/w[k];if(sc<bs){bs=sc;best=k}}if(!best)break;SV.stats[best]=stv(best)+1}}
+function jobDT(jid){const c={phy:0,rng:0,mag:0};for(const id of chain(jid))for(const sk of JM[id].sk)if(id!=='novice'||jid==='novice')c[sk.dt]+=JM[id].tier+1;return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]}
+const STAT_DT={phy:{str:3,vit:2,agi:1},rng:{dex:3,agi:2,luk:1},mag:{int:3,dex:1,vit:2}};
+function statAuto(){const w=JM[SV.job].line==='sn'?STAT_REC.sn:STAT_DT[jobDT(SV.job)];let guard=2000;while(guard--){let best=null,bs=1e9;for(const k in w){const v=stv(k);if(v>=STAT_MAX||statLeft()<statCost(v))continue;const sc=v/w[k];if(sc<bs){bs=sc;best=k}}if(!best)break;SV.stats[best]=stv(best)+1}}
 function calcStats(){
   const t=k=>SV.tal[k]||0;
   const st={dmg:1+(SV.blv-1)*.022+t('a1')*.04,crit:.05+t('a2')*.02,critD:1.5+t('a4')*.1,sig:1+t('a3')*.08,cd:1-t('b1')*.03,area:1+t('b2')*.04,mag:75*(1+t('b3')*.1),exp:1+t('b3')*.05,zeny:1+t('b4')*.1,hp:100+(SV.blv-1)*6+t('c1')*15,regen:t('c2')*.3,spd:1+t('c3')*.03,dr:t('c4')*.03,revive:t('c5'),bonusLv:t('a5'),freePick:t('b5'),bossDmg:t('a6')*.03,hpPct:t('c6')*.02,leech:t('c7')*.3};
@@ -655,7 +669,7 @@ function calcStats(){
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
     for(const [k,v] of it.aff)applyMod(st,k,v*(1+.12*(it.star||0)));for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   for(const [k,v] of Object.entries(collectionMods().m))applyMod(st,k,v);
-  {const a=k=>stv(k)-1;st.dmg+=a('str')*.005;st.spd+=a('agi')*.0025;st.dodge=Math.min(.35,a('agi')*.0015);st.hp+=a('vit')*3;st.hpPct+=a('vit')*.006;st.dr+=a('vit')*.001;st.area+=a('int')*.004;st.exp+=a('int')*.002;st.cd*=1-a('dex')*.0025;st.crit+=a('luk')*.002;st.critD+=a('luk')*.004;st.zeny+=a('luk')*.003}
+  {const a=k=>stv(k)-1;st.phy=1+a('str')*.008;st.rng=1+a('dex')*.008;st.mag=1+a('int')*.008;st.spd+=a('agi')*.0025;st.dodge=Math.min(.35,a('agi')*.0015);st.cd*=1-a('agi')*.001;st.hp+=a('vit')*3;st.hpPct+=a('vit')*.006;st.dr+=a('vit')*.001;st.area+=a('int')*.003;st.cd*=1-a('dex')*.0015;st.crit+=a('luk')*.002;st.critD+=a('luk')*.004;st.zeny+=a('luk')*.003}
   st.exp+=comfortExp()/100;
   if(SV.pet&&PM[SV.pet]){const [k,v]=petBon(SV.pet);applyMod(st,k,v)}
   st.hp=Math.round(st.hp*(1+st.hpPct));return st;
@@ -1302,7 +1316,7 @@ function openLevel(){
     if(o.t==='h')return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:#ff8a8a">骨</b><span><strong>大骨頭</strong><small>回復 40 生命</small></span></button>`;
     if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
     if(o.t==='e'){const s=o.s;return `<button class="ch evo" data-i="${i}"><span class="num">${i+1}</span><b style="background:linear-gradient(135deg,#ffe27a,#ff9a3a)">${s.g}</b><span><strong>${s.n}・進化</strong><em>進化！</em><small>招式大幅強化：數量、範圍、傷害都提升（Lv5 ＋ ${PD[o.req].n}）</small></span></button>`}
-    const s=o.s;return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}</strong><em>${o.l===1?'學會！':'Lv '+o.l} · ${s.bs?'流派招式':JM[s.job].n}</em><small>${skDesc(s,o.l)}</small></span></button>`}).join('');
+    const s=o.s;return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}</strong><em>${o.l===1?'學會！':'Lv '+o.l} · ${s.bs?'流派招式':JM[s.job].n} ${dtTag(s)}</em><small>${skDesc(s,o.l)}</small></span></button>`}).join('');
   $('lvHint').textContent=IS_TOUCH?'':`也可以按 1～${choicesNow.length} 選擇`;$('lvHint').classList.toggle('hide',IS_TOUCH);
   show('lvlup');
 }
@@ -1428,8 +1442,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.21.0';
+const VERSION='0.21.1';
 const NEWS=[
+ {v:'0.21.1',d:'11/25',t:'屬性對應傷害類型',items:[['調整','招式分成物理、遠程、魔法三種傷害（招式說明旁會標出來）：力量加物理、靈巧加遠程、智力加魔法，每點 +0.8%。巫犬系和天使犬路線是魔法；獵犬系、牛仔犬系是遠程；護衛犬系、功夫犬路線、搗蛋犬系大多是物理；跑腿犬系的工匠路線偏物理和遠程、藥劑路線是魔法'],['調整','敏捷多了冷卻 -0.1%、靈巧冷卻改成 -0.15%；智力範圍改成 +0.3%'],['調整','「自動配點」改成看你目前職業主要用哪一種傷害來分配（物理：力量＞體力＞敏捷；遠程：靈巧＞敏捷＞幸運；魔法：智力＞體力＞靈巧）'],['新增','角色數值多了「物理／遠程／魔法」三種傷害加成的顯示']]},
  {v:'0.21.0',d:'11/25',t:'故事模式・基礎屬性・轉生',items:[['新增','故事《彩虹橋的另一邊》：加班到深夜的社畜，在雨夜救了一隻小狗後，醒來發現自己變成了狗，來到彩虹橋的狗狗天堂。人間的煩惱變成灰霧和怪物入侵，你要變強把五個地區搶回來。共有序章、五章和終章，第一次出戰某一關會播放該章開頭，第一次打倒魔王會播放結尾；對話可以點一下跳過打字、也能整段跳過'],['新增','「角色」分頁的「故事回顧」可以重看看過的劇情（已經通關的人可以直接看到對應章節）'],['新增','基礎屬性（參考 RO）：力量、敏捷、體力、智力、靈巧、幸運。每升一級拿屬性點，等級越高拿越多；屬性越高，加一點要花越多點，最高 99。可以照職業自動推薦配點，也能隨時免費重置。已經在玩的人會依目前等級補發點數'],['新增','敏捷會帶來「閃避」，被打中時有機率完全躲掉'],['新增','轉生：Base Lv 99 可以轉生，等級回到 1、屬性點重新分配，但每轉一次永久多 60 點屬性點（最多 5 轉）；職業、天賦、裝備都保留。名字旁會有轉生標記，主城頭上會有彩虹光圈，其他玩家也看得到'],['調整','因為有了屬性點，每升一級原本送的傷害（3%→2.2%）和生命（8→6）稍微降低，改由屬性補上']]},
  {v:'0.20.1',d:'11/25',t:'前期魔王調整',items:[['調整','第一關「古樹王」血量減少 40%、撞人的傷害減少 25%；第二關「巨蛛女王」血量減少 15%。招式沒怎麼升級也來得及在魔王逃走前打倒；難度挑戰的魔王維持原本強度']]},
  {v:'0.20.0',d:'11/25',t:'新手體驗大整理',items:[['調整','Job 經驗改成 Base 經驗的 6 成，Job 等級越高需要越多經驗：一轉後大約要打 5～8 場才能二轉（以前打一場就跳到 Job 36）'],['修正','手機上戰鬥畫面左上角的職業名稱不會再和「魔王出現」倒數疊在一起，太長會自動換行'],['修正','升級選強化的畫面：手機上不再顯示「按 1、2、3」，電腦上會照選項數量顯示'],['新增','第一次選狗的畫面多了一段遊戲介紹；每隻狗改成顯示個性（能力都一樣，只是外表不同）'],['調整','新手第一次打開「選單」會停在「出戰」分頁；歡迎教學改成先按「出戰」再按「出發」'],['調整','「流派」改成可以收起來的區塊，平常只顯示目前流派，點開才看詳細說明'],['調整','「造型」改名為「毛色」，和「時裝」比較不會搞混；抽毛色有一半機率抽到你現在這隻狗的毛色；新手教學改推薦先抽時裝（每隻狗都能穿）'],['調整','開場怪物出現得比較密，不會再前一分鐘很空、後面突然爆量；被包圍前 5 秒會先提醒，第一關的包圍規模也縮小'],['新增','魔王登場時會大吼一聲把身邊的小怪震開，前 2.5 秒不會攻擊；魔王戰時小怪變少；魔王在畫面外時，畫面邊緣有紫色箭頭指出方向'],['新增','關卡列表會提醒「你現在等級比推薦低 X 級」'],['新增','倒下時結算畫面會寫出是被什麼打倒的'],['調整','結算畫面的裝備改成「普通 ×6、精良 ×2」這樣的摘要，只把稀有以上的列出來'],['調整','沒登入時，主城上方的「登入帳號後…」提示 8 秒後會縮成小小的「單人模式」'],['新增','幫狗狗取名字：選完狗會請你取名（也可以按「隨機」），名字會顯示在主城裡狗狗的頭上，其他玩家也看得到；你的狗屋會變成「名字的家」，朋友來拜訪時也會看到；「角色」分頁可以隨時改名。已經在玩的人下次打開遊戲時會問一次'],['修正','戰鬥中下方的技能圖示太多時會自動換行，不會再被右下角的按鈕蓋住']]},
@@ -1555,11 +1570,11 @@ function renderHub(){
     const st=calcStats(),t=tier;
     const jobBox=t>=4?'<p>已經是三轉職業，恭喜！</p>':kids(SV.job).length?(canJob()?`<p>Job Lv 已經到 ${SV.jlv}，可以轉職了！</p><button class="btn" id="doJob">轉職</button>`:`<p>Job Lv ${JREQ[t]} 才能轉職（目前 ${SV.jlv}）。</p>`):'';
     H.innerHTML=`<h3>${esc(dogName())}・${j.n}　<button class="btn sm ghost" id="renameBtn">改名字</button> <button class="btn sm ghost" id="storyBtn">故事回顧</button></h3><p class="note" style="margin:-6px 0 8px">毛色：${SKM[curSkin()].n}</p>
-      <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>閃避</span><b>${Math.round((st.dodge||0)*1000)/10}%</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
+      <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>閃避</span><b>${Math.round((st.dodge||0)*1000)/10}%</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>物理／遠程／魔法</span><b>${Math.round(st.phy*100)}／${Math.round(st.rng*100)}／${Math.round(st.mag*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
       ${statBox()}
       <details class="box bldbox" ${bldOpen?'open':''}><summary><strong>流派：${buildName(SV.job,curBuild())}</strong>　<span class="note">點開看各流派、免費更換</span></summary><p class="note" style="margin:6px 0">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西。</p><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></details>
       <div class="box"><strong>轉職</strong>　<button class="btn sm ghost" id="jobGuide">職業介紹・轉職路線</button>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
-      <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b>（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
+      <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b> ${dtTag(s)}（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
       <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
       <div class="box"><strong>換一隻狗</strong><p class="note">等級、職業、裝備都會保留，只換外表。</p><button class="btn sm ghost" id="chgDog">換狗</button></div>
       <div class="box"><strong>存檔</strong><p class="note">存檔放在這個瀏覽器。換裝置時，複製存檔碼到新裝置貼上。</p><button class="btn sm" id="expSave">複製存檔碼</button><textarea id="impTxt" placeholder="在這裡貼上存檔碼"></textarea><button class="btn sm ghost" id="impSave">讀取存檔碼</button><button class="btn sm ghost" id="delSave">刪除存檔重新開始</button><p class="note" id="saveMsg"></p></div>`;
@@ -1718,7 +1733,7 @@ const CATN={melee:['近戰','#ff8a5a'],ranged:['遠程','#5aa8ff'],area:['範圍
 const subTree=id=>{const a=[id];for(const k of kids(id))a.push(...subTree(k));return a};
 const pathsFrom=id=>{const k=kids(id);if(!k.length)return [[id]];return k.flatMap(c=>pathsFrom(c).map(p=>[id,...p]))};
 function jobMix(id){const ids=subTree(id).filter(x=>x!=='novice'),m={melee:0,ranged:0,area:0};let n=0;for(const x of ids)for(const s of JM[x].sk){for(const c in BCAT)if(BCAT[c].includes(s.k)){m[c]++;n++}}for(const c in m)m[c]=n?m[c]/n:0;return m}
-const skChip=(s,tag)=>`<div class="skc"><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}${tag?`<em>${tag}</em>`:''}</strong>${MECH[s.k].d(skDmg(s,1),1,s.x)+skX(s.x)}</span></div>`;
+const skChip=(s,tag)=>`<div class="skc"><b style="background:${s.c}">${s.g}</b><span><strong>${s.n} ${dtTag(s)}${tag?`<em>${tag}</em>`:''}</strong>${MECH[s.k].d(skDmg(s,1),1,s.x)+skX(s.x)}</span></div>`;
 /* ---------- story: 彩虹橋的另一邊 ---------- */
 const STORY={
  pro:{n:'序章　最後一班加班',l:[
@@ -1842,7 +1857,7 @@ function drawHalo(c,x,y,t,n){if(!n)return;c.save();c.translate(x,y);const cols=[
 function openRebirth(){const r=(SV.reb||0)+1;$('rebT').textContent=`第 ${r} 次轉生`;$('rebB').innerHTML=`<p>走過彩虹橋的光，再一次從小狗開始。</p><ul style="text-align:left;line-height:1.7;margin:6px 0"><li><b>Base Lv 會回到 1</b>，屬性點全部退回重新分配</li><li>永久多 <b>${REB_PTS} 點</b>屬性點（轉生後總共 +${REB_PTS*r}）</li><li>職業、Job 等級、天賦、裝備、卡片、時裝、寵物都<b>保留</b></li><li>名字旁和主城頭上會有 ${r} 層彩虹光圈</li></ul>`;$('rebov').classList.remove('hide')}
 function doRebirth(){if(SV.blv<99||(SV.reb||0)>=REB_MAX)return;SV.reb=(SV.reb||0)+1;SV.blv=1;SV.bxp=0;SV.stats={};save();$('rebov').classList.add('hide');sfx('win');try{netRetrack()}catch(e){}renderHub();showTip('reb'+SV.reb,'轉生成功！',`你現在是 <b>${SV.reb} 轉</b>的狗狗了，多了 ${REB_PTS*SV.reb} 點屬性點。<br>記得到「角色」分頁重新分配屬性！`,true)}
 function statBox(){const left=statLeft(),reb=SV.reb||0;
-  return `<div class="box statbox"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><strong>基礎屬性${reb?`<span class="rebb">${reb} 轉</span>`:''}</strong><span class="note">剩餘點數 <b style="font-size:18px;color:${left?'#c0392b':'#5a4a34'}">${left}</b></span></div>
+  return `<div class="box statbox"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><strong>基礎屬性${reb?`<span class="rebb">${reb} 轉</span>`:''}</strong><span class="note">這個職業主要是 ${dtTag({dt:jobDT(SV.job)})} 傷害（吃${DTN[jobDT(SV.job)][2]}）　剩餘點數 <b style="font-size:18px;color:${left?'#c0392b':'#5a4a34'}">${left}</b></span></div>
    <div class="sgrid">${STATS.map(([k,n,en,d])=>{const v=stv(k),c=statCost(v),can=v<STAT_MAX&&left>=c;return `<div class="srow"><b class="sn">${n}<small>${en}</small></b><b class="sv">${v}</b><span class="sd">每點 ${d}</span><span class="sb"><button class="btn sm" data-st="${k}" data-n="1" ${can?'':'disabled'} aria-label="${n} 加 1 點">+1</button><button class="btn sm ghost" data-st="${k}" data-n="10" ${can?'':'disabled'} aria-label="${n} 加 10 點">+10</button></span><small class="sc">下一點要 ${v>=STAT_MAX?'—':c} 點</small></div>`}).join('')}</div>
    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="btn sm" id="stAuto" ${left>=2?'':'disabled'}>依職業推薦自動配點</button><button class="btn sm ghost" id="stReset">全部重置（免費）</button>${SV.blv>=99&&reb<REB_MAX?`<button class="btn sm" id="rebBtn" style="background:linear-gradient(90deg,#ff9a9a,#ffd36b,#9be36b,#6bc8ff,#c9a2ff)">轉生</button>`:''}</div>
    <p class="note" style="margin:6px 0 0">每升一級都會拿到屬性點，等級越高拿越多；屬性越高，加一點要花的點數越多（最高 ${STAT_MAX}）。${reb<REB_MAX?`Base Lv 99 可以<b>轉生</b>：等級回到 1，但永久多 ${REB_PTS} 點屬性點（最多 ${REB_MAX} 轉）。`:'已經是最高轉生次數了！'}</p></div>`}
