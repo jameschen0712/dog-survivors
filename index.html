@@ -171,7 +171,7 @@ textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;b
 .af{display:grid;gap:8px;margin:6px 0 4px}.af label{font-size:14px;font-weight:700}.af input{width:100%;font:16px "Noto Sans TC",sans-serif;padding:10px 12px;border-radius:10px;border:2px solid #e3d6b0;background:#fff;color:#2a2116}.af input:focus{outline:none;border-color:#2f7a3e}
 .atabs{display:flex;gap:6px;margin:0 0 8px}.atabs button{flex:1}
 .cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0}.cmp div{background:#fff;border:2px solid #e3d6b0;border-radius:12px;padding:10px;font-size:14px}
-.news{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:12px;max-height:56vh}
+.news{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:12px;max-height:56vh;overflow:hidden}
 .nlist{overflow:auto;display:grid;gap:4px;align-content:start;max-height:56vh}
 .nv{text-align:left;background:#fff;border:2px solid #e3d6b0;border-radius:10px;padding:6px 8px;cursor:pointer;font:700 13px Fredoka,"Noto Sans TC",sans-serif}
 .nv small{display:block;font-weight:500;color:#7a6a50;font-size:12px}.nv.on{border-color:#2f7a3e;background:#eef7ea}
@@ -181,7 +181,7 @@ textarea{width:100%;min-height:64px;font:13px/1.4 monospace;border-radius:10px;b
 #changelog details{background:var(--bg2);border:1px solid #2c5a37;border-radius:12px;padding:8px 12px;margin:0 0 6px}
 #changelog summary{cursor:pointer;font-weight:900}#changelog summary span{float:right;font-weight:500;color:var(--mute);font-size:13px}
 #changelog .nl{margin-top:8px;color:var(--ink)}
-@media(max-width:560px){.news{grid-template-columns:minmax(0,1fr)}.nlist{display:flex;overflow-x:auto;max-height:none}.nv{flex:none}}
+@media(max-width:560px){.news{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);overflow:hidden}.news .nbody{max-height:none;min-height:0}.nlist{display:flex;overflow-x:auto;max-height:none}.nv{flex:none}}
 .pullcard{width:min(640px,100%);max-height:100%;overflow:auto}.pullcard .pulls{max-height:60vh;overflow:auto;padding:2px}
 .secs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.secs .btn{margin:0;padding:6px 12px;min-height:34px;font-size:14px}
 .pulls{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
@@ -1989,8 +1989,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.0';
+const VERSION='0.24.1';
 const NEWS=[
+ {v:'0.24.1',d:'11/25',t:'修正畫質模糊・最新消息視窗',items:[['修正','手機上「最新消息」內容太長時，文字會跑到「關閉」按鈕底下，現在內容改成在框框裡面捲動'],['修正','手機畫面變模糊：省電模式（每秒 30 張）被誤判成「手機太卡」，戰鬥中會一路把畫質降到最低，而且回到城鎮也不會恢復。現在改成照省電模式的速度判斷，離開戰鬥會恢復清晰度，手機上的解析度也調高']]},
  {v:'0.24.0',d:'11/25',t:'天賦樹・裝備跟著狗狗走・職業平衡',items:[['新增','天賦頁改成天賦樹：三條分支從中間往上長，點圖示看說明和加點，已點的會發光'],['調整','背包改成每隻狗各自一個，另外新增所有狗共用的「倉庫」（300 格），裝備可以放進倉庫給別隻狗用；原本背包裡的裝備都先放進倉庫'],['調整','武器分職業：每把武器標示「護衛犬系／巫犬系／獵犬系……」，只能裝自己職業系的武器（幼犬見習生、超級幼犬什麼都能用）；掉落的武器大多是自己職業系，商店開出的一定是'],['調整','毛色只能換成自己這隻狗品種的毛色，不能再換品種；其他品種的毛色還是算收藏加成，可以開那個品種的狗狗來穿'],['新增','商店列出寶箱的內容：各品質機率、各部位主數值、額外詞條數和卡槽數'],['調整','難度按鈕標示「通過前一級才會打開下一級」，還沒開的會顯示鎖頭'],['調整','金幣換骨頭改成每天最多 10 根，價格 1000、2000、3000…一根比一根貴（之前金幣太多可以無限換）'],['平衡','依照全職業模擬調整：牛仔犬系、療癒犬、舞步犬、功夫犬、影子犬、嚎歌犬系、怪盜犬、獒犬戰神等偏弱的職業加強；聖光守護神犬、瘋狂博士犬、小巫犬、跑腿犬等偏強的稍微調降'],['平衡','單體招式加強：骨頭箭／子彈每發多貫穿 1 隻、追蹤彈可以貫穿、三連肉球拳最後一下會震開周圍、連斬最後會掃過周圍']]},
  {v:'0.23.3',d:'11/25',t:'修正名字顯示',items:[['修正','登入帳號後，主城裡自己狗狗頭上顯示的是帳號名稱，現在改成顯示你幫狗狗取的名字']]},
  {v:'0.23.2',d:'11/25',t:'狗狗格子價格',items:[['調整','開新的狗狗格子改成越開越貴：第 4 格 20 根骨頭，之後依序 30、45、60、80，第 9 格 100 根（前 3 格一樣免費）']]},
@@ -3339,9 +3340,9 @@ function duoInvite(id,k){const p=NET.peers.get(id);if(!p||!NET.ctl||!DUOS[k])ret
 
 /* ---------- loop ---------- */
 const QL={lvl:0,avg:16,bad:0,good:0};
-function qualityTick(dt){if(state!=='play'){QL.bad=QL.good=0;return}const ms=dt*1000;QL.avg=QL.avg*.95+ms*.05;if(QL.avg>23){QL.bad+=dt;QL.good=0}else if(QL.avg<15){QL.good+=dt;QL.bad=0}else{QL.bad=Math.max(0,QL.bad-dt);QL.good=0}
+function qualityTick(dt){if(state!=='play'){QL.bad=QL.good=0;if(QL.lvl&&state!=='pause'&&state!=='level'&&state!=='chest'&&state!=='shrine'&&state!=='tip'){QL.lvl=0;QL.avg=16;resize()}return}const ms=dt*1000,tgt=1000/(lowPower()||QL.lvl>=3?30:60);QL.avg=QL.avg*.95+ms*.05;if(QL.avg>tgt*1.45){QL.bad+=dt;QL.good=0}else if(QL.avg<tgt*1.1){QL.good+=dt;QL.bad=0}else{QL.bad=Math.max(0,QL.bad-dt);QL.good=0}
   if(QL.bad>1.2&&QL.lvl<3){QL.lvl++;QL.bad=0;QL.avg=16;resize()}else if(QL.good>8&&QL.lvl>0){QL.lvl--;QL.good=0;resize()}}
-function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.max(1,Math.min(lowPower()?1.5:2,window.devicePixelRatio||1)*[1,.8,.65,.5][QL.lvl]);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
+function resize(){const r=frame.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(200,r.height);DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1)*[1,.85,.7,.55][QL.lvl]);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);S=Math.max(W<520?.72:.8,Math.min(1.15,Math.min(W,H)/(W<520?520:480)))}
 const ro=new ResizeObserver(resize);ro.observe(frame);
 const IS_TOUCH=(()=>{try{return matchMedia('(pointer:coarse)').matches}catch(e){return false}})();
 const lowPower=()=>SV.lowPower===undefined?IS_TOUCH:!!SV.lowPower;
