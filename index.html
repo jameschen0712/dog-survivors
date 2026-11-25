@@ -208,7 +208,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="chestov" style="z-index:22"><div class="card"><h2 id="chestT">寶箱！</h2><div id="chestB"></div><button class="btn" id="chestOk">太好了！</button></div></div>
       <div class="ov hide" id="shrineov" style="z-index:22"><div class="card"><h2>祭壇</h2><p class="sub">選一個本局有效的效果</p><div id="shrineB" class="choices"></div></div></div>
       <div class="ov hide" id="tipov" style="z-index:30"><div class="card"><h2 id="tipT"></h2><div id="tipB" style="text-align:left;font-size:15px;line-height:1.7;margin:0 0 12px"></div><button class="btn" id="tipOk">知道了</button></div></div>
-      <div class="ov hide" id="over"><div class="card"><h2 id="ovT"></h2><div class="stats" id="ovS"></div><div class="rw" id="ovR"></div><button class="btn" id="toTown">回到城鎮</button><button class="btn ghost hide" id="again"></button></div></div>
+      <div class="ov hide" id="over"><div class="card"><canvas id="ovAnim" width="320" height="150" style="display:block;width:100%;max-width:320px;height:auto;aspect-ratio:32/15;margin:-4px auto 6px;border-radius:14px"></canvas><h2 id="ovT"></h2><div class="stats" id="ovS"></div><div class="rw" id="ovR"></div><button class="btn" id="toTown">回到城鎮</button><button class="btn ghost hide" id="again"></button></div></div>
     </div>
   </div>
   <section class="how">
@@ -1293,7 +1293,8 @@ function end(win){
   }
   if(G.bossPick&&!G.trial){lines.unshift(`<div><b>魔王寶物：從三件裡挑一件帶走</b></div><div class="items" id="bpick">${G.bossPick.map((it,i)=>itemHTML(it,`<button class="btn sm" data-bp="${i}">選這件</button>`)).join('')}</div>`);bossPickOpen=G.bossPick}
   $('ovR').innerHTML=lines.join('');paintItems($('ovR'));
-  {const a=$('again');let lab='',go=null;if(!G.trial){if(G.mode==='tower'){const f=towerCP();lab=`直接挑戰無限之塔第 ${f} 層`;go={mode:'tower',floor:f}}else if(G.mode==='stage'){const nx=Math.min(SV.stage,STAGES.length-1);lab=nx>G.stage?`直接挑戰下一關：${STAGES[nx].n}`:`再挑戰一次：${STAGES[G.stage].n}`;go={stage:nx>G.stage?nx:G.stage,heat:nx>G.stage?0:G.heat}}}againGo=go;a.textContent=lab;a.classList.toggle('hide',!go)}
+  {const a=$('again');let lab='',go=null;if(!G.trial){if(G.mode==='tower'){const f=towerCP();lab=`直接挑戰無限之塔第 ${f} 層`;go={mode:'tower',floor:f}}else if(G.mode==='stage'){const nx=win?Math.min(SV.stage,STAGES.length-1):G.stage;lab=nx>G.stage?`直接挑戰下一關：${STAGES[nx].n}`:`再挑戰一次：${STAGES[G.stage].n}`;go={stage:nx>G.stage?nx:G.stage,heat:nx>G.stage?0:G.heat}}}againGo=go;a.textContent=lab;a.classList.toggle('hide',!go)}
+  {const fl2=G.mode==='tower'?Math.max(0,G.floor-(G.startFloor||1)):0;startOvAnim(G.mode==='tower'?(fl2>0?'tower':G.retreat?'retreat':'lose'):win?'win':G.escaped?'escaped':G.retreat?'retreat':'lose')}
   show('over');$('pbtn').classList.add('hide');$('dashb').classList.add('hide');$('spdb').classList.add('hide');
 }
 let tipPrev=null;
@@ -1303,6 +1304,62 @@ function idleIncome(){if(!SV.breed||!SV.seen)return;const h=Math.min(12,(Date.no
   showTip('idle','狗狗散步回來了！',`你離開的 <b>${h.toFixed(1)} 小時</b>裡，狗狗在城鎮附近散步，撿到了 <b>${zn.toLocaleString()} 金幣</b>和 <b>${bx} Base 經驗</b>。<br><span class="note">離線收益最多累積 12 小時，通關越多關卡撿得越多。</span>`,true)}
 let bossPickOpen=null;
 function takeBossPick(i){if(!bossPickOpen)return;const it=bossPickOpen[i];if(SV.inv.length<BAG+10)SV.inv.push(it);bossPickOpen=null;if(SV.autoEq)autoEquip();save();const bp=$('bpick');if(bp)bp.innerHTML=`<p>已帶走：<b style="color:${RAR[it.rar].c}">${RAR[it.rar].n} ${esc(it.n)}</b></p>`;sfx('drop')}
+
+/* ---------- result-screen animation ---------- */
+const OVA={k:null,t:0,last:0,raf:0,skin:'shiba0',job:'novice',wear:{},floor:0};
+function startOvAnim(kind){const cv=$('ovAnim');if(!cv)return;const d=Math.min(2,window.devicePixelRatio||1);cv.width=320*d;cv.height=150*d;
+  Object.assign(OVA,{k:kind,t:0,last:performance.now(),skin:G.skin||curSkin(),job:G.job,wear:Object.assign({},SV.wear||{}),floor:G.floor||0,d});cancelAnimationFrame(OVA.raf);OVA.raf=requestAnimationFrame(ovaLoop)}
+function ovaLoop(now){if(state!=='over'||!OVA.k){OVA.k=null;return}OVA.raf=requestAnimationFrame(ovaLoop);if(now-OVA.last<32)return;OVA.t+=Math.min(.1,(now-OVA.last)/1000);OVA.last=now;
+  const cv=$('ovAnim'),c=cv.getContext('2d');c.setTransform(OVA.d,0,0,OVA.d,0,0);drawResult(c,320,150,OVA.t,OVA.k)}
+function drawResult(c,w,h,t,k){
+  c.clearRect(0,0,w,h);c.save();c.beginPath();if(c.roundRect)c.roundRect(0,0,w,h,14);else c.rect(0,0,w,h);c.clip();
+  const bg=c.createLinearGradient(0,0,0,h),BG={win:['#ffe9a8','#ffc96b'],tower:['#d8ccff','#9a86e8'],lose:['#b8c4d8','#8a98b0'],retreat:['#ffd0a0','#e88a6a'],escaped:['#cde8c8','#8ac080']}[k];
+  bg.addColorStop(0,BG[0]);bg.addColorStop(1,BG[1]);c.fillStyle=bg;c.fillRect(0,0,w,h);
+  const S2=2,gy=h-26,dog=(x,y,face,mv,P,sc)=>{c.save();c.translate(x,y-22);c.scale((sc||1)*S2,(sc||1)*S2);drawDog(c,OVA.skin,OVA.job,0,0,t,face,mv,OVA.wear,P);c.restore()};
+  const ground=col=>{c.fillStyle=col;c.beginPath();c.ellipse(w/2,h+40,w*.75,72,0,0,TAU);c.fill()};
+  if(k==='win'){
+    c.save();c.translate(w/2,gy-20);c.rotate(t*.4);c.globalAlpha=.28;for(let i=0;i<12;i++){c.rotate(TAU/12);c.fillStyle='#fff';c.beginPath();c.moveTo(0,0);c.lineTo(220,-22);c.lineTo(220,22);c.closePath();c.fill()}c.restore();
+    ground('#8fd16a');
+    const ph=(t*1.5)%1,air=Math.sin(ph*Math.PI),land=ph<.12||ph>.9;
+    // big golden bone trophy floating behind
+    c.save();c.translate(w/2+72,46+Math.sin(t*2.4)*5);c.rotate(-.3);c.fillStyle='#ffd35a';c.strokeStyle='#a8741a';c.lineWidth=2;
+    for(const sx of [-1,1]){c.beginPath();c.arc(sx*18,-5,7,0,TAU);c.arc(sx*18,5,7,0,TAU);c.fill();c.stroke()}rr(c,-18,-5,36,10,3,'#ffd35a');c.restore();
+    for(let i=0;i<4;i++){const a=t*3+i*1.7,r=Math.max(0,Math.sin(a))*4;star(c,w/2+72+Math.cos(i*1.6)*30,46+Math.sin(i*2.1)*22,r,'#fff')}
+    dog(w/2-10,gy-air*30,1,false,{eyes:'happy',mouth:.5+air*.4,tw:34,ta:.7,earFlap:air*.35,drop:land?1.5:-1,legs:air>.25?'bow':'stand',body:air>.25?-.12:0},land?1.04:1);
+    for(let i=0;i<34;i++){const x=(i*53+Math.sin(t*1.3+i)*14+i*i*7)%w,y=((t*(50+(i%5)*14)+i*41)%(h+16))-8,col=['#ff6b8a','#5ad0ff','#7fe36b','#fff27a','#c9a2ff'][i%5];c.save();c.translate(x,y);c.rotate(t*(2+i%3)+i);c.fillStyle=col;c.fillRect(-3,-1.6,6,3.2);c.restore()}
+  }else if(k==='tower'){
+    for(let i=0;i<18;i++){const x=(i*71)%w,y=(i*37)%(h-40)+6,r=1+Math.max(0,Math.sin(t*2+i))*1.6;circ(c,x,y,r,'rgba(255,255,255,.85)')}
+    const steps=5,sw2=44,sh=9,x0=w/2-120;for(let i=0;i<steps;i++){rr(c,x0+i*sw2,gy+8-(i+1)*sh,sw2+2,(i+1)*sh+20,3,i%2?'#7a6ab8':'#8a7ac8');rr(c,x0+i*sw2,gy+8-(i+1)*sh,sw2+2,4,2,'#b8acf0')}
+    const tx=x0+(steps-1)*sw2+24,ty=gy+8-steps*sh;
+    c.strokeStyle='#5a4a2a';c.lineWidth=2.5;c.beginPath();c.moveTo(tx+30,ty);c.lineTo(tx+30,ty-52);c.stroke();
+    const wv=Math.sin(t*5)*3;c.fillStyle='#ff6b6b';c.beginPath();c.moveTo(tx+30,ty-52);c.quadraticCurveTo(tx+52,ty-50+wv,tx+70,ty-44);c.lineTo(tx+30,ty-34);c.closePath();c.fill();
+    c.fillStyle='#fff';c.font='900 10px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillText(OVA.floor+'F',tx+46,ty-41);
+    dog(tx-4,ty+16,1,false,{legs:'sit',body:-.42,drop:1.5,tr:.95,ta:.3,tw:20,eyes:'happy',head:-.25-Math.max(0,Math.sin(t*2))*.25,mouth:.3})
+  }else if(k==='lose'){
+    ground('#7a9a78');
+    dog(w/2-6,gy,1,false,{legs:'lie',drop:6,head:.36,hy:2.6,eyes:'closed',tr:.9,ta:.03,tw:1.2,wig:0});
+    // rain cloud
+    const cx=w/2+8+Math.sin(t*.8)*6,cy=30;for(let i=0;i<14;i++){const x=cx-30+((i*13)%60),y=cy+12+((t*90+i*29)%60);c.strokeStyle='rgba(90,140,220,.8)';c.lineWidth=1.6;c.beginPath();c.moveTo(x,y);c.lineTo(x-2,y+6);c.stroke()}
+    for(const [dx,dy,r] of [[-22,4,13],[-6,-4,17],[14,2,14],[28,8,10],[0,10,14]])circ(c,cx+dx,cy+dy,r,'#e8ecf4');
+    circ(c,cx-6,cy+2,1.6,'#556');circ(c,cx+8,cy+2,1.6,'#556');c.strokeStyle='#556';c.lineWidth=1.3;c.beginPath();c.arc(cx+1,cy+9,4,Math.PI*1.15,Math.PI*1.85);c.stroke();
+    const a=Math.max(0,Math.sin(t*1.4));c.globalAlpha=a;c.fillStyle='#fff';c.font='700 12px "Noto Sans TC",sans-serif';c.textAlign='left';c.fillText('嗚…',w/2+42,gy-36-a*6);c.globalAlpha=1
+  }else if(k==='retreat'){
+    circ(c,w*.78,h*.62,30,'#ffe27a');circ(c,w*.78,h*.62,40,'rgba(255,226,122,.3)');ground('#c88a5a');
+    const L=w+90,x=((w*.72-t*34)%L+L)%L-45;
+    dog(x,gy,-1,true,{tw:6,ta:.2});
+    // bindle on a stick
+    const bx=x+16,by2=gy-30+Math.abs(Math.sin(t*14))*-1.5;c.strokeStyle='#7a4a1e';c.lineWidth=2.2;c.beginPath();c.moveTo(x-4,gy-8);c.lineTo(bx+6,by2-4);c.stroke();
+    ell(c,bx+8,by2,9,8,0,'#e85a5a');circ(c,bx+5,by2-2,1.4,'#fff');circ(c,bx+11,by2+2,1.4,'#fff');circ(c,bx+10,by2-4,1.2,'#fff');
+    for(let i=0;i<3;i++){const p=((t*2+i/3)%1);c.globalAlpha=.5*(1-p);circ(c,x+22+p*18,gy+10-p*4,3+p*5,'#f0d8b8')}c.globalAlpha=1
+  }else{ // escaped
+    ground('#6aa860');
+    const bx=w*.56+((t*50)%(w*.6))-40;c.save();c.translate(bx+40,gy-14);ell(c,0,0,22,18,0,'#7a4ab8');circ(c,-8,-4,4,'#fff');circ(c,6,-4,4,'#fff');circ(c,-9,-4,2,'#222');circ(c,5,-4,2,'#222');ell(c,0,7,6,3,0,'#3a1a5a');c.restore();
+    for(let i=0;i<3;i++){c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=2;c.beginPath();c.moveTo(bx+10-i*4,gy-24+i*8);c.lineTo(bx-10-i*6,gy-24+i*8);c.stroke()}
+    dog(w*.3,gy,1,false,{legs:'sit',body:-.42,drop:1.5,tr:.95,ta:.1,tw:4,head:Math.sin(t*1.6)*.3});
+    const q=Math.abs(Math.sin(t*3))*5;c.fillStyle='#fff';c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=3;c.font='900 22px Fredoka,sans-serif';c.textAlign='center';c.strokeText('?',w*.3+26,gy-72-q);c.fillText('?',w*.3+26,gy-72-q);c.font='900 15px Fredoka,sans-serif';c.strokeText('?',w*.3+44,gy-60-q*.6);c.fillText('?',w*.3+44,gy-60-q*.6)
+  }
+  c.restore()}
+function star(c,x,y,r,col){if(r<=0)return;c.fillStyle=col;c.beginPath();for(let i=0;i<8;i++){const rr2=i%2?r*.35:r,a=i*Math.PI/4;c.lineTo(x+Math.cos(a)*rr2,y+Math.sin(a)*rr2)}c.closePath();c.fill()}
 let againGo=null;
 const towerCP=()=>1+Math.floor((SV.towerBest||0)/10)*10;
 function again(){const g=againGo;if(!g)return;if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>itemScore(it)>itemScore(a[b])?i:b,0));G=null;if(g.mode==='tower')newRun(0,null,g);else newRun(g.stage,null,{heat:g.heat||0})}
@@ -1313,8 +1370,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.19.0';
+const VERSION='0.19.1';
 const NEWS=[
+ {v:'0.19.1',d:'11/25',t:'結算小動畫',items:[['新增','每場打完的結算畫面上方多了一段小動畫，用你自己的狗狗和身上的時裝：贏了會在彩帶和金骨頭前開心跳跳；輸了會趴在地上、頭上飄著小雨雲；撤退是背著小包袱在夕陽下走回家；魔王逃走時狗狗坐著歪頭冒問號，魔王一溜煙跑掉；無限之塔是坐在樓梯頂端，旁邊插著寫了層數的小旗子']]},
  {v:'0.19.0',d:'11/25',t:'狗狗職業・流派重做',items:[['調整','所有職業改成狗狗職業：護衛犬系、巫犬系、獵犬系、療癒犬系、跑腿犬系、搗蛋犬系、超級幼犬系、牛仔犬系，招式名稱也全部換成狗狗版（例如飛盤盾、臭襪攻擊、舔舔治療、天降大骨頭）；原本的進度、轉職和流派選擇都會保留'],['調整','流派重做：每個職業線的每一種流派都有一招自己的「流派招式」，開場就送（例如護衛犬的飛盤盾連發、巫犬的流星雨、搗蛋犬的臭襪毒霧），以前有些職業選了流派卻沒有對應招式的問題解決了'],['調整','流派差距拉大：近戰／遠程／範圍流派的主打招式傷害 +50～60%、冷卻大幅縮短，其他招式傷害 -25%；開場只帶主打類型的招式，升級時幾乎只出主打類型；近戰更耐打還會吸血、遠程跑更快、範圍招式更大；會心流爆擊更痛但沒爆擊時較弱；招式比較少的流派，主打招式會再額外加強；均衡流全部招式 +10% 而且升級變成四選一'],['新增','小地圖用小圖示標出寶箱、磁鐵、回血大骨頭和祭壇，會閃動比較好找；暫停選單有圖示說明'],['新增','裝備上的卡片可以拿下來了：在裝備旁按「卡片」，花 500 金幣把卡片拔下來放回收藏'],['新增','無限之塔：每打通 10 層解鎖一個新起點，結算畫面可以直接挑戰最高的起點；塔裡和每日副本都可以加速 ×2'],['新增','結算畫面多了「直接挑戰下一關／再挑戰一次」按鈕，不用回城鎮'],['調整','魔王出現後 2 分 30 秒還沒打倒就會逃走並結算（卡片副本等不會再卡住結束不了），魔王血條下方有倒數'],['調整','升級速度放慢：經驗獲得減少，Base／Job 等級越高需要的經驗越多'],['調整','怪物的子彈改成暗紅色、帶尖刺外框，和自己的招式更好分辨'],['修正','招式說明的傷害數字不會再出現一長串小數'],['修正','切到別的 App 或分頁時會靜音，切回來聲音會恢復（以前常常切回來就沒聲音）'],['修正','無限之塔每上一層就立刻記錄最高層數，中途被手機關掉也不會不見；登入雲端時會自動用比較新的那份存檔'],['修正','進塔或關卡後馬上撤退不會再拿到骨頭和任務進度（修正可以無限刷骨頭的問題）']]},
  {v:'0.18.2',d:'11/24',t:'搬新家',items:[['新增','遊戲搬到新網址 wangwang-survivors.pages.dev，網址更好記，也更適合分享給朋友'],['新增','打開舊網址會跳出「搬家了」視窗，按「帶著存檔搬過去」就會把這台裝置上的進度（包含還沒打完的關卡）一起帶到新網址'],['調整','雲端存檔、線上主城、拜訪狗屋都照常運作；有登入雲端帳號的話，到新網址登入同一個帳號就好']]},
  {v:'0.18.1',d:'11/24',t:'巴塔公主會說話了',items:[['新增','找「公主・巴塔」說話，牠會隨機回你：「嗚嗚～我要找媽媽～」然後加速亂跑跑掉；或是依照你們現在的感情回話（每次找牠說話都會增加，愛心越多越黏你）；或是一臉疑惑「....???」']]},
