@@ -1817,7 +1817,7 @@ function coopHud(c){const C=G.coop,o=raidObj()||{};let y=G.hudY||84;
   const p=G.p;if(p.down>0||p.dead){c.textAlign='center';c.font='900 18px "Noto Sans TC",sans-serif';c.lineWidth=5;c.strokeStyle='rgba(0,0,0,.6)';const s=p.dead?'你陣亡了，等隊友打完吧':`你倒下了！等隊友來救你（${Math.ceil(p.down)}）`;c.strokeText(s,W/2,H*.38);c.fillStyle='#ffd35a';c.fillText(s,W/2,H*.38)}}
 
 /* ======================= 團隊副本：大廳、配對、好友 ======================= */
-const TEAMSEL={mode:'boss',tier:0,size:4};
+const TEAMSEL={mode:'boss',tier:0,size:4,wait:30};
 const LOB={st:null};// st: null | {kind:'mm'|'party'|'join', ...}
 const RAID_SHOP=[['bone',6,'15 根狗骨頭','可以拿去抽毛色、時裝'],['r2',10,'稀有裝備','目前最高關卡等級的稀有（藍）裝備'],['r3',30,'史詩裝備','目前最高關卡等級的史詩（紫）裝備'],['r4',80,'傳說裝備','目前最高關卡等級的傳說（橘）裝備']];
 const onlineT=t=>t&&Date.now()-new Date(t).getTime()<4*60*1000;
@@ -1842,8 +1842,8 @@ function teamHTML(){const T=TEAMSEL,li=CLOUD()&&DogCloud.status().loggedIn,tok=S
   return `<h3>團隊副本　<span class="note">和朋友一起打，人不夠會補 AI 狗狗</span></h3>
     <div class="rmodes">${modeCard('boss')}${modeCard('def')}</div>
     <p style="margin:12px 0 6px"><b>難度</b></p><div class="tcp">${tierB}</div>
-    <p style="margin:12px 0 6px"><b>人數</b></p><div class="tcp">${sizeB}</div>${low}
-    <div class="tcp" style="margin-top:14px"><button class="btn" data-tm="mm" ${li?'':'disabled'}>隨機配對<small>${li?'30 秒湊不滿就補 AI':'要先登入'}</small></button><button class="btn" data-tm="party" ${li?'':'disabled'}>開隊伍邀好友<small>${li?'由你當隊長':'要先登入'}</small></button><button class="btn ghost" data-tm="solo">和 AI 一起練習<small>不用連線</small></button></div>
+    <p style="margin:12px 0 6px"><b>人數</b></p><div class="tcp">${sizeB}</div><p style="margin:12px 0 6px"><b>隨機配對最多等多久</b>　<span class="note">時間到還湊不滿就補 AI</span></p><div class="tcp">${[0,15,30,60].map(w=>`<button class="btn sm${T.wait===w?"":" ghost"}" data-tm="wait:${w}">${w?w+" 秒":"不等"}</button>`).join("")}</div>${low}
+    <div class="tcp" style="margin-top:14px"><button class="btn" data-tm="mm" ${li?'':'disabled'}>隨機配對<small>${li?(T.wait?T.wait+' 秒湊不滿就補 AI':'馬上補 AI 開打'):'要先登入'}</small></button><button class="btn" data-tm="party" ${li?'':'disabled'}>開隊伍邀好友<small>${li?'由你當隊長':'要先登入'}</small></button><button class="btn ghost" data-tm="solo">和 AI 一起練習<small>不用連線</small></button></div>
     <p class="note">每局都從 Lv1 開始、各自選強化；升級時全隊一起選，選好才繼續。寶箱會讓全隊多一次升級。經驗、金幣大家都拿得到，裝備各自掉。</p>
     <h3 style="margin-top:18px" data-anchor="raidshop">團隊徽章兌換　<span class="note">你有 ${tok} 個</span></h3><div class="slots">${shop}</div>
     <h3 style="margin-top:18px" data-anchor="friends">好友</h3><div class="box">${fr}</div>`}
@@ -1851,6 +1851,7 @@ function paintFriends(){for(const cv of $('hbody').querySelectorAll('canvas[data
 async function teamClick(b,v){const [a,x]=v.split(':');const T=TEAMSEL;
   if(a==='mode'){T.mode=RAIDM[x]?x:'boss';renderHub();return}
   if(a==='tier'){T.tier=Math.max(0,Math.min(2,+x|0));renderHub();return}
+  if(a==='wait'){T.wait=[0,15,30,60].includes(+x)?+x:30;renderHub();return}
   if(a==='size'){T.size=RSIZE.includes(+x)?+x:4;renderHub();return}
   if(a==='login'){openAcct();return}
   if(a==='back'){renderLobby();return}
@@ -1872,7 +1873,7 @@ async function teamClick(b,v){const [a,x]=v.split(':');const T=TEAMSEL;
 function lobbySlots(list,size){let h='';for(let i=0;i<size;i++){const m=list[i];h+=m?`<div class="lslot"><b>${esc(m.n||'狗狗')}</b><small>${JM[m.j]?JM[m.j].n:''}${m.lv?'・Lv '+m.lv:''}${m.host?'・隊長':''}</small></div>`:`<div class="lslot empty"><small>${LOB.st&&LOB.st.kind==='mm'?'配對中…':'等待加入'}</small></div>`}return h}
 function renderLobby(){const L=LOB.st,el=$('raidc');if(!L){$('raidov').classList.add('hide');return}
   const tier=RTIER[L.tier],list=L.list||[];let sub='',btn='';
-  if(L.kind==='mm'){const left=Math.max(0,Math.ceil((L.dead||0)-Date.now()/1000));sub=L.going?'找到隊友了，連線中…':`正在找隊友（${list.length}/${L.size}）・${left} 秒後補 AI 開打`}
+  if(L.kind==='mm'){const left=Math.max(0,Math.ceil((L.dead||0)-Date.now()/1000));sub=L.going?'找到隊友了，連線中…':`正在找隊友（${list.length}/${L.size}）・${left} 秒後補 AI 開打`;if(!L.going)btn='<button class="btn" data-lb="now">不等了，補 AI 開打</button>'}
   else if(L.kind==='party'&&L.host){sub=`邀請好友加入（${list.length}/${L.size}）。沒滿也能開，空位補 AI。`;btn=`<button class="btn" data-lb="start">開始！</button><button class="btn ghost" data-lb="invite">邀請好友</button>`}
   else sub=L.going?'連線中…':'等隊長按開始…';
   if(L.err)sub=`<b style="color:#c0392b">${esc(L.err)}</b>`;
@@ -1881,6 +1882,7 @@ function renderLobby(){const L=LOB.st,el=$('raidc');if(!L){$('raidov').classList
 function lobbyClick(e){const b=e.target.closest('button');if(!b)return;const a=b.dataset.lb;
   if(a==='cancel'){lobbyClose();return}
   if(a==='start'){partyStart();return}
+  if(a==='now'){mmNow();return}
   if(a==='invite'){$('raidov').classList.add('hide');openPanel('team','friends');setTimeout(()=>{const n=$('hbody').querySelector('[data-anchor="friends"]');if(n)n.insertAdjacentHTML('afterend','<p class="note" style="color:#2f7a3e;font-weight:700">點好友旁的「邀請」，再按上方「回到隊伍」。</p><button class="btn sm" data-tm="back">回到隊伍</button>')},50)}}
 async function lobbyClose(keepRoom){const L=LOB.st;LOB.st=null;$('raidov').classList.add('hide');if(!L)return;clearInterval(L.iv);clearTimeout(L.to);try{if(L.q)await L.q.leave()}catch(e){}if(!keepRoom&&L.room)try{await L.room.close()}catch(e){}}
 const myMeta=()=>{const pf=myProfile();return{n:pf.n,j:pf.j,lv:pf.lv,pf}};
@@ -1906,12 +1908,13 @@ async function startParty(){if(needLogin())return;const T=TEAMSEL;LOB.st={kind:'
   try{LOB.st.room=await joinRoom(rid(),true);LOB.st.list=[Object.assign(myMeta(),{id:LOB.st.room.me,host:true})];renderLobby();renderHub()}catch(e){if(LOB.st){LOB.st.err=e.message||String(e);renderLobby()}}}
 function partyStart(){hostStart()}
 async function sendInvite(fid){const L=LOB.st;if(!L||!L.room)throw new Error('先開一個隊伍');await DogCloud.sendTo('user:'+fid,'inv',{room:L.room.id,n:dogName(),mode:L.mode,tier:L.tier,size:L.size})}
-async function startMM(){if(needLogin())return;const T=TEAMSEL,key=`${T.mode}-${T.tier}-${T.size}`;LOB.st={kind:'mm',mode:T.mode,tier:T.tier,size:T.size,list:[],dead:Date.now()/1000+30};renderLobby();
+async function startMM(){if(needLogin())return;const T=TEAMSEL,key=`${T.mode}-${T.tier}-${T.size}`;LOB.st={kind:'mm',mode:T.mode,tier:T.tier,size:T.size,list:[],dead:Date.now()/1000+T.wait};renderLobby();
   const L=LOB.st;
-  try{L.q=await Coop.queue({key,me:{n:dogName(),j:SV.job,lv:SV.blv},
-      onMembers:list=>{if(LOB.st!==L||L.going)return;L.list=L.q?L.q.members():list;const lead=L.list[0];if(lead)L.dead=(lead.t||Date.now())/1000+30;renderLobby();mmTick()},
+  try{L.q=await Coop.queue({key,me:{n:dogName(),j:SV.job,lv:SV.blv,wt:T.wait},
+      onMembers:list=>{if(LOB.st!==L||L.going)return;L.list=L.q?L.q.members():list;const lead=L.list[0];if(lead)L.dead=(lead.t||Date.now())/1000+(lead.wt>=0&&lead.wt<=90?lead.wt:30);renderLobby();mmTick()},
       onGo:p=>{if(LOB.st!==L)return;mmJoin(p)}});
     L.list=L.q.members();L.iv=setInterval(()=>{if(LOB.st!==L){clearInterval(L.iv);return}renderLobby();mmTick()},1000)}catch(e){L.err=e.message||String(e);renderLobby()}}
+function mmNow(){const L=LOB.st;if(!L||L.kind!=='mm'||L.going||!L.q)return;const list=L.q.members();if(list.length&&list[0].id===L.q.me){L.dead=0;mmTick()}else{lobbyClose().then(()=>{TEAMSEL.mode=L.mode;TEAMSEL.tier=L.tier;TEAMSEL.size=L.size;startSolo()})}}
 function mmTick(){const L=LOB.st;if(!L||L.kind!=='mm'||L.going||!L.q)return;const list=L.q.members();if(!list.length||list[0].id!==L.q.me)return;
   if(list.length>=L.size||Date.now()/1000>=L.dead){const ids=list.slice(0,L.size).map(m=>m.id),room=rid();L.q.go({ids,room,host:L.q.me});mmJoin({ids,room,host:L.q.me})}}
 async function mmJoin(p){const L=LOB.st;if(!L||L.going)return;L.going=true;clearInterval(L.iv);renderLobby();try{await L.q.leave()}catch(e){}L.q=null;
@@ -2009,8 +2012,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.9';
+const VERSION='0.25.0';
 const NEWS=[
+ {v:'0.25.0',d:'11/25',t:'配對等待時間自己選',items:[['新增','團隊副本隨機配對可以自己選最多等多久：不等、15 秒、30 秒、60 秒，時間到湊不滿就補 AI'],['新增','配對中多了「不等了，補 AI 開打」按鈕，隨時可以直接開打']]},
  {v:'0.24.9',d:'11/25',t:'主城狗狗當 AI 隊友・不再黏在一起',items:[['修正','團隊副本的 AI 隊友會互相保持距離、分散在你身邊和魔王周圍不同方向，不會再全部疊在同一個位置'],['新增','AI 隊友改成主城裡的狗狗和 NPC 來幫忙：可能是庫里、巴塔、阿布、大熊、雪球、隊長……，外型和名字都跟主城一樣，同一場不會重複']]},
  {v:'0.24.8',d:'11/25',t:'天賦樹好點多了',items:[['調整','天賦樹不用再上下滑：樹變矮一點，說明框固定在畫面下方；點一下圖示看說明，再點一下同一個圖示就直接加 1 點']]},
  {v:'0.24.7',d:'11/25',t:'寶箱自動關閉',items:[['調整','戰鬥中開寶箱的結果視窗，幾秒後會自動關掉繼續戰鬥（按鈕上會倒數；有開「自動選強化」的話更快），掛著玩也不會卡住']]},
