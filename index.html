@@ -515,16 +515,20 @@ const ET={
  sprout:{hp:9,spd:52,r:12,dmg:6,xp:1},bat:{hp:6,spd:92,r:10,dmg:5,xp:1},shroom:{hp:22,spd:44,r:14,dmg:8,xp:2},
  wisp:{hp:16,spd:74,r:12,dmg:8,xp:2},golem:{hp:70,spd:34,r:20,dmg:14,xp:4},knight:{hp:120,spd:58,r:18,dmg:16,xp:5},
  beetle:{hp:14,spd:60,r:12,dmg:6,xp:1},spider:{hp:20,spd:82,r:13,dmg:8,xp:2},owl:{hp:18,spd:72,r:12,dmg:7,xp:2},lavablob:{hp:30,spd:46,r:14,dmg:9,xp:2},imp:{hp:26,spd:86,r:12,dmg:9,xp:3},
- yeti:{hp:62,spd:44,r:17,dmg:13,xp:4},penguin:{hp:28,spd:62,r:12,dmg:8,xp:2},cloud:{hp:24,spd:76,r:13,dmg:8,xp:2},gargoyle:{hp:90,spd:64,r:17,dmg:15,xp:5}};
+ yeti:{hp:62,spd:44,r:17,dmg:13,xp:4},penguin:{hp:28,spd:62,r:12,dmg:8,xp:2},cloud:{hp:24,spd:76,r:13,dmg:8,xp:2},gargoyle:{hp:90,spd:64,r:17,dmg:15,xp:5},
+ scarab:{hp:22,spd:80,r:12,dmg:8,xp:2},cactus:{hp:40,spd:40,r:14,dmg:11,xp:3},mummy:{hp:80,spd:50,r:16,dmg:14,xp:4},sandworm:{hp:110,spd:56,r:18,dmg:16,xp:5},
+ balloon:{hp:20,spd:84,r:12,dmg:8,xp:2},gearbot:{hp:45,spd:66,r:13,dmg:11,xp:3},tinsoldier:{hp:85,spd:58,r:16,dmg:15,xp:4},toybox:{hp:120,spd:54,r:18,dmg:17,xp:5}};
 const STAGES=[
  {n:'青青草原',rec:1,hp:1,dmg:1,rw:1,boss:'古樹王',bt:'treant',pool:['sprout','bat','beetle','shroom','golem'],g:['#5a9a46','#467f36','#6fae58'],col:'#3f8f4e'},
  {n:'幽暗森林',rec:15,hp:3,dmg:1.8,rw:2.4,boss:'巨蛛女王',bt:'spiderq',pool:['shroom','wisp','spider','owl','knight'],g:['#3c6b3a','#2c5229','#4b7d45'],col:'#2c5a3a'},
  {n:'熔岩洞窟',rec:30,hp:6.5,dmg:2.8,rw:5,boss:'熔岩巨人',bt:'lavagiant',pool:['lavablob','imp','bat','golem','knight'],g:['#6a4a3a','#4f3428','#8a5a3a'],col:'#8a3a22'},
  {n:'冰霜山脈',rec:45,hp:12,dmg:4.2,rw:9,boss:'雪原猛獁',bt:'mammoth',pool:['penguin','yeti','wisp','owl','golem'],g:['#9fb8c8','#7f98a8','#c8dce6'],col:'#4a7a9a'},
- {n:'天空之城',rec:60,hp:20,dmg:6,rw:15,boss:'雷鳥',bt:'thunderbird',pool:['cloud','gargoyle','imp','owl','knight'],g:['#a8c8e8','#88a8d0','#d8e8f8'],col:'#5a6ab8'}];
+ {n:'天空之城',rec:60,hp:20,dmg:6,rw:15,boss:'雷鳥',bt:'thunderbird',pool:['cloud','gargoyle','imp','owl','knight'],g:['#a8c8e8','#88a8d0','#d8e8f8'],col:'#5a6ab8'},
+ {n:'黃沙金字塔',rec:75,hp:32,dmg:8.5,rw:24,boss:'法老貓王',bt:'pharaoh',pool:['scarab','cactus','mummy','sandworm','gargoyle'],g:['#e2c68c','#c9a86a','#f2deb0'],col:'#b8863a'},
+ {n:'玩具時計塔',rec:90,hp:52,dmg:12,rw:38,boss:'時計魔王',bt:'clockking',pool:['balloon','gearbot','tinsoldier','toybox','cloud'],g:['#dcc4ea','#bc9ccc','#f2e2fa'],col:'#8a5ab8'}];
 
 /* ---------- monsters & cards ---------- */
-const EN={sprout:'苔芽',bat:'燈籠蝠',shroom:'毒菇',wisp:'墨靈',golem:'卵石魔像',knight:'枯木騎士',beetle:'角甲蟲',spider:'樹蛛',owl:'夜梟',lavablob:'熔岩泥',imp:'火焰小鬼',yeti:'小雪怪',penguin:'企鵝兵',cloud:'雲精靈',gargoyle:'石像鬼'};
+const EN={sprout:'苔芽',bat:'燈籠蝠',shroom:'毒菇',wisp:'墨靈',golem:'卵石魔像',knight:'枯木騎士',beetle:'角甲蟲',spider:'樹蛛',owl:'夜梟',lavablob:'熔岩泥',imp:'火焰小鬼',yeti:'小雪怪',penguin:'企鵝兵',cloud:'雲精靈',gargoyle:'石像鬼',scarab:'聖甲蟲',cactus:'仙人掌怪',mummy:'繃帶木乃伊',sandworm:'沙蟲',balloon:'氣球怪',gearbot:'齒輪精',tinsoldier:'發條士兵',toybox:'玩具箱怪'};
 /* card: id, name, slot, mods [[key,value]], source monster type (or boss stage index), drop text */
 const CARDS=[
  ['c_sprout','苔芽卡','armor',[['hp',40]],'sprout'],
@@ -540,7 +544,10 @@ const CARDS=[
  ['c_b1','巨蛛女王卡','armor',[['hp',120],['regen',1]],1],
  ['c_b2','熔岩巨人卡','weapon',[['critD',30]],2],
  ['c_b3','雪原猛獁卡','acc',[['cd',12]],3],
- ['c_b4','雷鳥卡','acc',[['atk',10],['exp',20],['zeny',20]],4]];
+ ['c_b4','雷鳥卡','acc',[['atk',10],['exp',20],['zeny',20]],4],
+ ['c_scarab','聖甲蟲卡','acc',[['zeny',15],['spd',4]],'scarab'],['c_cactus','仙人掌怪卡','weapon',[['atk',10],['crit',3]],'cactus'],['c_mummy','繃帶木乃伊卡','armor',[['hp',140]],'mummy'],['c_sandworm','沙蟲卡','armor',[['dr',7],['hp',40]],'sandworm'],
+ ['c_balloon','氣球怪卡','acc',[['spd',8],['area',6]],'balloon'],['c_gearbot','齒輪精卡','acc',[['cd',8]],'gearbot'],['c_tinsoldier','發條士兵卡','weapon',[['atk',15]],'tinsoldier'],['c_toybox','玩具箱怪卡','weapon',[['critD',28]],'toybox'],
+ ['c_b5','法老貓王卡','armor',[['hp',160],['dr',8]],5],['c_b6','時計魔王卡','acc',[['cd',12],['atk',10]],6]];
 const CM={};for(const r of CARDS)CM[r[0]]={id:r[0],n:r[1],slot:r[2],mods:r[3],src:r[4]};
 const MODN={atk:['傷害','%'],cd:['冷卻縮短','%'],spd:['移速','%'],area:['範圍','%'],hp:['生命',''],regen:['回復/秒',''],mag:['撿取範圍','%'],crit:['爆擊率','%'],exp:['經驗','%'],zeny:['金幣','%'],dr:['減傷','%'],critD:['爆擊傷害','%']};
 const modTxt=mods=>mods.map(([k,v])=>`${MODN[k][0]} ${k==='cd'?'-':'+'}${v}${MODN[k][1]}`).join('、');
@@ -649,7 +656,7 @@ const RAR=[{n:'普通',c:'#a8a8a8',m:1,a:0},{n:'精良',c:'#4fb84f',m:1.3,a:1},{
 const AFF={atk:['傷害','%',3],cd:['冷卻縮短','%',2],spd:['移速','%',2],area:['範圍','%',3],hp:['生命','',14],regen:['回復/秒','',.3],mag:['撿取範圍','%',6],crit:['爆擊率','%',2],exp:['經驗','%',4],zeny:['金幣','%',6]};
 const SLOTN={weapon:'武器',armor:'防具',acc:'飾品'};
 const WNAME={nov:'木棒',sw:'長劍',mg:'法杖',ar:'長弓',ac:'錫杖',me:'戰斧',th:'匕首',sn:'木棒',gs:'左輪槍'},ANAME=['皮甲','鎖甲','法袍','輕甲'],CNAME=['項圈','鈴鐺','護符','戒指'];
-const MAT=['草原','森林','熔岩','冰霜','天空'];
+const MAT=['草原','森林','熔岩','冰霜','天空','黃沙','玩具'];
 const WLINE={sw:'護衛犬系',mg:'巫犬系',ar:'獵犬系',ac:'療癒犬系',me:'跑腿犬系',th:'偷襪小賊系',gs:'牛仔犬系'},FREEW=['nov','sn'];
 const wLineName=wt=>WLINE[wt]||'所有職業';
 function canWear(it,job){if(!it||it.slot!=='weapon')return true;const ln=JM[job||SV.job].line;return FREEW.includes(ln)||!it.wt||FREEW.includes(it.wt)||it.wt===ln}
@@ -1064,6 +1071,16 @@ function drawEnemyBody(c,e,t){const bob=Math.sin(t*6+e.ph)*1.2;
     case 'lavagiant':rr(c,-13,-6,26,20,6,'#3a2418');c.strokeStyle='#ff7a2e';c.lineWidth=1.4;c.beginPath();c.moveTo(-8,-4);c.lineTo(-3,3);c.lineTo(-6,10);c.moveTo(6,-3);c.lineTo(3,4);c.lineTo(8,11);c.stroke();rr(c,-17,-2,5,13,2,'#4a3020');rr(c,12,-2,5,13,2,'#4a3020');rr(c,-8,-15,16,11,4,'#4a3020');c.globalAlpha=.6+.3*Math.sin(t*6);circ(c,-3,-10,2,'#fff27a');circ(c,3,-10,2,'#fff27a');c.globalAlpha=1;ell(c,0,-17,6,2,0,'#ff7a2e');break;
     case 'mammoth':ell(c,-1,0,14,11,0,'#8a5a3a');for(let i=0;i<5;i++)ell(c,-10+i*5,8,3,4,0,'#7a4a2e');circ(c,9,-3,7,'#9a6a46');rr(c,13,-2,3,12,1.5,'#9a6a46');c.strokeStyle='#f6efe0';c.lineWidth=2.4;c.beginPath();c.arc(14,4,6,-1.2,1.4);c.stroke();ell(c,4,-4,3,5,.3,'#7a4a2e');circ(c,11,-5,1.4,'#1a1414');for(const lx of [-9,-3,4])rr(c,lx-2,9,4.5,5,1.5,'#6a4028');break;
     case 'thunderbird':{const fl=Math.sin(t*9)*4;tri(c,-2,-2,-22,-14-fl,-8,6,'#3a6ad0');tri(c,2,-2,22,-14-fl,8,6,'#3a6ad0');tri(c,-4,-1,-18,-10-fl,-8,4,'#ffe27a');tri(c,4,-1,18,-10-fl,8,4,'#ffe27a');ell(c,0,2,7,9,0,'#4a7ae0');circ(c,0,-7,5.5,'#4a7ae0');tri(c,-2,-12,0,-19,2,-12,'#ffe27a');tri(c,1,-11,4,-17,4,-10,'#ffe27a');tri(c,3,-7,8,-6,3,-5,'#f5a742');circ(c,1.5,-8,1.3,'#fff');tri(c,-3,10,0,16,3,10,'#ffe27a');break}
+    case 'scarab':c.translate(0,bob*.3);ell(c,0,2,12,9,0,'#1f4f7a');ell(c,0,1,10,7.5,0,'#2a7ab8');rr(c,-.6,-6,1.2,15,.6,'#f0c040');ell(c,-3,-2,3,2,0,'rgba(255,255,255,.35)');circ(c,9,-1,4,'#1f4f7a');circ(c,10,-2,1.2,'#ffe27a');c.strokeStyle='#f0c040';c.lineWidth=1.4;c.beginPath();c.moveTo(11,-4);c.lineTo(15,-8);c.stroke();break;
+    case 'cactus':rr(c,-6,-12,12,24,6,'#5aa84a');rr(c,-13,-4,6,10,3,'#5aa84a');rr(c,7,-8,6,10,3,'#5aa84a');c.strokeStyle='#2f6a28';c.lineWidth=1;for(let i=-8;i<10;i+=5){c.beginPath();c.moveTo(-2,i);c.lineTo(-4,i-1);c.moveTo(3,i+2);c.lineTo(5,i+1);c.stroke()}circ(c,0,-14,3.5,'#ff6a8a');circ(c,-2,-3,1.6,'#1a1414');circ(c,3,-3,1.6,'#1a1414');rr(c,-2,1,5,1.5,.7,'#1a1414');break;
+    case 'mummy':c.translate(0,bob*.5);rr(c,-9,-12,18,24,6,'#e8dcc0');c.strokeStyle='#c8b890';c.lineWidth=1.6;for(let i=-9;i<12;i+=4){c.beginPath();c.moveTo(-9,i);c.lineTo(9,i+2);c.stroke()}rr(c,-6,-6,12,4,2,'#3a2a20');circ(c,-3,-4,1.4,'#7fffb0');circ(c,3,-4,1.4,'#7fffb0');rr(c,8,0,8,3,1.5,'#e8dcc0');break;
+    case 'sandworm':{for(let i=3;i>=0;i--){const ox=-i*6,oy=Math.sin(t*8+e.ph+i)*3;circ(c,ox,oy+2,9-i*.8,i%2?'#b89050':'#c8a060')}circ(c,4,0,10,'#d8b070');circ(c,8,1,5,'#5a2a1a');for(let k=0;k<5;k++){const a=k*1.25;tri(c,8+Math.cos(a)*5,1+Math.sin(a)*5,8+Math.cos(a+.3)*3,1+Math.sin(a+.3)*3,8+Math.cos(a-.3)*3,1+Math.sin(a-.3)*3,'#fff')}break}
+    case 'balloon':{c.translate(0,bob*1.6);c.strokeStyle='#5a4a6a';c.lineWidth=1;c.beginPath();c.moveTo(0,10);c.quadraticCurveTo(4,16,0,22);c.stroke();ell(c,0,-2,11,13,0,'#ff6a8a');ell(c,-4,-7,3,4,-.5,'rgba(255,255,255,.55)');tri(c,-2,10,2,10,0,13,'#d84a6a');circ(c,-3,-1,1.5,'#1a1414');circ(c,4,-1,1.5,'#1a1414');c.beginPath();c.arc(0,3,3,0,Math.PI);c.strokeStyle='#1a1414';c.stroke();break}
+    case 'gearbot':{c.save();c.rotate(t*2+e.ph);for(let k=0;k<8;k++){c.save();c.rotate(k*Math.PI/4);rr(c,-2.5,-15,5,6,1.5,'#9a8050');c.restore()}circ(c,0,0,11,'#b8a070');circ(c,0,0,5,'#8a7040');c.restore();circ(c,0,0,4.5,'#fff');circ(c,1,0,2.2,'#ff5a5a');break}
+    case 'tinsoldier':rr(c,-6,6,4,7,1.5,'#2a2a3a');rr(c,2,6,4,7,1.5,'#2a2a3a');rr(c,-8,-6,16,13,3,'#d83a3a');rr(c,-8,-1,16,2,1,'#f0c040');circ(c,0,-10,6,'#f4d8b8');rr(c,-5,-24,10,12,2,'#1f1f2a');rr(c,-6,-13,12,2,1,'#f0c040');circ(c,-2,-10,1.2,'#1a1414');circ(c,2,-10,1.2,'#1a1414');circ(c,-4,-8,1.3,'#ff9aa0');circ(c,4,-8,1.3,'#ff9aa0');{c.save();c.translate(-10,-2);c.rotate(t*6);rr(c,-1,-5,2,10,1,'#c0c0c8');rr(c,-5,-1,10,2,1,'#c0c0c8');c.restore()}break;
+    case 'toybox':{const op=Math.max(0,Math.sin(t*4+e.ph))*.5;rr(c,-13,-4,26,17,3,'#a86ad8');rr(c,-13,2,26,3,1,'#ffe27a');c.save();c.translate(-13,-4);c.rotate(-op);rr(c,0,-5,26,6,2,'#8a4ab8');c.restore();if(op>.1){circ(c,-4,-6,2,'#fff');circ(c,4,-6,2,'#fff');circ(c,-4,-6,1,'#1a1414');circ(c,4,-6,1,'#1a1414');ell(c,0,0,5,2.5,0,'#ff6a8a')}break}
+    case 'pharaoh':{ell(c,0,4,13,10,0,'#f0c040');ell(c,-9,10,4,3,0,'#e0b030');ell(c,9,10,4,3,0,'#e0b030');circ(c,0,-6,9,'#f4d070');for(let k=0;k<5;k++){const y=-12+k*3.5;tri(c,-9,y,-15,y+10,-9,y+3,k%2?'#2a5ab8':'#f0c040');tri(c,9,y,15,y+10,9,y+3,k%2?'#2a5ab8':'#f0c040')}rr(c,-9,-17,18,6,3,'#2a5ab8');rr(c,-9,-15,18,2,1,'#f0c040');tri(c,-7,-15,-4,-22,-1,-15,'#f4d070');tri(c,1,-15,4,-22,7,-15,'#f4d070');circ(c,-3,-6,1.8,'#2a8a3a');circ(c,3,-6,1.8,'#2a8a3a');tri(c,-1,-3,1,-3,0,-1.6,'#ff8aa0');rr(c,-1.2,-1,2.4,6,1,'#2a5ab8');break}
+    case 'clockking':{rr(c,-9,10,5,6,2,'#5a3a7a');rr(c,4,10,5,6,2,'#5a3a7a');circ(c,0,0,15,'#5a3a7a');circ(c,0,0,12.5,'#f8f2ff');for(let k=0;k<12;k++){const a=k*TAU/12;circ(c,Math.cos(a)*10.5,Math.sin(a)*10.5,k%3?0.8:1.5,'#5a3a7a')}c.strokeStyle='#2a1a3a';c.lineCap='round';c.lineWidth=2;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(t*.6-1.57)*6,Math.sin(t*.6-1.57)*6);c.stroke();c.lineWidth=1.2;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(t*4-1.57)*9,Math.sin(t*4-1.57)*9);c.stroke();circ(c,0,0,1.6,'#c89aff');tri(c,-12,-12,-6,-15,-15,-6,'#f0c040');tri(c,12,-12,6,-15,15,-6,'#f0c040');circ(c,-4,-4,1.4,'#ff3a6a');circ(c,4,-4,1.4,'#ff3a6a');break}
     case 'treant':{const lc=e.col||(G?STAGES[G.stage].col:'#3f8f4e');rr(c,-12,8,6,4,2,'#4f3520');rr(c,6,8,6,4,2,'#4f3520');rr(c,-9,-8,18,20,4,'#6b4a2e');circ(c,-8,-14,8,lc);circ(c,8,-14,8,lc);circ(c,0,-20,9,shade(lc,.15));circ(c,-3,-22,3,'rgba(255,255,255,.18)');circ(c,-3,0,2,'#ffdd55');circ(c,4,0,2,'#ffdd55');c.beginPath();c.arc(.5,6,3,0,Math.PI);c.fillStyle='#2a1a10';c.fill();break}
   }
 }
@@ -1085,9 +1102,11 @@ function drawEnemy(c,e,t){
 const tiles=STAGES.map((st,si)=>{const cv2=document.createElement('canvas');cv2.width=cv2.height=256;const c=cv2.getContext('2d');let s=7+si;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
   c.fillStyle=st.g[0];c.fillRect(0,0,256,256);
   for(let i=0;i<14;i++){c.fillStyle=rgba(st.g[2],.4);c.beginPath();c.ellipse(rnd()*256,rnd()*256,20+rnd()*30,12+rnd()*18,0,0,TAU);c.fill()}
+  if(si===6){for(let x=0;x<256;x+=32)for(let y=0;y<256;y+=32)if(((x+y)/32)%2){c.fillStyle=rgba(st.g[1],.35);c.fillRect(x,y,32,32)}}
   c.strokeStyle=st.g[1];c.lineWidth=2;c.lineCap='round';
-  for(let i=0;i<60;i++){const x=rnd()*256,y=rnd()*256;c.beginPath();c.moveTo(x-3,y);c.lineTo(x-4,y-6);c.moveTo(x,y);c.lineTo(x,y-8);c.moveTo(x+3,y);c.lineTo(x+4,y-6);c.stroke()}
-  const fl=si===2?['#ff8a3d','#ffcf4a']:si===3?['#ffffff','#cfefff']:['#fff6d8','#ffd35a'];
+  if(si===5){for(let i=0;i<40;i++){c.fillStyle=rgba(st.g[1],.7);c.beginPath();c.ellipse(rnd()*256,rnd()*256,2+rnd()*3,1.5+rnd()*2,0,0,TAU);c.fill()}for(let i=0;i<6;i++){c.beginPath();const y=rnd()*256;c.moveTo(0,y);c.bezierCurveTo(80,y-10,170,y+10,256,y);c.stroke()}}
+  else if(si!==6)for(let i=0;i<60;i++){const x=rnd()*256,y=rnd()*256;c.beginPath();c.moveTo(x-3,y);c.lineTo(x-4,y-6);c.moveTo(x,y);c.lineTo(x,y-8);c.moveTo(x+3,y);c.lineTo(x+4,y-6);c.stroke()}
+  const fl=si===2?['#ff8a3d','#ffcf4a']:si===3?['#ffffff','#cfefff']:si===5?['#e86a8a','#ffe27a']:si===6?['#ff8ac8','#8ad8ff']:['#fff6d8','#ffd35a'];
   for(let i=0;i<10;i++){const x=rnd()*256,y=rnd()*256;c.fillStyle=fl[rnd()<.5?0:1];for(let k=0;k<5;k++){c.beginPath();c.arc(x+Math.cos(k*1.256)*3,y+Math.sin(k*1.256)*3,2,0,TAU);c.fill()}}
   return cv2});
 
@@ -1100,10 +1119,10 @@ function cluster(){const v=inView();if(!v.length)return null;let best=v[0],bc=-1
 
 /* ---------- run ---------- */
 function show(id){for(const x of ['breedov','hub','jobov','lvlup','pause','over'])$(x).classList.toggle('hide',x!==id)}
-const towerStage=f=>Math.min(4,Math.floor((f-1)/10));
+const towerStage=f=>Math.min(STAGES.length-1,Math.floor((f-1)/10));
 function towerMul(f){const k=f>50?f-41:(f-1)%10;return{hp:Math.pow(1.09,k),dmg:Math.pow(1.05,k),rw:1+k*.12,exp:1,zeny:1,card:1}}
 const DUNG={gold:{n:'黃金副本',d:'金幣 ×3、菁英怪變多',mul:{zeny:3}},card:{n:'卡片副本',d:'卡片掉落率 ×6、魔王必掉卡',mul:{card:6}},exp:{n:'經驗副本',d:'Base／Job 經驗 ×3',mul:{exp:3}}};
-const dungStage=()=>Math.min(4,Math.max(0,(SV.cleared||0)-1));
+const dungStage=()=>Math.min(STAGES.length-1,Math.max(0,(SV.cleared||0)-1));
 function dailyLeft(){const d=new Date().toDateString();if(!SV.daily||SV.daily.d!==d)SV.daily={d,n:3};return SV.daily.n}
 const tE=()=>G.mode==='tower'?Math.min(240,70+G.ft*1.2+((G.floor-1)%10)*6):G.t;
 const BOSS_ESC=150,RUN_KEY='dog-run-v1',RUN_SKIP={bsk:1,E:1,P:1,B:1,J:1,Z:1,FX:1,TX:1,boss:1,banner:1,wep:1,bossPick:1,hs:1,dashT:1,dashV:1};
@@ -1203,7 +1222,7 @@ function kill(e){
   if(e.elite)G.J.push({x:e.x,y:e.y+14,v:0,chest:1,m:false});
   if((e.elite&&Math.random()<.35)||Math.random()<.0035||(G.J.length>260&&!G.J.some(j=>j.mag)&&Math.random()<.02))G.J.push({x:e.x-10,y:e.y,v:0,mag:1,m:false});
 }
-const EC={sprout:'#7cc35a',bat:'#5a60a0',shroom:'#4aa3a0',wisp:'#7a5ab8',golem:'#a3a59a',knight:'#9a7048',treant:'#6b4a2e',beetle:'#3f7a4a',spider:'#7a4a9a',owl:'#a8865a',lavablob:'#ff7a2e',imp:'#e04a3a',yeti:'#e8f0f8',penguin:'#2a3040',cloud:'#ffffff',gargoyle:'#8a8e96',spiderq:'#6a3a8a',lavagiant:'#ff6a2e',mammoth:'#8a5a3a',thunderbird:'#ffe27a'};
+const EC={sprout:'#7cc35a',bat:'#5a60a0',shroom:'#4aa3a0',wisp:'#7a5ab8',golem:'#a3a59a',knight:'#9a7048',treant:'#6b4a2e',beetle:'#3f7a4a',spider:'#7a4a9a',owl:'#a8865a',lavablob:'#ff7a2e',imp:'#e04a3a',yeti:'#e8f0f8',penguin:'#2a3040',cloud:'#ffffff',gargoyle:'#8a8e96',spiderq:'#6a3a8a',lavagiant:'#ff6a2e',mammoth:'#8a5a3a',thunderbird:'#ffe27a',scarab:'#2a7ab8',cactus:'#5aa84a',mummy:'#e8dcc0',sandworm:'#c8a060',balloon:'#ff6a8a',gearbot:'#b8a070',tinsoldier:'#d83a3a',toybox:'#a86ad8',pharaoh:'#f0c040',clockking:'#c89aff'};
 function floorUp(){const old=G.stage;G.floor++;if(!G.trial&&G.floor-1>(SV.towerBest||0)){SV.towerBest=G.floor-1;G.towerRec=1;save()}snapRun();G.stage=towerStage(G.floor);G.mul=towerMul(G.floor);G.ft=0;G.boss=null;G.B=[];heal(G.p.max*.25);if((G.floor-1)%5===0)G.rw.bones++;
   banner(`第 ${G.floor-1} 層通過！前往第 ${G.floor} 層`);sfx('lvl');flash=.3;if(G.stage!==old){G.E=G.E.filter(e=>e.boss);banner(`進入新區域：${STAGES[G.stage].n}（第 ${G.floor} 層）`)}playMusic('s'+G.stage)}
 let chestT=null;
@@ -1290,6 +1309,8 @@ function bossAI(e,dt){
   if(e.type==='mammoth'){if(e.dash>0){e.dash-=dt;e.x+=e.dvx*dt;e.y+=e.dvy*dt;if(e.dash<=0){const n=12;for(let i=0;i<n;i++){const a=i*TAU/n;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,r:7,dmg:11*sd,life:3,ice:1})}}return}
     if(e.wind>0){e.wind-=dt;e.kx=R(-40,40);if(e.wind<=0){const a=Math.atan2(p.y-e.y,p.x-e.x);e.dvx=Math.cos(a)*560;e.dvy=Math.sin(a)*560;e.dash=.75;sfx('boom')}return}
     if(e.at<=0){e.at=4.5;e.wind=.7;banner('雪原猛獁要衝過來了！');G.banner.life=1.2}return}
+  if(e.type==='pharaoh'){if(e.at<=0){e.at=2.3;const a0=Math.atan2(p.y-e.y,p.x-e.x);for(let k=1;k<=5;k++)G.Z.push({k:'bz',x:e.x+Math.cos(a0)*k*72,y:e.y+Math.sin(a0)*k*72,R:44,life:.7+k*.13,max:.7+k*.13,dmg:17*sd,c:'#e0b050'})}if(e.st<=0){e.st=6.5;for(let i=0;i<4;i++){const a=i*TAU/4+R(0,1);spawnEnemy('mummy',false,e.x+Math.cos(a)*90,e.y+Math.sin(a)*90)}const n=20,o=R(0,TAU);for(let i=0;i<n;i++){const a=o+i*TAU/n;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*160,vy:Math.sin(a)*160,r:7,dmg:11*sd,life:4})}banner('法老貓王召喚了木乃伊！');G.banner.life=1.2}return}
+  if(e.type==='clockking'){e.ca=(e.ca||0)+dt*.8;if(e.at<=0){e.at=.4;for(const off of [0,Math.PI]){const a=e.ca+off;for(let k=2;k<=4;k++)G.Z.push({k:'bz',x:e.x+Math.cos(a)*k*62,y:e.y+Math.sin(a)*k*62,R:30,life:.65,max:.65,dmg:13*sd,c:'#c89aff'})}}if(e.st<=0){e.st=6;const n=24,o=R(0,TAU);for(let i=0;i<n;i++){const a=o+i*TAU/n,sp=i%2?140:210;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:6,dmg:11*sd,life:4})}for(let i=0;i<3;i++)spawnEnemy('tinsoldier',false,e.x+R(-80,80),e.y+R(-80,80));banner('時計魔王的指針在轉！別站在紫色圈圈上');G.banner.life=1.2}return}
   if(e.type==='thunderbird'){if(e.at<=0){e.at=1.6;G.Z.push({k:'bz',x:p.x+R(-20,20),y:p.y+R(-20,20),R:50,life:.9,max:.9,dmg:16*sd,c:'#fff27a',zap:1})}if(e.st<=0){e.st=5;const n=18,o=R(0,TAU);for(let i=0;i<n;i++){const a=o+i*TAU/n;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*200,vy:Math.sin(a)*200,r:6,dmg:11*sd,life:4})}}return}
   if(e.at<=0){e.at=2.8;const n=14,o=R(0,TAU);for(let i=0;i<n;i++){const a=o+i*TAU/n;G.B.push({x:e.x,y:e.y,vx:Math.cos(a)*170,vy:Math.sin(a)*170,r:7,dmg:12*STAGES[G.stage].dmg,life:4})}}
   if(e.st<=0){e.st=7;for(let i=0;i<6;i++){const a=i*TAU/6;spawnEnemy('sprout',false,e.x+Math.cos(a)*70,e.y+Math.sin(a)*70)}}
@@ -2031,8 +2052,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.26.1';
+const VERSION='0.27.0';
 const NEWS=[
+ {v:'0.27.0',d:'11/25',t:'新地圖：黃沙金字塔、玩具時計塔',items:[['新增','第 6 關「黃沙金字塔」（推薦 Lv75）：聖甲蟲、仙人掌怪、繃帶木乃伊、沙蟲；魔王「法老貓王」會朝你射出一整排流沙、召喚木乃伊'],['新增','第 7 關「玩具時計塔」（推薦 Lv90）：氣球怪、齒輪精、發條士兵、玩具箱怪；魔王「時計魔王」兩根指針會一直轉圈掃過地面，還會叫發條士兵出來'],['新增','8 張新怪物卡和 2 張魔王卡；新地圖有自己的地面、音樂和裝備（黃沙、玩具系列）'],['調整','無限之塔 51 層以後、每日副本、本週魔王也會用到新地圖']]},
  {v:'0.26.1',d:'11/25',t:'主城狗狗會自己玩了',items:[['新增','主城的狗狗不再只會走來走去：會坐下、趴著睡覺、伸懶腰、追尾巴轉圈、唱歌、冒愛心'],['新增','附近有別的狗狗時，牠們會一起玩雙人互動：碰鼻子、拔河、追逐、摔角、理毛、依偎、擊掌，和玩家之間的雙人動作一樣']]},
  {v:'0.26.0',d:'11/25',t:'本週魔王・公會設施・高難度掉寶',items:[['新增','本週魔王（出戰頁）：每週一換一隻強化版魔王，2:30 就出現、血量 ×2.6；可以重複挑戰，每週第一次擊破送 🦴20、團隊徽章 5、史詩裝備一件，魔王寶物至少史詩'],['新增','狗狗公會設施（商店頁）：花金幣永久升級訓練場（傷害）、醫護站（生命）、學堂（經驗）、金庫（金幣）、幸運神社（掉寶率）、跑步場（移速）、道場（爆擊傷害），全帳號所有狗狗都吃得到，每級越來越貴，最高 Lv20'],['新增','高難度掉更好的東西：每升一級難度，掉落裝備的品質提高、卡片掉率 +20%；難3 以上魔王寶物必有一件史詩，難5 魔王寶物全部史詩以上']]},
  {v:'0.25.2',d:'11/25',t:'越級挑戰變難・難度倍率看得到',items:[['平衡','越級打怪變難：等級每比關卡推薦等級低 1 級，怪物血量 +4%、攻擊 +3%（例如低 24 級：血量 ×1.96、攻擊 ×1.72）。每日副本、無限之塔也一樣；團隊副本照全隊平均等級算。關卡卡片和開場都會寫出現在的倍率'],['調整','選難度時會直接顯示那一級的倍率：怪物血量、攻擊、數量各變幾倍，經驗和金幣幾倍，第一次通過送幾根骨頭']]},
@@ -2769,6 +2791,7 @@ function skillSfx(sk){let n=SKS[sk.k];if(sk.x.bullet)n='shoot';if(sk.k==='rain')
 /* music: original hand-written tunes, soft synth voices + reverb */
 const NOTE=n=>440*Math.pow(2,(n-69)/12);
 /* melody: [midi or 0 for rest, length in eighths]; chords: one per bar (8 eighths) as midi triads; bass: root per bar */
+const TRACKS_EXTRA=()=>{TRACKS.s5=Object.assign({},TRACKS.s2,{bpm:104,lead:'pluck'});TRACKS.s6=Object.assign({},TRACKS.s4,{bpm:122,lead:'bell',arp:1});TRACKS.boss5=Object.assign({},TRACKS.boss2||TRACKS.boss0,{bpm:150});TRACKS.boss6=Object.assign({},TRACKS.boss4||TRACKS.boss0,{bpm:158})};
 const TRACKS={
  town:{bpm:88,lead:'bell',drums:0,arp:0,
   mel:[[76,2],[79,2],[84,2],[79,2],[74,2],[79,2],[83,3],[81,1],[84,3],[83,1],[81,2],[76,2],[77,2],[81,2],[79,4],[76,2],[79,2],[84,2],[86,2],[86,3],[84,1],[83,2],[79,2],[81,2],[77,2],[79,2],[74,2],[72,6],[0,2]],
@@ -2810,6 +2833,7 @@ for(const T of Object.values(TRACKS)){T.at={};let st=0;for(const [n,d] of T.mel)
 function auBus(){if(AU.bus)return;const c=AU.ctx;AU.comp=c.createDynamicsCompressor();AU.comp.threshold.value=-18;AU.comp.ratio.value=3;AU.master.disconnect();AU.master.connect(AU.comp);AU.comp.connect(c.destination);
   const len=Math.floor(c.sampleRate*2.2),ir=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
   AU.rev=c.createConvolver();AU.rev.buffer=ir;AU.revG=c.createGain();AU.revG.gain.value=.32;AU.bus=c.createGain();AU.bus.connect(AU.mg);AU.bus.connect(AU.revG);AU.revG.connect(AU.rev);AU.rev.connect(AU.mg)}
+TRACKS_EXTRA();
 function voice(f,t,d,kind,v){const c=AU.ctx,g=c.createGain(),lp=c.createBiquadFilter();lp.type='lowpass';g.connect(AU.bus);lp.connect(g);
   const osc=(type,ff,det,vol)=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.value=ff;o.detune.value=det||0;og.gain.value=vol;o.connect(og);og.connect(lp);o.start(t);o.stop(t+d+1.2)};
   if(kind==='bell'){lp.frequency.value=5000;osc('sine',f,0,1);osc('sine',f*2,3,.35);osc('sine',f*3,0,.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.005);g.gain.exponentialRampToValueAtTime(.0008,t+Math.max(.6,d+.5))}
