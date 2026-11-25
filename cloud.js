@@ -168,6 +168,19 @@
     const { error } = await sb.from('homes').upsert({ user_id: user.id, data });
     if (error) throw new Error(zh(error));
   };
+  // ---------- 排行榜 ----------
+  api.putScore = async function (row) {
+    if (!enabled || !user) return;
+    const { error } = await sb.from('leaderboard').upsert(Object.assign({ user_id: user.id }, row));
+    if (error) throw new Error(zh(error));
+  };
+  api.topScores = async function (kind, n) {
+    if (!enabled) return [];
+    const col = kind === 'tower' ? 'tower' : 'score';
+    const { data, error } = await sb.from('leaderboard').select('user_id, username, name, sk, j, w, reb, lv, para, tower').order(col, { ascending: false }).limit(n || 50);
+    if (error) throw new Error(zh(error));
+    return data || [];
+  };
   api.getHome = async function (uid) {
     needUser();
     const { data, error } = await sb.from('homes').select('username, data, updated_at').eq('user_id', uid).maybeSingle();

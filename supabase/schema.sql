@@ -196,3 +196,42 @@ create policy "team: write" on realtime.messages
   for insert to authenticated
   with check ((realtime.topic() like 'mm:%' or realtime.topic() like 'room:%' or realtime.topic() like 'user:%')
               and realtime.messages.extension in ('broadcast', 'presence'));
+
+-- 11) 排行榜：每位玩家一列（最強的那隻狗），所有人都能看；只能更新自己的
+create table if not exists public.leaderboard (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  username   text,
+  name       text check (char_length(name) <= 16),
+  sk         text check (char_length(sk) <= 24),
+  j          text check (char_length(j) <= 16),
+  w          jsonb not null default '{}'::jsonb check (pg_column_size(w) < 2048),
+  reb        int not null default 0 check (reb between 0 and 10),
+  lv         int not null default 1 check (lv between 1 and 99),
+  para       int not null default 0 check (para between 0 and 100000),
+  tower      int not null default 0 check (tower between 0 and 100000),
+  score      bigint generated always as (reb::bigint * 1000000 + lv::bigint * 10000 + para) stored,
+  updated_at timestamptz not null default now()
+);
+create index if not exists leaderboard_score on public.leaderboard (score desc);
+create index if not exists leaderboard_tower on public.leaderboard (tower desc);
+alter table public.leaderboard enable row level security;
+drop policy if exists "rank: read"   on public.leaderboard;
+drop policy if exists "rank: insert" on public.leaderboard;
+drop policy if exists "rank: update" on public.leaderboard;
+create policy "rank: read"   on public.leaderboard for select to anon, authenticated using (true);
+create policy "rank: insert" on public.leaderboard for insert to authenticated with check (auth.uid() = user_id);
+create policy "rank: update" on public.leaderboard for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+revoke all on public.leaderboard from anon;
+grant select on public.leaderboard to anon;
+grant select, insert, update on public.leaderboard to authenticated;
+-- 帳號名稱由伺服器帶入，玩家改不了
+create or replace function public.leaderboard_fill() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.user_id := auth.uid();
+  new.username := (select username from public.profiles where user_id = auth.uid());
+  new.updated_at := now();
+  return new;
+end $$;
+drop trigger if exists leaderboard_fill on public.leaderboard;
+create trigger leaderboard_fill before insert or update on public.leaderboard for each row execute function public.leaderboard_fill();
