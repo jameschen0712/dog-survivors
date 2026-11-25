@@ -2164,8 +2164,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.29.1';
+const VERSION='0.29.2';
 const NEWS=[
+ {v:'0.29.2',d:'11/25',t:'主城畫面變成一片綠色',items:[['修正','有時候打完一局、從選單回到主城，畫面會變成只有一片綠色草地（還停在戰鬥地圖），現在主城一定會畫出主城'],['調整','畫面某個東西出錯時，遊戲不會整個卡住，會在下面顯示一行錯誤訊息，可以截圖回報']]},
  {v:'0.29.1',d:'11/25',t:'頒獎台・拔河繩子',items:[['調整','主城排行榜改成三階頒獎台：中間最高是第 1 名、左邊第 2 名、右邊第 3 名，台子上寫著轉生、等級和巔峰等級；還沒有人的位置會顯示「虛位以待」'],['修正','主城狗狗自己玩拔河時沒有繩子，現在會看到繩子了']]},
  {v:'0.29.0',d:'11/25',t:'流派 2.0：屬性・奧義・共鳴・熟練度',items:[['新增','流派改成獨立的「流派配置」畫面，分成五頁：主流派、屬性、奧義、共鳴、熟練度（角色分頁和出戰分頁都有按鈕）'],['新增','屬性（Base Lv 15 解鎖）：火焰（燃燒）、冰霜（緩速、打 6 下冰凍）、雷電（連鎖閃電）、劇毒（疊毒，滿層易傷）、神聖（打菁英和魔王更痛、擊倒回血、每 40 隻放聖光）'],['新增','奧義：12 種有好有壞的強力特性，例如玻璃大砲、背水一戰、處決者、越戰越勇、元素共振、不屈之魂；Base Lv 30、Lv 60、1 轉各開一格'],['新增','共鳴：主流派和屬性剛好配對會觸發 10 種額外效果，例如近戰＋火焰「爆炎拳」（燃燒的怪被打倒會連鎖爆炸）、範圍＋雷電「雷暴」、會心＋劇毒「毒刃」'],['新增','流派熟練度：用哪個流派出戰就累積哪個的熟練度，最高 Lv 10，每級加傷害，Lv 3／6／10 有里程碑，練滿得到「大師」稱號；每隻狗狗分開算'],['說明','屬性、奧義、熟練度只在單人模式生效，組隊副本只看主流派']]},
  {v:'0.28.0',d:'11/25',t:'10 轉・巔峰等級・排行榜',items:[['新增','轉生上限從 5 轉提高到 10 轉，而且有里程碑：1 轉經驗 +20%、天賦點 +1；之後每轉經驗再 +10%；3 轉「轉生勇者」稱號、開場多一次升級；5 轉招式傷害 +10%；7 轉「傳說之犬」、生命 +10%；10 轉「彩虹橋守護神」、金色光環、傷害再 +10%'],['新增','巔峰等級：Base Lv 99 之後的經驗不會浪費，會累積成巔峰等級（顯示成 Lv99 ★12），每升一級得 1 點，可以加在攻擊、體魄、專注、精準，沒有上限（冷卻和爆擊有上限）；轉生也會保留'],['新增','排行榜：選單上方「排行榜」可以看等級榜（轉生 → 等級 → 巔峰）和無限之塔榜，每個帳號用最強的那隻狗上榜'],['新增','等級榜前三名的狗狗會變成立牌，站在主城冒險之門前的台座上（金、銀、銅），點牠們可以直接看排行榜']]},
@@ -3320,7 +3321,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{},dg.P||undefined);c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
  if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;ds.push({y:p.y,f:()=>{{const du=NET.duo;if(du&&(du.a===p.id||du.b===p.id)){const dp=duoPose(du,du.a===p.id?'a':'b');drawEmoteDog(c,p.sk,p.j,dp.x,dp.y,t+p.x*.01,dp.face,dp.mv,p.w,null,1.2,{pose:dp.P})}else drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit})}if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
- ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
+ ds.sort((a,b)=>a.y-b.y).forEach(d=>{c.save();try{d.f()}catch(e){reportErr(e)}c.restore()});
  drawBalls(c);duoFxDraw(c,t);for(const dg of TDOGS)if(dg.duo&&dg.duo.a===dg&&dg.duo.b&&dg.duo.b.duo===dg.duo)duoFxDraw(c,t,dg.duo);
  if(NET.walk){const me=myId(),pos=id=>id===me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(id),L=pos(NET.walk.leader),F=pos(NET.walk.follower);if(L&&F){const ax=L.x+(L.face||1)*8,ay=L.y-6,bx=F.x+(F.face||1)*8,by=F.y-6;c.strokeStyle='#d0503a';c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+16,bx,by);c.stroke()}}
  // labels
@@ -3562,12 +3563,14 @@ const ro=new ResizeObserver(resize);ro.observe(frame);
 const IS_TOUCH=(()=>{try{return matchMedia('(pointer:coarse)').matches}catch(e){return false}})();
 const lowPower=()=>SV.lowPower===undefined?IS_TOUCH:!!SV.lowPower;
 let lastFrame=0;
-function loop(now){const hubOpen=state==='hub'&&!$('hub').classList.contains('hide'),cap=state==='play'?(lowPower()||QL.lvl>=3?30:60):(state==='town'||state==='house')?(lowPower()?30:45):hubOpen?8:12;
-  if(now-lastFrame<1000/cap-4){requestAnimationFrame(loop);return}lastFrame=now;
+let errT=0;function reportErr(e){try{console.error(e);const now=Date.now();if(now-errT<4000)return;errT=now;let b=$('errbar');if(!b){b=document.createElement('div');b.id='errbar';b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:99;background:#5a1a1a;color:#fff;font:12px/1.4 sans-serif;padding:6px 10px;border-radius:10px;opacity:.92;pointer-events:none;word-break:break-all';document.body.appendChild(b)}b.textContent='畫面出了點問題（遊戲會繼續跑）。如果一直出現，請截圖給我們：V'+VERSION+' '+String(e&&e.message||e).slice(0,140)+' '+String(e&&e.stack||'').split('\n').slice(1,3).join(' ').replace(/https?:\/\/[^\s)]*\//g,'').slice(0,160);clearTimeout(b._t);b.style.display='block';b._t=setTimeout(()=>b.style.display='none',8000)}catch(_){}}
+function loop(now){requestAnimationFrame(loop);try{loop0(now)}catch(e){reportErr(e);try{ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1}catch(_){}}}
+function loop0(now){const hubOpen=state==='hub'&&!$('hub').classList.contains('hide'),cap=state==='play'?(lowPower()||QL.lvl>=3?30:60):(state==='town'||state==='house')?(lowPower()?30:45):hubOpen?8:12;
+  if(now-lastFrame<1000/cap-4){return}lastFrame=now;
   const rawDt=(now-last)/1000,dt=Math.min(state==='play'?.05:.1,rawDt);last=now;if(rawDt<.25)qualityTick(rawDt);flash=Math.max(0,flash-dt);
   if(state==='play'){if(G.hs>0)G.hs-=dt;else for(let i=0;i<(G.speed||1)&&state==='play';i++)update(dt)}else if(state==='town'||state==='house')updateTown(dt);else if(state==='hub'){menuT+=dt;if(SV.breed&&!$('hub').classList.contains('hide'))portrait($('hubDog'),curSkin(),SV.job,menuT,true)}
   netLife(dt);{const tv=state==='town'||state==='house',tu=$('townui');if(tu.classList.contains('hide')===tv){tu.classList.toggle('hide',!tv);if(tv){renderTownUI();netRetrack()}else{closeEmoteBar();closePeerMenu()}}if(tv&&$('netchip').classList.contains('hide')===(state==='town'))netChip()}
-  if(hubOpen){}else if(SV.breed&&!G&&(state==='town'||state==='house'||state==='hub'))renderTown();else render();requestAnimationFrame(loop)}
+  if(hubOpen){}else if(SV.breed&&(state==='town'||state==='house'||(!G&&state==='hub')))renderTown();else render()}
 try{for(const it of SV.stor||[])fixItem(it);weaponCheck();if(SV.wpOff){const n=SV.wpOff;SV.wpOff=null;save();setTimeout(()=>showTip("wpoff"+Date.now(),"武器分職業了",`武器現在有職業系別，「${esc(n)}」不是${JM[SV.job].n}能用的武器，已經先卸下放回背包。`,true),1500)}}catch(e){}
 resize();buildDex();
 buildChangelog();
