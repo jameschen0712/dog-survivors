@@ -1189,12 +1189,13 @@ function kill(e){
 const EC={sprout:'#7cc35a',bat:'#5a60a0',shroom:'#4aa3a0',wisp:'#7a5ab8',golem:'#a3a59a',knight:'#9a7048',treant:'#6b4a2e',beetle:'#3f7a4a',spider:'#7a4a9a',owl:'#a8865a',lavablob:'#ff7a2e',imp:'#e04a3a',yeti:'#e8f0f8',penguin:'#2a3040',cloud:'#ffffff',gargoyle:'#8a8e96',spiderq:'#6a3a8a',lavagiant:'#ff6a2e',mammoth:'#8a5a3a',thunderbird:'#ffe27a'};
 function floorUp(){const old=G.stage;G.floor++;if(!G.trial&&G.floor-1>(SV.towerBest||0)){SV.towerBest=G.floor-1;G.towerRec=1;save()}snapRun();G.stage=towerStage(G.floor);G.mul=towerMul(G.floor);G.ft=0;G.boss=null;G.B=[];heal(G.p.max*.25);if((G.floor-1)%5===0)G.rw.bones++;
   banner(`第 ${G.floor-1} 層通過！前往第 ${G.floor} 層`);sfx('lvl');flash=.3;if(G.stage!==old){G.E=G.E.filter(e=>e.boss);banner(`進入新區域：${STAGES[G.stage].n}（第 ${G.floor} 層）`)}playMusic('s'+G.stage)}
+let chestT=null;
 function openChest(){
   const r=Math.random(),n=r<.05?3:r<.3?2:1,got=[];
   for(let i=0;i<n;i++){const cs=rollChoices().filter(o=>o.t!=='h');if(cs.length){const o=cs.sort((a,b)=>choiceScore(b)-choiceScore(a))[0];applyChoice(o);got.push(choiceName(o))}else{const z=Math.round(50*STAGES[G.stage].rw);G.rw.zeny+=z;got.push(`${z} 金幣`)}}
   state='chest';keys.clear();$('chestT').textContent=n===3?'超級大獎！':n===2?'雙重獎勵！':'寶箱！';
   let k=0;const names=[...Object.values(PD).map(d=>d.n),...Object.values(G.wep).map(w=>w.s.n)];$('chestB').innerHTML='<div class="roll" id="roll"></div>';$('chestov').classList.remove('hide');$('chestOk').disabled=true;sfx('drop');
-  const iv=setInterval(()=>{k++;const el=$('roll');if(el)el.textContent=names[k%names.length];if(k%3===0)sfx('ui');if(k>=14){clearInterval(iv);$('chestB').innerHTML=got.map(g=>`<div class="win">${esc(g)}</div>`).join('');$('chestOk').disabled=false;sfx(n>1?'job':'lvl')}},80);
+  const iv=setInterval(()=>{k++;const el=$('roll');if(el)el.textContent=names[k%names.length];if(k%3===0)sfx('ui');if(k>=14){clearInterval(iv);$('chestB').innerHTML=got.map(g=>`<div class="win">${esc(g)}</div>`).join('');$('chestOk').disabled=false;sfx(n>1?'job':'lvl');let left=SV.autoPick?2:3;const ok=$('chestOk'),tick=()=>{if(state!=='chest'){ok.textContent='太好了！';return}if(left<=0){ok.textContent='太好了！';closeChest();return}ok.textContent=`太好了！（${left}）`;left--;chestT=setTimeout(tick,1000)};clearTimeout(chestT);tick()}},80);
 }
 function closeChest(){$('chestov').classList.add('hide');if(state==='chest'){state='play';last=performance.now();if(G.pend>0)openLevel()}}
 /* shrines */
@@ -2005,8 +2006,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.6';
+const VERSION='0.24.7';
 const NEWS=[
+ {v:'0.24.7',d:'11/25',t:'寶箱自動關閉',items:[['調整','戰鬥中開寶箱的結果視窗，幾秒後會自動關掉繼續戰鬥（按鈕上會倒數；有開「自動選強化」的話更快），掛著玩也不會卡住']]},
  {v:'0.24.6',d:'11/25',t:'難度選擇改得更清楚',items:[['調整','難度改成「先選再出發」：關卡下面有「普通、難1～難5」可以點選，選好後「出發」按鈕會寫「出發（難1）」，確定是用那個難度在打；打倒該難度的魔王才會打開下一級，打過的會打勾。之前「出發」永遠是普通難度，黃色的「難1」容易被誤會成已經選好的難度']]},
  {v:'0.24.5',d:'11/25',t:'修正點螢幕會卡一下',items:[['修正','有些手機（尤其 iPhone 開靜音或在 LINE 等 App 裡開）戰鬥中每點一下螢幕，遊戲就會嘗試重新啟動聲音，造成畫面卡一下；現在不會每次點都重試，最多偶爾試一次']]},
  {v:'0.24.4',d:'11/25',t:'兩隻幼犬寵物',items:[['新增','孵蛋婆婆那裡多了兩隻幼犬寵物（史詩）：黃金獵犬幼犬「金金」（傷害 +6%）、瑪爾濟斯幼犬「棉棉」（移動速度 +6%），會跟在狗狗身邊跑']]},
