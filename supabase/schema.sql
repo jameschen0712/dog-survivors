@@ -131,3 +131,68 @@ begin
 end $$;
 drop trigger if exists visits_fill on public.visits;
 create trigger visits_fill before insert on public.visits for each row execute function public.visits_fill();
+
+-- 9) 好友：a 送出邀請給 b；b 接受後變成好友。雙方都能刪除。
+create table if not exists public.friends (
+  a          uuid not null references auth.users(id) on delete cascade,
+  b          uuid not null references auth.users(id) on delete cascade,
+  status     text not null default 'pending' check (status in ('pending', 'accepted')),
+  created_at timestamptz not null default now(),
+  primary key (a, b),
+  check (a <> b)
+);
+alter table public.friends enable row level security;
+drop policy if exists "friends: read"   on public.friends;
+drop policy if exists "friends: ask"    on public.friends;
+drop policy if exists "friends: accept" on public.friends;
+drop policy if exists "friends: remove" on public.friends;
+create policy "friends: read"   on public.friends for select to authenticated using (auth.uid() in (a, b));
+create policy "friends: ask"    on public.friends for insert to authenticated with check (auth.uid() = a and status = 'pending');
+create policy "friends: accept" on public.friends for update to authenticated using (auth.uid() = b) with check (auth.uid() = b and status = 'accepted');
+create policy "friends: remove" on public.friends for delete to authenticated using (auth.uid() in (a, b));
+revoke all on public.friends from anon;
+grant select, insert, update, delete on public.friends to authenticated;
+
+-- 線上狀態：玩家每分鐘回報一次
+alter table public.profiles add column if not exists last_seen timestamptz;
+create or replace function public.touch_seen() returns void
+language sql security definer set search_path = public as $$
+  update public.profiles set last_seen = now() where user_id = auth.uid();
+$$;
+revoke all on function public.touch_seen() from public, anon;
+grant execute on function public.touch_seen() to authenticated;
+
+-- 用帳號名稱找玩家（只回傳 id 和名稱）
+create or replace function public.find_player(uname text) returns table (id uuid, username text)
+language sql stable security definer set search_path = public as $$
+  select p.user_id, p.username from public.profiles p where p.username = lower(uname) and auth.uid() is not null limit 1;
+$$;
+revoke all on function public.find_player(text) from public, anon;
+grant execute on function public.find_player(text) to authenticated;
+
+-- 我的好友清單（含對方狗狗名字、毛色、職業、最後上線時間）
+create or replace function public.my_friends() returns table (id uuid, username text, status text, outgoing boolean, last_seen timestamptz, nm text, sk text, j text)
+language sql stable security definer set search_path = public as $$
+  select o.other, p.username, f.status, f.a = auth.uid(), p.last_seen,
+         h.data->>'nm', h.data->>'sk', h.data->>'j'
+  from public.friends f
+  cross join lateral (select case when f.a = auth.uid() then f.b else f.a end as other) o
+  join public.profiles p on p.user_id = o.other
+  left join public.homes h on h.user_id = o.other
+  where auth.uid() in (f.a, f.b)
+  order by p.username;
+$$;
+revoke all on function public.my_friends() from public, anon;
+grant execute on function public.my_friends() to authenticated;
+
+-- 10) 團隊副本的即時頻道：配對大廳 mm:*、隊伍房間 room:*、個人邀請信箱 user:<自己的 id>（只有自己收得到）
+drop policy if exists "team: read"  on realtime.messages;
+drop policy if exists "team: write" on realtime.messages;
+create policy "team: read" on realtime.messages
+  for select to authenticated
+  using ((realtime.topic() like 'mm:%' or realtime.topic() like 'room:%' or realtime.topic() = 'user:' || auth.uid()::text)
+         and realtime.messages.extension in ('broadcast', 'presence'));
+create policy "team: write" on realtime.messages
+  for insert to authenticated
+  with check ((realtime.topic() like 'mm:%' or realtime.topic() like 'room:%' or realtime.topic() like 'user:%')
+              and realtime.messages.extension in ('broadcast', 'presence'));

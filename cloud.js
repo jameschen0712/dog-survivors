@@ -45,6 +45,7 @@
     validName(u) { return /^[a-z0-9_]{3,16}$/i.test(u || ''); },
     validPass(p) { return typeof p === 'string' && p.length >= 8 && /[a-z]/i.test(p) && /[0-9]/.test(p); },
 
+    myId() { return user ? user.id : ''; },
     async init() {
       if (!enabled) return;
       const { data } = await sb.auth.getSession();
@@ -185,6 +186,75 @@
     const { data, error } = await sb.from('visits').select('visitor_name, phrase, day, created_at').eq('host_id', user.id).gte('day', since).order('created_at', { ascending: false }).limit(50);
     if (error) throw new Error(zh(error));
     return data || [];
+  };
+
+  // ---------- 通用即時頻道：配對大廳、團隊房間、個人邀請信箱 ----------
+  // topic 只能是 mm:* / room:* / user:*（伺服器端 RLS 也會檢查）
+  api.openChannel = async function (topic, o) {
+    needUser(); o = o || {};
+    if (!/^(mm|room|user):[a-z0-9:_-]{1,80}$/i.test(topic)) throw new Error('bad topic');
+    try { const { data } = await sb.auth.getSession(); await sb.realtime.setAuth(data.session ? data.session.access_token : undefined); } catch (e) { /* ignore */ }
+    const cfgc = { private: true, broadcast: { self: false } };
+    if (o.presence) cfgc.presence = { key: user.id };
+    const ch = sb.channel(topic, { config: cfgc });
+    const members = () => { const st = ch.presenceState(), out = []; for (const k in st) { const m = st[k][st[k].length - 1]; if (m) out.push(Object.assign({}, m, { id: k })); } return out; };
+    if (o.presence) ch.on('presence', { event: 'sync' }, () => { if (o.onPresence) o.onPresence(members()); });
+    for (const ev of (o.events || [])) ch.on('broadcast', { event: ev }, (m) => { if (o.onEvent) o.onEvent(ev, m.payload || {}); });
+    const status = await new Promise((res) => { let done = false; const t = setTimeout(() => { if (!done) { done = true; res('TIMED_OUT'); } }, 8000); ch.subscribe((s2) => { if (done) { if ((s2 === 'CHANNEL_ERROR' || s2 === 'CLOSED') && o.onState) o.onState('error'); return; } if (s2 === 'SUBSCRIBED' || s2 === 'CHANNEL_ERROR' || s2 === 'TIMED_OUT') { done = true; clearTimeout(t); res(s2); } }); });
+    if (status !== 'SUBSCRIBED') { try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } throw new Error(status === 'CHANNEL_ERROR' ? '連線被拒絕（伺服器設定還沒完成）' : '連不上伺服器'); }
+    if (o.presence) await ch.track(o.presence);
+    return {
+      id: user.id,
+      members,
+      send(ev, payload) { return ch.send({ type: 'broadcast', event: ev, payload: Object.assign({ from: user.id }, payload) }).catch(() => {}); },
+      track(m) { return ch.track(m).catch(() => {}); },
+      async leave() { try { if (o.presence) await ch.untrack(); } catch (e) { /* ignore */ } try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } }
+    };
+  };
+
+  // 不加入頻道、直接送一則訊息（例如送組隊邀請到對方的信箱 user:<id>）；伺服器只檢查「能不能寫」
+  api.sendTo = async function (topic, ev, payload) {
+    needUser();
+    if (!/^(mm|room|user):[a-z0-9:_-]{1,80}$/i.test(topic)) throw new Error('bad topic');
+    try { const { data } = await sb.auth.getSession(); await sb.realtime.setAuth(data.session ? data.session.access_token : undefined); } catch (e) { /* ignore */ }
+    const ch = sb.channel(topic, { config: { private: true } });
+    try { const r = await ch.send({ type: 'broadcast', event: ev, payload: Object.assign({ from: user.id }, payload) }); if (r !== 'ok') throw new Error('送不出去，請稍後再試'); }
+    finally { try { await sb.removeChannel(ch); } catch (e) { /* ignore */ } }
+  };
+
+  // ---------- 好友 ----------
+  api.touchSeen = async function () { if (!enabled || !user) return; try { await sb.rpc('touch_seen'); } catch (e) { /* ignore */ } };
+  api.findPlayer = async function (username) {
+    needUser();
+    const { data, error } = await sb.rpc('find_player', { uname: String(username || '').toLowerCase() });
+    if (error) throw new Error(zh(error));
+    return data && data.length ? data[0] : null;
+  };
+  api.friends = async function () {
+    needUser();
+    const { data, error } = await sb.rpc('my_friends');
+    if (error) throw new Error(zh(error));
+    return data || [];
+  };
+  api.friendRequest = async function (uid) {
+    needUser();
+    if (uid === user.id) throw new Error('不能加自己為好友');
+    // 如果對方已經先邀請我，直接接受
+    const { data: back } = await sb.from('friends').select('status').eq('a', uid).eq('b', user.id).maybeSingle();
+    if (back) { const { error } = await sb.from('friends').update({ status: 'accepted' }).eq('a', uid).eq('b', user.id); if (error) throw new Error(zh(error)); return 'accepted'; }
+    const { error } = await sb.from('friends').insert({ a: user.id, b: uid });
+    if (error) { if (String(error.code) === '23505') return 'dup'; throw new Error(zh(error)); }
+    return 'sent';
+  };
+  api.friendAccept = async function (uid) {
+    needUser();
+    const { error } = await sb.from('friends').update({ status: 'accepted' }).eq('a', uid).eq('b', user.id);
+    if (error) throw new Error(zh(error));
+  };
+  api.friendRemove = async function (uid) {
+    needUser();
+    await sb.from('friends').delete().eq('a', user.id).eq('b', uid);
+    await sb.from('friends').delete().eq('a', uid).eq('b', user.id);
   };
 
   // 關掉分頁或切到背景時，把還沒上傳的存檔送出去

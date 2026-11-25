@@ -69,3 +69,9 @@ Supabase 內建的寄信服務只適合測試，每小時只能寄幾封。正�
 - 每次 push 到 `main`，Cloudflare 會自動重新部署（約 30 秒）
 - 舊網址 https://jameschen0712.github.io/dog-survivors/ 仍然開著，但會跳出「搬家了」視窗，可以把這台裝置的本機進度用網址帶到新網址（`#move=` 參數）
 - 本機進度（localStorage）是跟著網址走的，所以換網址時才需要搬；雲端存檔不受影響
+
+## 好友與團隊副本（V0.22.0）
+
+`supabase/schema.sql` 第 9、10 段新增了好友資料表（friends）、線上狀態（profiles.last_seen）、三個 RPC（touch_seen、find_player、my_friends），以及團隊副本用的即時頻道權限（mm:*、room:*、user:<自己的 id>）。已在 SQL Editor 執行過；之後換主機時整份重跑即可。
+
+團隊副本的遊戲畫面走 WebRTC 直接連線（隊長 ↔ 隊員），伺服器頻道只用來配對、交換連線資訊；連不上 P2P 時才改走伺服器轉送。
