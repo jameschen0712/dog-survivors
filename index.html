@@ -804,6 +804,7 @@ const CD={
  tongue:(c,L,a,t)=>{ell(c,L.nx-3,L.hy+6.5+Math.sin(t*6)*.4,1.8,2.8,.2,a)},
  sparkleeye:(c,L,a,b,t)=>{const s=.7+.3*Math.sin(t*6);starP(c,L.ex+4,L.ey-4,2.4*s,a);starP(c,L.ex+6,L.ey,1.4*s,b)},
  clownnose:(c,L,a)=>{circ(c,L.nx,L.hy+1.2,2.8,a);circ(c,L.nx-.8,L.hy+.4,.8,'#fff')},
+ sock:(c,L,a,b)=>{const x=L.nx-3,y=L.hy+5;c.save();c.translate(x,y);c.rotate(.35);rr(c,-2.2,0,4.4,9,1.8,a);rr(c,-2.2,1.6,4.4,1.3,.5,b);rr(c,-2.2,4.2,4.4,1.3,.5,b);ell(c,-.2,9.6,3.8,2.4,0,a);rr(c,-2.6,-1,5.2,2,1,b);c.restore()},
  bone:(c,L,a)=>{const x=L.nx-2,y=L.hy+5;rr(c,x-5,y-.9,10,1.8,.9,a);for(const dx of [-5,5])for(const dy of [-1.2,1.2])circ(c,x+dx,y+dy,1.4,a)},
  rose:(c,L,a,b)=>{const x=L.nx-2,y=L.hy+5;lineP(c,[[x-6,y+1],[x+4,y-1]],'#4a8a3a',1);ell(c,x-2,y+1.5,1.8,.9,.4,'#6ab04a');circ(c,x+5,y-1.5,2.4,a);circ(c,x+5,y-1.5,1.2,b)},
  whiskers:(c,L,a)=>{for(const dy of [-1,1])lineP(c,[[L.nx-3,L.hy+3],[L.nx+3,L.hy+3+dy*2]],a,.6)},
@@ -912,6 +913,7 @@ const CSET_BONUS=1;
 function cosBonus(id){const o=CSM[id];return [o.bon[0],Math.round(o.bon[1]*starMul((SV.cstar||{})[id])*10)/10]}
 const cosOwn=id=>(SV.cown||[]).includes(id);
 function cosSets(){return CSETS.filter(s=>CSLOT.every(([slot])=>cosOwn('cs_'+s[0]+'_'+slot))).map(s=>s[1])}
+CSM.npc_sock={id:'npc_sock',slot:'face',d:'sock',a:'#f6f2e8',b:'#e05a5a',n:'臭襪子'};
 function drawCos(c,L,id,t,layer){const o=CSM[id];if(!o)return;if(o.slot==='back'&&(layer==='behind')!==!!CBACK[o.d])return;const f=CD[o.d];if(f)f(c,L,o.a,o.b,t,o.kind)}
 
 function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
@@ -1912,8 +1914,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.22.1';
+const VERSION='0.22.2';
 const NEWS=[
+ {v:'0.22.2',d:'11/25',t:'主城狗狗會聊天了',items:[['修正','「襪子獵人・庫里」嘴裡叼的改成臭襪子（原本是骨頭）；找牠說話會分享牠的襪子收藏，越常聊越喜歡你'],['新增','主城多了 10 隻狗狗：阿秋（秋田）、鬍子爺爺（雪納瑞）、嗅嗅（米格魯）、棉花（比熊）、露露（馬爾濟斯）、隊長（德牧）、皺皺（巴哥）、小約（約克夏）、西西（西施）、白白（博美），現在一共 25 隻'],['新增','主城每一隻狗狗都會說話了：走過去按「跟 ○○ 說話」，每隻有自己的個性和台詞，有些還會偷偷教你遊戲技巧']]},
  {v:'0.22.1',d:'11/25',t:'14 種新狗狗',items:[['新增','新增 14 個常見品種：台灣米克斯、博美、馬爾濟斯、法國鬥牛犬、雪納瑞、比熊、米格魯、薩摩耶、西施、約克夏、巴哥、秋田犬、德國牧羊犬、大麥町，現在一共 24 種'],['新增','每個新品種都有 4～6 款毛色（含 SSR），例如台灣黑狗、白襪黑狗、虎斑法鬥、櫻花秋田、彩虹大麥町，抽毛色就抽得到'],['新增','新的毛色花紋：虎斑、白襪；博美、比熊、薩摩耶有蓬蓬的毛領，馬爾濟斯和西施綁著小蝴蝶結'],['新增','主城多了五隻新品種的狗狗到處逛：雪球、毛毛、胖虎、阿黑、點點'],['說明','品種變多後，要收集全部毛色會比較久；抽毛色時還是有一半機率抽到你自己這隻狗的毛色']]},
  {v:'0.22.0',d:'11/25',t:'好友與團隊副本',items:[['新增','好友：用帳號名稱加好友，看得到好友在不在線上（選單新增「團隊」分頁）'],['新增','團隊副本「灰霧大魔王討伐」：2／4／6 人一起打魔王，魔王會張護盾，要有人站上光柱才能打破；倒下的隊友站旁邊 3 秒就能救起來'],['新增','團隊副本「守護彩虹橋」：守住中間的彩虹水晶撐過 10 波，第 5、10 波有魔王'],['新增','可以邀請好友組隊，也可以隨機配對；30 秒湊不滿人會補 AI 狗狗，也能自己和 AI 一起練習。中途有人離開會由 AI 接手'],['新增','團隊徽章：打團隊副本拿徽章，可以換骨頭和稀有／史詩／傳說裝備'],['新增','戰鬥畫面左上角會顯示自己的血量數字'],['調整','抽毛色、抽時裝的地方會顯示你現在有幾根骨頭，選單上方也會顯示'],['調整','難度提高：怪物血量和攻擊隨時間成長得更快、數量更多，前兩關魔王也變強一點'],['修正','手機長按畫面不會再跳出「拷貝／搜尋」選單或放大鏡'],['修正','確認視窗改成遊戲內的視窗，不會再被瀏覽器的「禁止顯示對話方塊」擋住']]},
  {v:'0.21.2',d:'11/25',t:'緊急修正',items:[['修正','上一版讓戰鬥中「撿寶石的範圍」幾乎變成 0（要走到寶石正上方才撿得到），已經修好'],['修正','基礎屬性的物理／遠程／魔法傷害加成和閃避，之前在戰鬥中沒有生效，現在會正確套用']]},
@@ -2803,7 +2806,33 @@ const DIGS=[[-700,-120],[-820,120],[-610,250],[-880,-260]];
 const TREES=(()=>{let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<70;i++){const side=i%4;let x,y;if(side===0){x=TOWN.x0+20+r()*1900;y=TOWN.y0+10+r()*70}else if(side===1){x=TOWN.x0+20+r()*1900;y=TOWN.y1-50+r()*60}else if(side===2){x=TOWN.x0+10+r()*60;y=TOWN.y0+r()*1150}else{x=TOWN.x1-60+r()*60;y=TOWN.y0+r()*1150}o.push([x,y,.8+r()*.5])}
   for(const p of [[-560,-300],[-900,0],[-560,330],[-760,-380],[-940,330],[860,-360],[880,300],[480,-420],[-480,-470],[150,470],[-160,470]])o.push([p[0],p[1],1.1]);return o})();
 const FLOWERS=(()=>{let s=29;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<90;i++)o.push([TOWN.x0+r()*1960,TOWN.y0+r()*1200,['#ffb3cc','#fff27a','#ffffff','#b3d9ff'][i%4]]);return o})();
-const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2','dachs1','dachs3','samo0','pom0','fren0','mix0','dal0'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-300+(i%10)*65+(i>9?30:0),y:i>9?(i%2?190:-190):i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂','襪子獵人・庫里','公主・巴塔','雪球','毛毛','胖虎','阿黑','點點'][i],wear:[{},{},{},{},{},{},{},{},{face:'cx_34'},{head:'cs_magical_head'}][i]}));
+const TDOG_DEF=[
+ ['corgi1','麻糬',{},['今天也要努力撿寶石！','聽說短腿跑起來比較快，是真的喔','我最喜歡在噴水池旁邊曬太陽～','你有看到我的球嗎？紅色的那顆']],
+ ['husky2','布丁',{},['嗷嗚嗚嗚～～！','我不是在生氣，我只是在唱歌','雪地關卡超舒服的，你去過了嗎？','剛剛我又把沙發拆了，噓——']],
+ ['golden1','奶茶',{},['要不要摸摸頭？我很會被摸喔','團隊副本打不贏？找朋友一起去吧！','倒下的隊友，站在旁邊就能救起來喔','大家都是好狗狗～']],
+ ['chi1','豆花',{},['我才不怕怪物！我只是在發抖而已！','你、你靠太近了啦！','體型小也能變很強的，你等著看']],
+ ['shiba1','小米',{},['……（轉頭）','不要以為給我點心我就會理你','好啦，摸一下就好喔','柴犬的尾巴捲捲才是正義']],
+ ['border1','芝麻',{},['我已經把城裡的羊……不對，狗都數過一遍了','升級的時候要想好流派喔','你今天的任務做完了嗎？公告欄看得到','動起來！不要站著發呆！']],
+ ['westie1','湯圓',{},['嘿嘿嘿，今天也很開心！','我是白色的，所以不能滾泥巴','你知道嗎？挖寶點可以挖到好東西']],
+ ['lab2','可樂',{},['你身上有點心的味道……','我剛吃完，但還可以再吃','聽說魔王的寶物要從三件裡挑一件','肚子餓了，要不要一起去覓食？']],
+ ['dachs1','襪子獵人・庫里',{face:'npc_sock'},null],
+ ['dachs3','公主・巴塔',{head:'cs_magical_head'},null],
+ ['samo0','雪球',{},['（微笑）','我一直在笑，不是因為我知道什麼秘密喔','冬天到了，我的毛是最暖的被子','要不要一起堆雪狗？']],
+ ['pom0','毛毛',{},['我不是毛球！我是博美！','汪汪汪汪汪！（意思是你好）','我的毛每天要梳一百下']],
+ ['fren0','胖虎',{},['呼……嚕……（打呼）','我的耳朵是天線，可以收到點心的訊號','跑步好累，我們用走的就好']],
+ ['mix0','阿黑',{},['我是在這座城長大的','歡迎來到彩虹橋的另一邊，以後就是一家人了','有怪物欺負你就跟我說','台灣的土狗最顧家了']],
+ ['dal0','點點',{},['你猜我身上有幾個點？答案是：我也不知道','跑起來的時候，點點會變成一條線喔','我以前在消防局幫忙']],
+ ['akita0','阿秋',{},['我會在這裡等，等多久都可以','有人在等的地方，就是家','你回來啦，我一直都知道你會回來']],
+ ['schn0','鬍子爺爺',{},['年輕狗，老夫看你骨骼清奇','打不過就先回來練等，不丟臉','屬性點記得點，不要都存著','當年老夫一口氣打到無限之塔五十層……']],
+ ['beag0','嗅嗅',{},['嗅嗅嗅……這裡有寶物的味道！','我的鼻子是全城最靈的','你口袋裡是不是有肉乾？']],
+ ['bich0','棉花',{},['軟綿綿～要不要抱一下？','我今天剛洗完澎澎，香香的','下雨天最討厭了，毛會塌掉']],
+ ['malt0','露露',{},['本小姐今天的蝴蝶結好看嗎？','巴塔公主是我的好朋友喔','不可以弄髒我的毛！']],
+ ['gsd0','隊長',{},['立正！稍息！','團隊副本記得分工：有人顧光柱，有人打魔王','守水晶的時候，怪物會先衝水晶，要擋在前面','報告，城鎮一切平安！']],
+ ['pug0','皺皺',{},['呼～呼～我只是呼吸比較大聲','我的臉皺皺的，但我的心是平的','可以分我一口嗎？一口就好']],
+ ['york0','小約',{},['別看我小，我脾氣很大的！','哼，我才不需要保護','……好啦，你可以陪我一下']],
+ ['shih0','西西',{},['我的瀏海擋住眼睛了，你是誰？','西施是很高貴的品種喔','今天的天氣很適合睡午覺']],
+ ['pom1','白白',{},['我跟毛毛是兄弟，但我比較帥','嘿！你要去打魔王嗎？帶我去！','我也想要小皇冠……']]];
+const TDOGS=TDOG_DEF.map((d,i)=>({skin:SKM[d[0]]?d[0]:BASE.shiba,x:-330+(i%9)*82,y:[-115,110,-190,190,-260][Math.floor(i/9)%5]+(i%2?14:-14),tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:d[1],wear:d[2],lines:d[3]}));
 const ENTERX=720,ENTERY=34;
 
 /* home data */
@@ -2930,13 +2959,17 @@ function drawTree(c,x,y,s){shadow(c,x,y+4,16*s,5*s);rr(c,x-4*s,y-18*s,8*s,22*s,2
 /* town update & render */
 function townTargets(){const o=NPCS.map(n=>({n,x:n.x,y:n.y,r:n.b&&n.b.k==='myhouse'?ENTERY:0}));const d=digToday();for(let i=0;i<DIGS.length;i++)if(!d.got.includes(i))o.push({dig:i,x:DIGS[i][0],y:DIGS[i][1]});for(const dg of TDOGS)o.push({dog:dg,x:dg.x,y:dg.y});return o}
 function digToday(){const td=new Date().toDateString();if(!SV.dig||SV.dig.d!==td)SV.dig={d:td,got:[]};return SV.dig}
-function actLabel(a){if(a.dog&&a.dog.n==='公主・巴塔')return '跟 公主・巴塔 說話';return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
+function actLabel(a){if(a.dog&&(a.dog.lines||a.dog.n==='公主・巴塔'||a.dog.n==='襪子獵人・庫里'))return `跟 ${a.dog.n} 說話`;return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
 function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
  if(a.n){if(a.n.id==='home'){enterHouse();return}a.n.open();return}
  if(a.dig!==undefined){const d=digToday();if(d.got.includes(a.dig))return;d.got.push(a.dig);const h=homeData(),r=Math.random(),st=SV.stage||0;let msg;
    if(r<.08){SV.bones++;msg='挖到 1 根狗骨頭！'}else if(r<.55){const k=['wood','cloth','stone'][Math.floor(Math.random()*3)],v=2+Math.floor(Math.random()*3)+st;h.mat[k]+=v;msg=`挖到 ${MATN[k]} ×${v}！`}else{const z=Math.round((80+Math.random()*120)*(1+st));SV.zeny+=z;msg=`挖到 ${z} 金幣！`}
    save();sfx('coin');townFx.push({x:DIGS[a.dig][0],y:DIGS[a.dig][1]-30,s:msg,life:2.2});for(let q=0;q<14;q++)townFx.push({p:1,x:DIGS[a.dig][0],y:DIGS[a.dig][1],vx:R(-60,60),vy:R(-120,-40),life:.7});renderTownUI();return}
- if(a.dog){const dg=a.dog;if(dg.n==='公主・巴塔'){bataTalk(dg);return}dg.heart=1.6;dg.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:dg.x,y:dg.y-40,s:'♥',life:1.2})}}
+ if(a.dog){const dg=a.dog;if(dg.n==='公主・巴塔'){bataTalk(dg);return}if(dg.n==='襪子獵人・庫里'){kuliTalk(dg);return}if(dg.lines){dogTalk(dg);return}dg.heart=1.6;dg.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:dg.x,y:dg.y-40,s:'♥',life:1.2})}}
+function dogTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.2;dg.face=TP.x>dg.x?1:-1;let k;do{k=Math.floor(Math.random()*dg.lines.length)}while(dg.lines.length>1&&k===dg.lastL);dg.lastL=k;dg.say={s:dg.lines[k],t:0};dg.heart=1.2;dg.w=2;TP.heart=.8;sfx('s_patted',1,.2)}
+function kuliTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.kuli=Math.min(10,(SV.npcLove.kuli||0)+1);save();dg.face=TP.x>dg.x?1:-1;
+  const L=['嘿嘿，這隻襪子是我今天的戰利品','你的襪子……聞起來好香，借我一下？','左腳的襪子都被我收集齊了，現在在找右腳的','噓！不要跟主人說襪子在我這裡','全城的臭襪子都是我的寶物！','襪子越臭，等級越高，這是常識'],L2=['好啦，送你一隻我最愛的襪子（但你不能拿走）','你是我的襪子好朋友！','下次一起去偷……不是，去「借」襪子吧！'];
+  const pool=n>=6?L.concat(L2):L;dg.say={s:pool[Math.floor(Math.random()*pool.length)],t:0,h:Math.min(5,Math.ceil(n/2))};dg.heart=1.6;dg.w=2.5;dg.tx=dg.x+(Math.random()<.5?-60:60);dg.ty=dg.y;TP.heart=1;sfx('s_patted',1,.2)}
 function bataTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.bata=Math.min(10,(SV.npcLove.bata||0)+1);save();dg.face=TP.x>dg.x?1:-1;const r=Math.random();
  if(r<1/3){dg.say={s:'嗚嗚～我要找媽媽～',t:0};dg.zoom=3.2;dg.tx=0;sfx('s_howl',.7,.2)}
  else if(r<2/3){const L=n<3?'哼！本公主才不讓你隨便摸～':n<6?'嗯…勉強讓你摸一下好了':n<10?'嘿嘿，最喜歡你了！再摸一下嘛～':'你是巴塔公主專屬的騎士！';const hc=Math.max(1,Math.min(5,Math.ceil(n/2)));dg.say={s:L,t:0,h:hc};dg.heart=1.6;dg.w=2.5;TP.heart=1;sfx('s_patted',1,.2)}
