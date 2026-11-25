@@ -1177,8 +1177,8 @@ function update(dt){
   G.shT=(G.shT||70)-dt;if(G.shT<=0&&!G.boss){G.shT=75;const a=R(0,TAU);G.Z.push({k:'shrine',x:p.x+Math.cos(a)*260,y:p.y+Math.sin(a)*260,life:35,max:35});banner('附近出現了祭壇！')}
   if(G.mode!=='tower'&&!G.warned&&G.t>=G.bossT-15){G.warned=1;banner(`${STAGES[G.stage].boss}即將出現！`);sfx('bossin')}
   if(G.mode!=='tower'&&G.boss&&!G.bossDone&&G.t>=G.bossT+BOSS_ESC&&!G.winT){G.escaped=1;sfx('lose');end(false);return}
-  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp;
-    const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};
+  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp*(G.heat?1:([.6,.85][G.stage]||1));
+    const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};if(G.stage===0)e.dmg=Math.round(e.dmg*.75);
     e.ent=2.5;G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin');bossRoar()}
   if(G.winT>0){G.winT-=dt;if(G.winT<=0){end(true);return}}
 
@@ -1402,8 +1402,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.20.0';
+const VERSION='0.20.1';
 const NEWS=[
+ {v:'0.20.1',d:'11/25',t:'前期魔王調整',items:[['調整','第一關「古樹王」血量減少 40%、撞人的傷害減少 25%；第二關「巨蛛女王」血量減少 15%。招式沒怎麼升級也來得及在魔王逃走前打倒；難度挑戰的魔王維持原本強度']]},
  {v:'0.20.0',d:'11/25',t:'新手體驗大整理',items:[['調整','Job 經驗改成 Base 經驗的 6 成，Job 等級越高需要越多經驗：一轉後大約要打 5～8 場才能二轉（以前打一場就跳到 Job 36）'],['修正','手機上戰鬥畫面左上角的職業名稱不會再和「魔王出現」倒數疊在一起，太長會自動換行'],['修正','升級選強化的畫面：手機上不再顯示「按 1、2、3」，電腦上會照選項數量顯示'],['新增','第一次選狗的畫面多了一段遊戲介紹；每隻狗改成顯示個性（能力都一樣，只是外表不同）'],['調整','新手第一次打開「選單」會停在「出戰」分頁；歡迎教學改成先按「出戰」再按「出發」'],['調整','「流派」改成可以收起來的區塊，平常只顯示目前流派，點開才看詳細說明'],['調整','「造型」改名為「毛色」，和「時裝」比較不會搞混；抽毛色有一半機率抽到你現在這隻狗的毛色；新手教學改推薦先抽時裝（每隻狗都能穿）'],['調整','開場怪物出現得比較密，不會再前一分鐘很空、後面突然爆量；被包圍前 5 秒會先提醒，第一關的包圍規模也縮小'],['新增','魔王登場時會大吼一聲把身邊的小怪震開，前 2.5 秒不會攻擊；魔王戰時小怪變少；魔王在畫面外時，畫面邊緣有紫色箭頭指出方向'],['新增','關卡列表會提醒「你現在等級比推薦低 X 級」'],['新增','倒下時結算畫面會寫出是被什麼打倒的'],['調整','結算畫面的裝備改成「普通 ×6、精良 ×2」這樣的摘要，只把稀有以上的列出來'],['調整','沒登入時，主城上方的「登入帳號後…」提示 8 秒後會縮成小小的「單人模式」'],['新增','幫狗狗取名字：選完狗會請你取名（也可以按「隨機」），名字會顯示在主城裡狗狗的頭上，其他玩家也看得到；你的狗屋會變成「名字的家」，朋友來拜訪時也會看到；「角色」分頁可以隨時改名。已經在玩的人下次打開遊戲時會問一次'],['修正','戰鬥中下方的技能圖示太多時會自動換行，不會再被右下角的按鈕蓋住']]},
  {v:'0.19.2',d:'11/25',t:'職業介紹・升級曲線',items:[['新增','轉職畫面重做：點一下職業就會看到牠的大圖、這一系的定位（近戰／遠程／範圍各佔多少）、這個職業的招式、練到三轉會學到的招牌招式、三種流派招式，還有完整的轉職路線圖（每一步都有小圖），確定了再按「選」'],['新增','轉職畫面可以直接「試玩看看」那個職業'],['新增','「角色」分頁多了「職業介紹・轉職路線」按鈕，隨時可以看全部職業，路線裡的每一隻都能點開看；已經到過的轉數可以直接從這裡換職業'],['調整','Base Lv 40 以後升級需要的經驗大幅增加，越接近 99 越難，99 級變成長期目標（已經升上去的等級不會掉）'],['調整','無限之塔高樓層的獎勵倍率只加在金幣和掉寶上，經驗最多 ×1.6，不會再爬幾層就狂升級']]},
  {v:'0.19.1',d:'11/25',t:'結算小動畫',items:[['新增','每場打完的結算畫面上方多了一段小動畫，用你自己的狗狗和身上的時裝：贏了會在彩帶和金骨頭前開心跳跳；輸了會趴在地上、頭上飄著小雨雲；撤退是背著小包袱在夕陽下走回家；魔王逃走時狗狗坐著歪頭冒問號，魔王一溜煙跑掉；無限之塔是坐在樓梯頂端，旁邊插著寫了層數的小旗子']]},
