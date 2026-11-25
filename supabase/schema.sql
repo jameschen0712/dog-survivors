@@ -235,3 +235,33 @@ begin
 end $$;
 drop trigger if exists leaderboard_fill on public.leaderboard;
 create trigger leaderboard_fill before insert or update on public.leaderboard for each row execute function public.leaderboard_fill();
+
+-- 12) 所有角色排行榜：每個帳號的每一隻狗狗各一列（slot 0～8）
+create table if not exists public.leaderboard_chars (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  slot       int  not null check (slot between 0 and 8),
+  username   text,
+  name       text check (char_length(name) <= 16),
+  sk         text check (char_length(sk) <= 24),
+  j          text check (char_length(j) <= 16),
+  reb        int not null default 0 check (reb between 0 and 10),
+  lv         int not null default 1 check (lv between 1 and 99),
+  para       int not null default 0 check (para between 0 and 100000),
+  tower      int not null default 0 check (tower between 0 and 100000),
+  score      bigint generated always as (reb::bigint * 1000000 + lv::bigint * 10000 + para) stored,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, slot)
+);
+create index if not exists leaderboard_chars_score on public.leaderboard_chars (score desc);
+alter table public.leaderboard_chars enable row level security;
+drop policy if exists "rankc: read"   on public.leaderboard_chars;
+drop policy if exists "rankc: insert" on public.leaderboard_chars;
+drop policy if exists "rankc: update" on public.leaderboard_chars;
+create policy "rankc: read"   on public.leaderboard_chars for select to anon, authenticated using (true);
+create policy "rankc: insert" on public.leaderboard_chars for insert to authenticated with check (auth.uid() = user_id);
+create policy "rankc: update" on public.leaderboard_chars for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+revoke all on public.leaderboard_chars from anon;
+grant select on public.leaderboard_chars to anon;
+grant select, insert, update on public.leaderboard_chars to authenticated;
+drop trigger if exists leaderboard_chars_fill on public.leaderboard_chars;
+create trigger leaderboard_chars_fill before insert or update on public.leaderboard_chars for each row execute function public.leaderboard_fill();

@@ -174,6 +174,17 @@
     const { error } = await sb.from('leaderboard').upsert(Object.assign({ user_id: user.id }, row));
     if (error) throw new Error(zh(error));
   };
+  api.putChars = async function (rows) {
+    if (!enabled || !user || !rows.length) return;
+    const { error } = await sb.from('leaderboard_chars').upsert(rows.map(r => Object.assign({ user_id: user.id }, r)));
+    if (error) throw new Error(zh(error));
+  };
+  api.topChars = async function (n) {
+    if (!enabled) return [];
+    const { data, error } = await sb.from('leaderboard_chars').select('user_id, slot, username, name, sk, j, reb, lv, para, tower').order('score', { ascending: false }).limit(n || 200);
+    if (error) throw new Error(zh(error));
+    return data || [];
+  };
   api.topScores = async function (kind, n) {
     if (!enabled) return [];
     const col = kind === 'tower' ? 'tower' : 'score';
