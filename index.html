@@ -304,9 +304,23 @@ const B={
  golden:['黃金獵犬','flop',.6,'fluff',1.1,{}],
  lab:['拉布拉多','flop',.6,'straight',1.1,{}],
  border:['邊境牧羊犬','fold',.6,'fluff',1,{}],
- husky:['哈士奇','up',.6,'curl',1.1,{husky:1}]};
-const BPERS={shiba:'倔強又忠心',corgi:'短腿跑超快',poodle:'聰明愛漂亮',dachs:'長長的好奇寶寶',chihuahua:'小小但很勇敢',westie:'白白蓬蓬開心果',golden:'溫柔的大暖男',lab:'愛吃又愛玩',border:'超聰明工作狂',husky:'愛嚎叫的戲精'};
-const REC={shiba:'幼犬見習生、護衛犬',corgi:'跑腿犬',poodle:'巫犬',dachs:'護衛犬',chihuahua:'牛仔犬',westie:'超級幼犬',golden:'搗蛋犬',lab:'療癒犬',border:'巫犬',husky:'護衛犬'};
+ husky:['哈士奇','up',.6,'curl',1.1,{husky:1}],
+ mix:['台灣米克斯','up',.6,'straight',1,{}],
+ pom:['博美','up',.3,'fluff',.7,{mane:1}],
+ maltese:['馬爾濟斯','long',.35,'fluff',.75,{silky:1,knot:1}],
+ frenchie:['法國鬥牛犬','bat',.12,'short',.9,{short:1,wrinkle:1}],
+ schnauzer:['雪納瑞','fold',.5,'short',.85,{beard:1}],
+ bichon:['比熊','flop',.3,'pom',.78,{curly:1,mane:1}],
+ beagle:['米格魯','long',.5,'straight',.9,{}],
+ samoyed:['薩摩耶','up',.5,'fluff',1.15,{mane:1,puff:1}],
+ shihtzu:['西施','long',.12,'fluff',.78,{silky:1,knot:1,short:1}],
+ yorkie:['約克夏','up',.35,'straight',.7,{silky:1,tanhead:1}],
+ pug:['巴哥','fold',.1,'curl',.85,{wrinkle:1,short:1}],
+ akita:['秋田犬','up',.55,'curl',1.15,{fluff:1}],
+ gsd:['德國牧羊犬','up',.7,'fluff',1.2,{long:1}],
+ dalmatian:['大麥町','flop',.6,'straight',1.1,{}]};
+const BPERS={shiba:'倔強又忠心',corgi:'短腿跑超快',poodle:'聰明愛漂亮',dachs:'長長的好奇寶寶',chihuahua:'小小但很勇敢',westie:'白白蓬蓬開心果',golden:'溫柔的大暖男',lab:'愛吃又愛玩',border:'超聰明工作狂',husky:'愛嚎叫的戲精',mix:'台灣在地好夥伴',pom:'一顆會跑的毛球',maltese:'優雅的白色小公主',frenchie:'蝙蝠耳的胖胖鬥士',schnauzer:'大鬍子小老頭',bichon:'軟綿綿的雲朵',beagle:'鼻子最靈的貪吃鬼',samoyed:'永遠在微笑的天使',shihtzu:'嬌貴的小獅子',yorkie:'小個子大脾氣',pug:'皺皺臉的開心果',akita:'沉穩的忠犬',gsd:'可靠的警犬',dalmatian:'滿身斑點的跑者'};
+const REC={shiba:'幼犬見習生、護衛犬',corgi:'跑腿犬',poodle:'巫犬',dachs:'護衛犬',chihuahua:'牛仔犬',westie:'超級幼犬',golden:'搗蛋犬',lab:'療癒犬',border:'巫犬',husky:'護衛犬',mix:'護衛犬、偷襪小賊',pom:'小巫犬',maltese:'療癒犬',frenchie:'護衛犬',schnauzer:'跑腿犬',bichon:'療癒犬',beagle:'小獵犬',samoyed:'療癒犬',shihtzu:'小巫犬',yorkie:'偷襪小賊',pug:'跑腿犬',akita:'護衛犬',gsd:'護衛犬',dalmatian:'小獵犬'};
 /* skin: id, breed, name, rarity(0 basic,1 R,2 SR,3 SSR), fur, fur2, pattern, special effect */
 const SKINS=[
 ['shiba0','shiba','赤柴',0,'#d9893d','#fff3e0','chest'],['shiba1','shiba','黑柴',1,'#2a2220','#f0dcc0','tan'],['shiba2','shiba','白柴',1,'#f3ead8','#fffaf0','none'],['shiba3','shiba','胡麻柴',2,'#a8743a','#2a1e16','saddle'],['shiba4','shiba','櫻花柴',3,'#f6b6c8','#fff0f4','chest','sakura'],
@@ -318,7 +332,21 @@ const SKINS=[
 ['golden0','golden','黃金獵犬',0,'#e0a94a','#f0c878','none'],['golden1','golden','英系奶油黃金',1,'#f3dcae','#fbecd0','none'],['golden2','golden','深紅黃金',1,'#b8602a','#d07a3a','none'],['golden3','golden','奶茶黃金',2,'#d0a070','#f0d0a0','chest'],['golden4','golden','太陽黃金',3,'#ffbf3a','#fff0a0','none','gold'],
 ['lab0','lab','黃色拉布拉多',0,'#e8c98a','#f2dcaa','none'],['lab1','lab','黑色拉布拉多',1,'#1f1c1a','#2e2a28','none'],['lab2','lab','巧克力拉布拉多',1,'#5a3424','#6a4030','none'],['lab3','lab','銀灰拉布拉多',2,'#8a8c90','#a8aaae','none'],['lab4','lab','銀河拉布拉多',3,'#2a1e50','#c8a8ff','spots','star'],
 ['border0','border','黑白邊牧',0,'#1f1a18','#fbf7ef','chest'],['border1','border','紅白邊牧',1,'#8a4a2a','#fbf7ef','chest'],['border2','border','藍色隕石邊牧',2,'#9aa3ad','#2a2a2a','merle'],['border3','border','紅色隕石邊牧',2,'#c89070','#7a3a1e','merle'],['border4','border','極光邊牧',3,'#204a5a','#9fffd8','chest','aurora'],
-['husky0','husky','灰白哈士奇',0,'#7a8088','#fbf7ef','chest'],['husky1','husky','黑白哈士奇',1,'#2a2a2e','#fbf7ef','chest'],['husky2','husky','紅白哈士奇',1,'#a8603a','#fbf7ef','chest'],['husky3','husky','純白哈士奇',2,'#f8f8f8','#ffffff','none'],['husky4','husky','雪狼哈士奇',3,'#c8d8ec','#ffffff','chest','frost']];
+['husky0','husky','灰白哈士奇',0,'#7a8088','#fbf7ef','chest'],['husky1','husky','黑白哈士奇',1,'#2a2a2e','#fbf7ef','chest'],['husky2','husky','紅白哈士奇',1,'#a8603a','#fbf7ef','chest'],['husky3','husky','純白哈士奇',2,'#f8f8f8','#ffffff','none'],['husky4','husky','雪狼哈士奇',3,'#c8d8ec','#ffffff','chest','frost'],
+['mix0','mix','台灣黑狗',0,'#1e1a18','#2a2420','none'],['mix1','mix','黃金土狗',1,'#d8a050','#f6e0b8','chest'],['mix2','mix','虎斑米克斯',1,'#8a5a2a','#3a2418','brindle'],['mix3','mix','白襪黑狗',2,'#1e1a18','#fbf7ef','socks'],['mix4','mix','福氣金米克斯',3,'#f5c542','#fff3b0','chest','gold'],
+['pom0','pom','橘色博美',0,'#f0a050','#fbe0b8','chest'],['pom1','pom','白色博美',1,'#fbf8f2','#ffffff','none'],['pom2','pom','黑色博美',1,'#262222','#383232','none'],['pom3','pom','奶油博美',2,'#f3dcae','#fbecd0','none'],['pom4','pom','棉花糖博美',3,'#ffd0e8','#d0ecff','none','candy'],
+['malt0','maltese','白色馬爾濟斯',0,'#fbf8f2','#ffffff','none'],['malt1','maltese','奶油馬爾濟斯',1,'#f6e8cc','#fffaf0','none'],['malt2','maltese','檸檬耳馬爾濟斯',2,'#fbf8f2','#f0d898','mask'],['malt3','maltese','雪精靈馬爾濟斯',3,'#eef8ff','#cfeaff','none','frost'],
+['fren0','frenchie','淺黃法鬥',0,'#e0b880','#f3dcb8','chest'],['fren1','frenchie','虎斑法鬥',1,'#5a3a22','#2a1a10','brindle'],['fren2','frenchie','奶油法鬥',1,'#f3e4c8','#fbf3e0','none'],['fren3','frenchie','藍灰法鬥',2,'#7a8494','#e8e8f0','chest'],['fren4','frenchie','黑白花法鬥',2,'#fbf7ef','#1f1a18','patch'],['fren5','frenchie','星空法鬥',3,'#1e2450','#8ea8ff','spots','star'],
+['schn0','schnauzer','椒鹽雪納瑞',0,'#8a8c90','#e8e8e8','none'],['schn1','schnauzer','黑銀雪納瑞',1,'#1f1c1a','#c8ccd0','none'],['schn2','schnauzer','純黑雪納瑞',1,'#1f1c1a','#3a3634','none'],['schn3','schnauzer','純白雪納瑞',2,'#fbf8f2','#ffffff','none'],['schn4','schnauzer','極光雪納瑞',3,'#204a5a','#9fffd8','none','aurora'],
+['bich0','bichon','比熊',0,'#fbfaf5','#ffffff','none'],['bich1','bichon','奶油比熊',1,'#f6ead2','#fffaf0','none'],['bich2','bichon','杏色比熊',2,'#ecc9a0','#f8e4c8','none'],['bich3','bichon','糖果比熊',3,'#ffc8e0','#c8e8ff','patch','candy'],
+['beag0','beagle','三色米格魯',0,'#fbf7ef','#b5682f','tri'],['beag1','beagle','紅白米格魯',1,'#c0703a','#fbf7ef','chest'],['beag2','beagle','檸檬米格魯',1,'#fbf7ef','#e8c070','patch'],['beag3','beagle','巧克力米格魯',2,'#6a4030','#fbf7ef','chest'],['beag4','beagle','嘉年華米格魯',3,'#ff8a5a','#fff27a','patch','fiesta'],
+['samo0','samoyed','薩摩耶',0,'#fbfaf5','#ffffff','none'],['samo1','samoyed','奶油薩摩耶',1,'#f6ead2','#fffaf0','none'],['samo2','samoyed','餅乾薩摩耶',2,'#e8d0a8','#fbf3e0','chest'],['samo3','samoyed','雪原薩摩耶',3,'#e8f6ff','#ffffff','none','frost'],
+['shih0','shihtzu','金白西施',0,'#e0b060','#fbf7ef','patch'],['shih1','shihtzu','黑白西施',1,'#1f1a18','#fbf7ef','patch'],['shih2','shihtzu','銀灰西施',1,'#a8acb0','#f4f4f4','patch'],['shih3','shihtzu','紅白西施',2,'#b8602a','#fbf7ef','patch'],['shih4','shihtzu','櫻花西施',3,'#f6b6c8','#fff0f4','patch','sakura'],
+['york0','yorkie','約克夏',0,'#3a4a5a','#d8a050','tan'],['york1','yorkie','銀藍約克夏',1,'#7a8a9a','#e8c890','tan'],['york2','yorkie','金色約克夏',1,'#c89040','#f0d090','none'],['york3','yorkie','巧克力約克夏',2,'#5a3424','#d8a050','tan'],['york4','yorkie','星光約克夏',3,'#2a1e50','#ffd88a','tan','star'],
+['pug0','pug','淺黃巴哥',0,'#e8c890','#2a2220','mask'],['pug1','pug','黑巴哥',1,'#1f1c1a','#2e2a28','none'],['pug2','pug','銀灰巴哥',1,'#c0bcb0','#2a2220','mask'],['pug3','pug','杏色巴哥',2,'#e8a868','#2a2220','mask'],['pug4','pug','黃金巴哥',3,'#f5c542','#3a2a10','mask','gold'],
+['akita0','akita','紅秋田',0,'#c8783a','#fbf3e0','chest'],['akita1','akita','白秋田',1,'#f3ead8','#fffaf0','none'],['akita2','akita','虎斑秋田',1,'#6a4a30','#2a1a10','brindle'],['akita3','akita','胡麻秋田',2,'#a8743a','#2a1e16','saddle'],['akita4','akita','櫻花秋田',3,'#f6b6c8','#fff0f4','chest','sakura'],
+['gsd0','gsd','黑棕德牧',0,'#c8884a','#1f1a18','saddle'],['gsd1','gsd','全黑德牧',1,'#1f1c1a','#2e2a28','none'],['gsd2','gsd','白色德牧',1,'#f8f6f0','#ffffff','none'],['gsd3','gsd','灰狼德牧',2,'#8a8c90','#2a2a2e','saddle'],['gsd4','gsd','英雄德牧',3,'#2a3a6a','#ffd35a','saddle','gold'],
+['dal0','dalmatian','大麥町',0,'#fbfaf5','#1f1a18','spots'],['dal1','dalmatian','肝色大麥町',1,'#fbfaf5','#6a3a20','spots'],['dal2','dalmatian','檸檬大麥町',2,'#fbfaf5','#e0b050','spots'],['dal3','dalmatian','彩虹大麥町',3,'#fbfaf5','#ff7ab0','spots','fiesta']];
 const SKM={},BASE={};for(const r of SKINS){SKM[r[0]]={id:r[0],b:r[1],n:r[2],rar:r[3],f:r[4],f2:r[5],pat:r[6],fx:r[7]};if(r[3]===0)BASE[r[1]]=r[0]}
 /* collection bonus: every owned skin adds a small permanent bonus (stacks, no need to wear it) */
 const SBK=['atk','crit','spd','hp','cd','area','exp','zeny'],SBV={atk:[0,1,2.5,5],crit:[0,1,2,4],spd:[0,1,2,4],hp:[0,10,25,50],cd:[0,1,2,3.5],area:[0,1.5,3,6],exp:[0,3,6,12],zeny:[0,4,8,15]};
@@ -888,7 +916,7 @@ function drawCos(c,L,id,t,layer){const o=CSM[id];if(!o)return;if(o.slot==='back'
 
 function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   const sk=SKM[skid]||SKM.shiba0,j=JM[jid],[,ear,sn,tail,sz0,o]=B[sk.b],f=sk.f,f2=sk.f2,pat=sk.pat,sz=Math.sqrt(sz0);
-  const light=lum(f)>.6,dk=shade(f,-.22),TAN='#b5682f',hc=pat==='tri'&&light?TAN:f;
+  const light=lum(f)>.6,dk=shade(f,-.22),TAN='#b5682f',hc=o.tanhead?f2:pat==='tri'&&light?TAN:f;
   const ec=pat==='tri'?(light?shade(TAN,-.15):f):(pat==='mask'||pat==='patch'||pat==='merle')?f2:shade(hc,-.12);
   P=P||{};const pLeg=P.legs||'stand',pBody=P.body||0,pHead=P.head||0,pMouth=P.mouth||0,pEye=P.eyes||'';
   const sw=P.wig!==undefined?P.wig:mv?Math.sin(t*14):0,bob=mv?-Math.abs(sw)*1.6:Math.sin(t*3)*.6*(pLeg==='lie'?.3:1);
@@ -899,7 +927,7 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   if(P.flip){c.translate(0,by);c.rotate(P.flip);c.translate(0,-by)}
   const W2=wear||{},L={hx,hy,hr,by,bl,ex:hx+2.5,ey:hy-1.5,nkx:hx-3,nky:hy+7,nx:hx+8};
   const pvx=-bl+4,pvy=by+4,rot=(px,py)=>{const dx=px-pvx,dy=py-pvy,cs=Math.cos(pBody),sn2=Math.sin(pBody);return [pvx+dx*cs-dy*sn2,pvy+dx*sn2+dy*cs]};
-  const legCol=i=>i%2?dk:f,paws=(lx,i)=>{if(pat==='tan'||(pat==='tri'&&!light))rr(c,lx-2,12-2.5,4.5,2.5,1,pat==='tan'?f2:'#b5682f')};
+  const legCol=i=>i%2?dk:f,paws=(lx,i)=>{if(pat==='socks')rr(c,lx-2,12-3.5,4.5,3.5,1,f2);else if(pat==='tan'||(pat==='tri'&&!light))rr(c,lx-2,12-2.5,4.5,2.5,1,pat==='tan'?f2:'#b5682f')};
   const frontLeg=(lx,i,topY)=>{const lift=i===3?(P.lift||0):0,len=12-topY;if(lift){c.save();c.translate(lx,topY+1);c.rotate(-lift*1.5);rr(c,-2,0,4.5,len,2,legCol(i));c.restore()}else{rr(c,lx-2,topY,4.5,len,2,legCol(i));paws(lx,i)}};
   /* legs (drawn before the body so the body overlaps them) */
   if(pLeg==='stand'||pLeg==='up'){[-bl+3,-bl+8,bl-9,bl-4].forEach((lx,i)=>{const ph=(i%2?1:-1)*sw*1.8;if(i>=2&&P.lift&&i===3){frontLeg(lx+ph,i,12-lh);return}rr(c,lx-2+ph,12-lh,4.5,lh,2,legCol(i));paws(lx+ph,i)})}
@@ -919,11 +947,13 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   else if(tail==='short')ell(c,-2,-2,3.5,2.5,-.5,f);
   c.restore();
   ell(c,0,by,bl,7.5,0,f);
+  if(o.puff){for(let i=-bl+2;i<=bl-2;i+=4)circ(c,i,by-5.5,3.6,shade(f,.05));for(let i=-bl+4;i<=bl-4;i+=5)circ(c,i,by+5.5,3,f)}
+  if(pat==='brindle'){c.save();c.strokeStyle=f2;c.lineWidth=1.3;c.globalAlpha=.5;for(let i=-bl+5;i<bl-4;i+=3){c.beginPath();c.moveTo(i,by-5.5);c.lineTo(i-2,by+4.5);c.stroke()}c.restore()}
   if(pat==='saddle')ell(c,-2,by-3.5,bl-3,4.5,0,f2);
   if(pat==='tri')ell(c,-2,by-3.5,bl-3,4.5,0,light?'#2a2220':f);
   if(pat==='patch')ell(c,-3,by-2,6,5,0,f2);
   if(pat==='spots'||pat==='merle')for(const [sx,sy,sr] of [[-6,-3,2.6],[-1,1,2],[4,-4,2.2],[-9,2,1.8],[2,-1,1.6]])circ(c,sx,by+sy,sr*(pat==='merle'?1.4:1),f2);
-  if(pat==='chest'||pat==='chestmask'||(pat==='tri'&&!light))ell(c,bl-4,by+2,5.5,4.5,0,f2);
+  if(pat==='chest'||pat==='chestmask'||pat==='socks'||(pat==='tri'&&!light))ell(c,bl-4,by+2,5.5,4.5,0,f2);
   if(o.silky){c.fillStyle=f;for(let i=-bl+3;i<bl-2;i+=4){c.beginPath();c.moveTo(i,by+4);c.lineTo(i+2,by+10);c.lineTo(i+4,by+4);c.fill()}}
   if(o.curly)for(let i=0;i<6;i++)circ(c,-bl+3+i*(bl*2-6)/5,by-6,3,shade(f,.1));
   if(j.tier>=2){c.beginPath();c.moveTo(bl-5,by-6);c.quadraticCurveTo(-2,by-9,-bl-1,by+3);c.lineTo(-bl+3,by+7);c.quadraticCurveTo(0,by+1,bl-7,by-1);c.closePath();c.fillStyle=shade(j.c,-.3);c.fill();if(j.tier>=3){c.strokeStyle='#f5c542';c.lineWidth=1.3;c.stroke()}}
@@ -931,6 +961,7 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   /* head group (rotates around the neck) */
   c.save();if(pHead){const nx0=hx-4,ny0=hy+6;c.translate(nx0,ny0);c.rotate(pHead);c.translate(-nx0,-ny0)}
   if(o.fluff)for(const [dx,dy] of [[-4,4],[0,6],[3,3],[-6,0]])circ(c,hx+dx,hy+dy,5,shade(f,.06));
+  if(o.mane)for(let k=0;k<10;k++){const a=k*TAU/10;circ(c,hx-1+Math.cos(a)*(hr+.5),hy+1+Math.sin(a)*(hr+.5),4.4,shade(f,k%2?.04:-.03))}
   if(ear==='up'){tri(c,hx-1,hy-4,hx+2,hy-14,hx+5,hy-5,shade(ec,-.15));tri(c,hx-6,hy-4,hx-3,hy-15,hx+1,hy-6,ec);tri(c,hx-4.5,hy-6,hx-3,hy-12,hx-.5,hy-6,'#f2a7a0')}
   if(ear==='fold'){tri(c,hx-5,hy-5,hx-2,hy-12,hx+2,hy-6,ec);tri(c,hx-2,hy-12,hx+2,hy-6,hx+3.5,hy-9,shade(ec,-.18))}
   if(ear==='bat'){ell(c,hx+2,hy-10,3.6,6.5,.25,shade(ec,-.15));ell(c,hx-3,hy-10,4,7,-.25,ec);ell(c,hx-3,hy-9,2,4.5,-.25,'#f2a7a0')}
@@ -939,6 +970,8 @@ function drawDog(c,skid,jid,x,y,t,face,mv,wear,P){
   if(o.curly)circ(c,hx-1,hy-8,5,shade(f,.12));
   if(pat==='patch')ell(c,hx-3,hy-2,5,6,0,f2);
   if(pat==='merle')circ(c,hx-3,hy-3,3,f2);
+  if(pat==='spots'){circ(c,hx-3,hy-4,1.6,f2);circ(c,hx-5,hy+1,1.2,f2)}
+  if(o.knot){circ(c,hx-1,hy-9,3.4,f);tri(c,hx-1,hy-11,hx-5,hy-14,hx-5,hy-9,'#ff5a7a');tri(c,hx-1,hy-11,hx+3,hy-14,hx+3,hy-9,'#ff5a7a');circ(c,hx-1,hy-11,1.2,'#ff8aa0')}
   if(o.wrinkle){c.strokeStyle=shade(hc,-.3);c.lineWidth=1;for(let k=0;k<3;k++){c.beginPath();c.arc(hx+1,hy-3+k*2.2,4,Math.PI*1.15,Math.PI*1.85);c.stroke()}}
   const sl=3.5+sn*6,sx=hx+4+sl*.6,mc={mask:f2,chestmask:'#2a2420',chest:f2,tan:f2,tri:light?'#fbf7ef':f2}[pat]||shade(hc,.08);
   if(pMouth>0){ell(c,sx-.5,hy+5.2+pMouth*1.6,sl*.75,1+pMouth*2.4,0,'#5a1e1e');ell(c,sx+.5,hy+6.2+pMouth*2.4,sl*.4,.8+pMouth*1.1,0,'#ff8a9a')}
@@ -1879,8 +1912,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.22.0';
+const VERSION='0.22.1';
 const NEWS=[
+ {v:'0.22.1',d:'11/25',t:'14 種新狗狗',items:[['新增','新增 14 個常見品種：台灣米克斯、博美、馬爾濟斯、法國鬥牛犬、雪納瑞、比熊、米格魯、薩摩耶、西施、約克夏、巴哥、秋田犬、德國牧羊犬、大麥町，現在一共 24 種'],['新增','每個新品種都有 4～6 款毛色（含 SSR），例如台灣黑狗、白襪黑狗、虎斑法鬥、櫻花秋田、彩虹大麥町，抽毛色就抽得到'],['新增','新的毛色花紋：虎斑、白襪；博美、比熊、薩摩耶有蓬蓬的毛領，馬爾濟斯和西施綁著小蝴蝶結'],['新增','主城多了五隻新品種的狗狗到處逛：雪球、毛毛、胖虎、阿黑、點點'],['說明','品種變多後，要收集全部毛色會比較久；抽毛色時還是有一半機率抽到你自己這隻狗的毛色']]},
  {v:'0.22.0',d:'11/25',t:'好友與團隊副本',items:[['新增','好友：用帳號名稱加好友，看得到好友在不在線上（選單新增「團隊」分頁）'],['新增','團隊副本「灰霧大魔王討伐」：2／4／6 人一起打魔王，魔王會張護盾，要有人站上光柱才能打破；倒下的隊友站旁邊 3 秒就能救起來'],['新增','團隊副本「守護彩虹橋」：守住中間的彩虹水晶撐過 10 波，第 5、10 波有魔王'],['新增','可以邀請好友組隊，也可以隨機配對；30 秒湊不滿人會補 AI 狗狗，也能自己和 AI 一起練習。中途有人離開會由 AI 接手'],['新增','團隊徽章：打團隊副本拿徽章，可以換骨頭和稀有／史詩／傳說裝備'],['新增','戰鬥畫面左上角會顯示自己的血量數字'],['調整','抽毛色、抽時裝的地方會顯示你現在有幾根骨頭，選單上方也會顯示'],['調整','難度提高：怪物血量和攻擊隨時間成長得更快、數量更多，前兩關魔王也變強一點'],['修正','手機長按畫面不會再跳出「拷貝／搜尋」選單或放大鏡'],['修正','確認視窗改成遊戲內的視窗，不會再被瀏覽器的「禁止顯示對話方塊」擋住']]},
  {v:'0.21.2',d:'11/25',t:'緊急修正',items:[['修正','上一版讓戰鬥中「撿寶石的範圍」幾乎變成 0（要走到寶石正上方才撿得到），已經修好'],['修正','基礎屬性的物理／遠程／魔法傷害加成和閃避，之前在戰鬥中沒有生效，現在會正確套用']]},
  {v:'0.21.1',d:'11/25',t:'屬性對應傷害類型',items:[['調整','招式分成物理、遠程、魔法三種傷害（招式說明旁會標出來）：力量加物理、靈巧加遠程、智力加魔法，每點 +0.8%。巫犬系和天使犬路線是魔法；獵犬系、牛仔犬系是遠程；護衛犬系、功夫犬路線、搗蛋犬系大多是物理；跑腿犬系的工匠路線偏物理和遠程、藥劑路線是魔法'],['調整','敏捷多了冷卻 -0.1%、靈巧冷卻改成 -0.15%；智力範圍改成 +0.3%'],['調整','「自動配點」改成看你目前職業主要用哪一種傷害來分配（物理：力量＞體力＞敏捷；遠程：靈巧＞敏捷＞幸運；魔法：智力＞體力＞靈巧）'],['新增','角色數值多了「物理／遠程／魔法」三種傷害加成的顯示']]},
@@ -2769,7 +2803,7 @@ const DIGS=[[-700,-120],[-820,120],[-610,250],[-880,-260]];
 const TREES=(()=>{let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<70;i++){const side=i%4;let x,y;if(side===0){x=TOWN.x0+20+r()*1900;y=TOWN.y0+10+r()*70}else if(side===1){x=TOWN.x0+20+r()*1900;y=TOWN.y1-50+r()*60}else if(side===2){x=TOWN.x0+10+r()*60;y=TOWN.y0+r()*1150}else{x=TOWN.x1-60+r()*60;y=TOWN.y0+r()*1150}o.push([x,y,.8+r()*.5])}
   for(const p of [[-560,-300],[-900,0],[-560,330],[-760,-380],[-940,330],[860,-360],[880,300],[480,-420],[-480,-470],[150,470],[-160,470]])o.push([p[0],p[1],1.1]);return o})();
 const FLOWERS=(()=>{let s=29;const r=()=>(s=(s*16807)%2147483647)/2147483647,o=[];for(let i=0;i<90;i++)o.push([TOWN.x0+r()*1960,TOWN.y0+r()*1200,['#ffb3cc','#fff27a','#ffffff','#b3d9ff'][i%4]]);return o})();
-const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2','dachs1','dachs3'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-300+i*65,y:i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂','襪子獵人・庫里','公主・巴塔'][i],wear:[{},{},{},{},{},{},{},{},{face:'cx_34'},{head:'cs_magical_head'}][i]}));
+const TDOGS=['corgi1','husky2','golden1','chi1','shiba1','border1','westie1','lab2','dachs1','dachs3','samo0','pom0','fren0','mix0','dal0'].map((sk,i)=>({skin:SKM[sk]?sk:BASE.shiba,x:-300+(i%10)*65+(i>9?30:0),y:i>9?(i%2?190:-190):i%2?110:-115,tx:0,ty:0,w:Math.random()*3,face:1,mv:false,heart:0,n:['麻糬','布丁','奶茶','豆花','小米','芝麻','湯圓','可樂','襪子獵人・庫里','公主・巴塔','雪球','毛毛','胖虎','阿黑','點點'][i],wear:[{},{},{},{},{},{},{},{},{face:'cx_34'},{head:'cs_magical_head'}][i]}));
 const ENTERX=720,ENTERY=34;
 
 /* home data */
