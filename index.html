@@ -1301,7 +1301,7 @@ function updPlayer(dt){
   {const db=$('dashb'),cd=Math.max(0,G.dashCd||0),ready=cd<=0;if(db.disabled===ready)db.disabled=!ready;const txt=ready?'衝':cd.toFixed(1);if(db.textContent!==txt)db.textContent=txt;if(db.style.setProperty)db.style.setProperty('--cd',ready?'0':String(cd/3));if(G.dashWasCd&&ready){db.classList.remove('ready');void db.offsetWidth;db.classList.add('ready')}G.dashWasCd=!ready}
   if(p.mv){const sp=p.spd*G.st.spd*dt*(p.slow>0?.55:1);p.x+=ix*sp;p.y+=iy*sp;const n=Math.hypot(ix,iy);p.fx=ix/n;p.fy=iy/n;if(Math.abs(ix)>.1)p.face=Math.sign(ix)}
   p.inv-=dt;if(G.st.regen)heal(G.st.regen*dt);
-  if(G.arena){const d=Math.hypot(p.x,p.y);if(d>G.arena){p.x*=G.arena/d;p.y*=G.arena/d}}
+  if(G.arena){const d=Math.hypot(p.x,p.y);if(d>G.arena){p.x*=G.arena/d;p.y*=G.arena/d;if(!(G.edgeT>0)){G.edgeT=6;banner('前面是濃濃的灰霧，過不去了！回到圈圈裡面打吧')}}G.edgeT=(G.edgeT||0)-dt}
   if(G.pet){const pt=G.pet;let tx=p.x-p.face*26,ty=p.y+8,fetching=false;
     const pm=SV.petMode||'auto';if(pm==='auto'){pt.ck=(pt.ck||0)-dt;if(pt.ck<=0){pt.ck=.5;let n=0;for(const j of G.J)if(!j.got&&!j.m&&(j.x-p.x)**2+(j.y-p.y)**2<330*330)n++;pt.auto=n>=8||(pt.auto&&n>=3)}}
     if(pm==='fetch'||(pm==='auto'&&pt.auto)){if(!pt.tgt||pt.tgt.got||pt.tgt.m){pt.tgt=null;let bd=330*330;for(const j of G.J){if(j.got||j.m)continue;const d2=(j.x-p.x)**2+(j.y-p.y)**2;if(d2<bd){bd=d2;pt.tgt=j}}}
@@ -1602,7 +1602,7 @@ function newCoopRun(o){
   G.me={id:G.coop.me,p:G.p,st:G.st,wep:G.wep,pas:G.pas,bfav:G.bfav,bdm:G.bdm,bcd:G.bcd,build:G.build,bsk:G.bsk,vis:false,name:dogName(),sk:G.skin,j:G.job,w:SV.wear||{}};
   G.coop.hostSeen=1;G.cx=G.me;G.p.down=0;G.p.rv=0;G.p.dead=0;
   for(const r of o.roster){if(r.id===G.coop.me)continue;const m=mkMate(r.id,cleanProfile(r.pf),!!r.ai,o.role==='host'?!r.ai:true);m.seen=1;G.coop.mates.push(m);G.coop.byId.set(m.id,m)}
-  G.arena=o.mode==='def'?640:820;
+  G.arena=o.mode==='def'?760:1100;
   G.raid={t:0,bossSp:0,pillars:null,markT:22,wave:0,brk:6,left:0,spT:0,wt:0};
   if(o.mode==='def'){const hp=Math.round(2600*STAGES[tier.stage].hp**.6*(1+.6*(n-1)));G.crys={x:0,y:0,r:34,hp,max:hp,crys:1}}
   G.eidMap=new Map();
@@ -2012,8 +2012,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.25.0';
+const VERSION='0.25.1';
 const NEWS=[
+ {v:'0.25.1',d:'11/25',t:'團隊副本場地邊界看得到了',items:[['修正','團隊副本的場地有邊界，之前是看不到的牆，走到邊緣會突然卡住；現在邊界外面是一圈灰霧，邊緣有虛線，走到邊上會提示'],['調整','團隊副本的場地變大：討伐魔王 1100、守護彩虹橋 760（原本 820、640）']]},
  {v:'0.25.0',d:'11/25',t:'配對等待時間自己選',items:[['新增','團隊副本隨機配對可以自己選最多等多久：不等、15 秒、30 秒、60 秒，時間到湊不滿就補 AI'],['新增','配對中多了「不等了，補 AI 開打」按鈕，隨時可以直接開打']]},
  {v:'0.24.9',d:'11/25',t:'主城狗狗當 AI 隊友・不再黏在一起',items:[['修正','團隊副本的 AI 隊友會互相保持距離、分散在你身邊和魔王周圍不同方向，不會再全部疊在同一個位置'],['新增','AI 隊友改成主城裡的狗狗和 NPC 來幫忙：可能是庫里、巴塔、阿布、大熊、雪球、隊長……，外型和名字都跟主城一樣，同一場不會重複']]},
  {v:'0.24.8',d:'11/25',t:'天賦樹好點多了',items:[['調整','天賦樹不用再上下滑：樹變矮一點，說明框固定在畫面下方；點一下圖示看說明，再點一下同一個圖示就直接加 1 點']]},
@@ -2596,6 +2597,7 @@ function render(){
       if(w.s.k==='sanct'){ctx.globalAlpha=.35;rr(ctx,p.x-4,p.y-Rr*.6,8,Rr*1.2,3,w.s.c);rr(ctx,p.x-Rr*.6,p.y-4,Rr*1.2,8,3,w.s.c)}
       for(let i=0;i<8;i++){const a=t*1.5+i*TAU/8;ctx.globalAlpha=.8;circ(ctx,p.x+Math.cos(a)*Rr,p.y+Math.sin(a)*Rr,3,w.s.c)}ctx.restore()}}
     if(G.coop){useCtx(G.me);drawRaidGround(t)}
+    if(G.arena){ctx.save();ctx.lineWidth=600;ctx.strokeStyle='rgba(70,64,92,.62)';ctx.beginPath();ctx.arc(0,0,G.arena+300,0,TAU);ctx.stroke();ctx.lineWidth=5;ctx.setLineDash([18,14]);ctx.lineDashOffset=-t*20;ctx.strokeStyle='rgba(235,225,255,.75)';ctx.beginPath();ctx.arc(0,0,G.arena,0,TAU);ctx.stroke();ctx.restore()}
     for(const z of G.Z)drawGroundZ(z,t);
     const cxl=cx-W/S/2-60,cxr=cx+W/S/2+60,cyt=cy-H/S/2-80,cyb=cy+H/S/2+60,inV=(x,y)=>x>cxl&&x<cxr&&y>cyt&&y<cyb;
     for(const j of G.J)if(inV(j.x,j.y))drawGem(j,t);
