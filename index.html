@@ -54,10 +54,28 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .ch strong{font-size:17px}.ch em{font-style:normal;font-size:13px;margin-left:8px;color:#a0661e;font-weight:700}.ch small{display:block;font-size:14px;color:#5a4a34}
 .num{flex:none;font:700 13px Fredoka,sans-serif;color:#8a7a5a;border:1.5px solid #d8c99a;border-radius:6px;padding:0 6px}
 .hint{margin:10px 0 0;font-size:13px;color:#7a6a50}
-.jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:10px}
+.jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.jb{padding:6px 4px 8px;gap:1px}.jb canvas{width:96px;height:80px}.jb strong{font-size:15px}.jb small{font-size:11px;color:#8a7a5a;line-height:1.25}
+.jb.on{border-color:var(--gold);background:#fff8dc;box-shadow:0 0 0 3px #f5c54266}
+.jobd{margin-top:10px;background:#fff;border:2px solid #e3d6b0;border-radius:14px;padding:12px}
+.jdh{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.jdh canvas{width:150px;height:125px;flex:none;background:radial-gradient(circle at 50% 70%,#fff3d0,#fff0 70%)}
+.jdh h3{margin:0;font-size:22px}.jdh .tier{display:inline-block;font-size:12px;background:#5a3a10;color:#fff;border-radius:8px;padding:1px 8px;margin-left:6px;vertical-align:3px}
+.jdh p{margin:4px 0;font-size:14px;color:#5a4a34}
+.meter{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:12px;align-items:center;margin-top:4px;max-width:260px}.meter i{display:block;height:8px;border-radius:4px;background:#eee3c4;overflow:hidden}.meter i b{display:block;height:100%;border-radius:4px}
+.jsec{margin-top:10px}.jsec>strong{display:block;font-size:14px;margin-bottom:4px}
+.skl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:6px}
+.skc{display:flex;gap:7px;align-items:flex-start;background:#fbf6e8;border-radius:10px;padding:6px 8px;font-size:12.5px;color:#5a4a34;line-height:1.35}
+.skc>b{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:900 13px "Noto Sans TC",sans-serif;color:#2a1a05;box-shadow:inset 0 -2px 0 #0002}
+.skc strong{display:block;font-size:13.5px;color:#2a1a05}.skc em{font-style:normal;font-size:11px;color:#2f7a3e;margin-left:4px}
+.jtree{display:grid;gap:6px}.jrow{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.jn{display:grid;justify-items:center;background:#fbf6e8;border:2px solid transparent;border-radius:10px;padding:3px 6px;cursor:pointer;font:inherit;color:inherit;min-width:74px}
+.jn canvas{width:56px;height:46px}.jn span{font-size:12px;font-weight:700}.jn small{font-size:10.5px;color:#8a7a5a}
+.jn.cur{border-color:var(--gold);background:#fff8dc}.jn.past{opacity:.55}.jarr{color:#c9a96a;font-weight:900;padding:0 1px}
+.jbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}.jbtns .btn{margin:0}
+@media(max-width:560px){.jobs{grid-template-columns:repeat(4,1fr);gap:5px}.jb{padding:4px 2px 6px}.jb canvas{width:64px;height:54px}.jb strong{font-size:12.5px}.jb small{display:none}.jdh canvas{width:110px;height:92px}.jdh h3{font-size:19px}.jn{min-width:64px;padding:2px 4px}.jn canvas{width:46px;height:38px}.jbtns{position:sticky;bottom:-12px;background:var(--paper);padding:8px 0;margin-bottom:-8px}}
 .jb{display:grid;justify-items:center;gap:3px;padding:10px;text-align:center}
-.jb canvas{width:120px;height:100px}
-.jb strong{font-size:19px}.jb .sk{font-size:13px;color:#5a4a34;text-align:left;width:100%}
+
+.jb .sk{font-size:13px;color:#5a4a34;text-align:left;width:100%}
 .jb .sk b{color:#2f7a3e}
 .breeds{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;max-height:min(56vh,460px);overflow:auto;padding:4px}
 .br{display:grid;justify-items:center;padding:6px 4px 8px;gap:0}
@@ -197,7 +215,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
         <div class="hbody" id="hbody"></div>
       </div>
       <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><p class="sub">之後每次轉職都是同一隻狗，只會換上新的裝備和招式。其他毛色可以在城鎮「造型」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
-      <div class="ov hide" id="jobov"><div class="card wide"><h2 id="jobT">轉職</h2><div id="jobs" class="jobs"></div><p class="hint">轉職後 Job Lv 從 1 開始，已經點過的天賦會保留。</p><button class="btn ghost" id="jobCancel">先不要</button></div></div>
+      <div class="ov hide" id="jobov"><div class="card wide" style="text-align:left"><h2 id="jobT" style="text-align:center">轉職</h2><p class="note" id="jobSub" style="text-align:center;margin:-6px 0 8px"></p><div id="jobs" class="jobs"></div><div id="jobD" class="jobd"></div><div class="jbtns"><button class="btn" id="jobOk">選這個職業</button><button class="btn ghost" id="jobTry">試玩看看</button><button class="btn ghost" id="jobCancel">先不要</button></div></div></div>
       <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint">也可以按 1、2、3 選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><p class="note" style="margin:2px 0 6px;font-size:12px">小地圖：<b style="color:#ffb43a">■</b> 寶箱　<b style="color:#e84a5f">∩</b> 磁鐵　<b style="color:#5fe38a">✚</b> 大骨頭（回血）　<b style="color:#fff6b0">★</b> 祭壇　<b style="color:#ffa53a">●</b> 菁英　<b style="color:#c45aff">●</b> 魔王</p><button class="btn ghost" id="lowPowBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="moveov" style="z-index:40"><div class="card" style="max-width:440px"><h2>🏠 汪汪倖存者搬家了！</h2><p>新網址：<br><b style="font-size:1.05em;white-space:nowrap;user-select:all">wangwang-survivors.pages.dev</b></p><p style="font-size:.92em;opacity:.85">按下面的按鈕，會把這台裝置上的進度一起帶過去。<br>有登入雲端存檔的話，到新網址登入同一個帳號也可以。</p><p><button class="btn" id="moveGo">帶著存檔搬過去</button></p><p><button class="btn ghost" id="moveStay" style="font-size:.85em">先留在舊網址</button></p></div></div>
@@ -403,7 +421,8 @@ const MECH={
  breath:{b:8,cd:2.8,d:v=>`朝前方噴出火焰吐息，連續傷害 ${v}`},
  bolt:{b:15,cd:1.1,d:(v,l)=>`發射 ${1+(l>>1)} 發追蹤彈，傷害 ${v}`}};
 const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
-const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x);
+const skX=x=>(x.slow?'，還會讓敵人變慢':'')+(x.rock?'，會把敵人撞飛':'')+(x.fire?'（火屬性）':x.zap?'（雷屬性）':'');
+const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x)+skX(s.x);
 
 const PD={
  vit:{n:'強健',g:'體',c:'#ff8a8a',d:()=>'生命上限 +20，並回復 20',f:g=>{g.p.max+=20;g.p.hp=Math.min(g.p.max,g.p.hp+20)}},
@@ -523,7 +542,7 @@ const CLOUD=()=>window.DogCloud&&DogCloud.enabled;
 function fixItem(it){if(it.slots===undefined)it.slots=Math.min(3,[0,1,1,2,2][it.rar]||0);if(!it.cards)it.cards=[];return it}
 const curSkin=()=>(SV.skin&&SV.skin[SV.breed])||BASE[SV.breed||'shiba'];
 const owns=id=>SKM[id]&&(SKM[id].rar===0||SV.owned.includes(id));
-const bNeed=l=>Math.floor(42*l**1.5),jNeed=(l,t)=>Math.floor((16+11*t)*l+12);
+const bNeed=l=>Math.floor(42*l**1.5*1.05**Math.max(0,l-40)),jNeed=(l,t)=>Math.floor((16+11*t)*l+12);
 
 /* ---------- talents ---------- */
 const TB=[
@@ -1024,7 +1043,7 @@ function hurt(e,d,kx,ky,kb,col){
 function kill(e){
   e.dead=true;G.kills++;if(e.elite)G.eliteKills=(G.eliteKills||0)+1;if(e.aff){if(e.aff.includes('split'))for(let i=0;i<4;i++){const s2=spawnEnemy(e.type,false,e.x+R(-20,20),e.y+R(-20,20));s2.hp*=2;s2.max=s2.hp}if(e.aff.includes('boom'))G.Z.push({k:'bz',x:e.x,y:e.y,R:90,life:.9,max:.9,dmg:Math.round(e.dmg*1.2),c:'#ff6a2e'})}if(G.st.leech)heal(G.st.leech);if(e.boss)G.bossKills=(G.bossKills||0)+1;const ec=EC[e.type]||'#e8f5c8';fx({k:'poof',x:e.x,y:e.y,R:e.r*1.8,c:ec,life:.28,max:.28});for(let i=0;i<(e.boss?30:7);i++){const a=R(0,TAU),v=R(80,240);fx({k:'chunk',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-140,s:R(2,4.5)*(e.r/12),c:ec,life:.5,max:.5,g:700})}
   const sg=STAGES[G.stage],xp=e.boss?200:e.elite?20:ET[e.type].xp;
-  const xm=2.25*sg.rw*G.st.exp*G.mul.rw*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*(e.guard?.4:1);
+  const xm=2.25*sg.rw*G.st.exp*Math.min(G.mul.rw,1.6)*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*(e.guard?.4:1);
   {const zv=Math.round((e.boss?(e.guard?150:600):e.elite?60:R(1,4)/.4)*sg.rw*G.st.zeny*G.mul.rw*G.mul.zeny),nc=e.boss?10:e.elite?5:(Math.random()<.4?1:0);for(let i=0;i<nc;i++)G.J.push({x:e.x+R(-18,18),y:e.y+R(-18,18),v:0,coin:Math.max(1,Math.round(zv/nc)),m:false})}
   if(!G.trial){const cr=(G.dtype==='card'&&e.boss&&!e.guard)?1:(e.boss?(e.guard?.08:CARD_RATE.boss):e.elite?CARD_RATE.elite:CARD_RATE.normal)*G.mul.card*G.cur.drop;if(Math.random()<cr){const cid=e.boss?'c_b'+G.stage:'c_'+e.type;if(CM[cid]){G.rw.cards.push(cid);txt(e.x,e.y-44,`獲得 ${CM[cid].n}！`,'#ff9ec4',true);sfx('job');fx({k:'ring',x:e.x,y:e.y,R:60,c:'#ff9ec4',life:.5,max:.5,fill:1})}}
     if(e.guard){G.rw.items.push(genItem(G.stage,G.floor%10===0?2:G.floor%5===0?1:0))}else if(e.boss){G.bossPick=[genItem(G.stage,2),genItem(G.stage,2),genItem(G.stage,Math.random()<.35?3:2)]}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004*G.cur.drop)G.rw.items.push(genItem(G.stage,0))}
@@ -1370,8 +1389,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽造型或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.19.1';
+const VERSION='0.19.2';
 const NEWS=[
+ {v:'0.19.2',d:'11/25',t:'職業介紹・升級曲線',items:[['新增','轉職畫面重做：點一下職業就會看到牠的大圖、這一系的定位（近戰／遠程／範圍各佔多少）、這個職業的招式、練到三轉會學到的招牌招式、三種流派招式，還有完整的轉職路線圖（每一步都有小圖），確定了再按「選」'],['新增','轉職畫面可以直接「試玩看看」那個職業'],['新增','「角色」分頁多了「職業介紹・轉職路線」按鈕，隨時可以看全部職業，路線裡的每一隻都能點開看；已經到過的轉數可以直接從這裡換職業'],['調整','Base Lv 40 以後升級需要的經驗大幅增加，越接近 99 越難，99 級變成長期目標（已經升上去的等級不會掉）'],['調整','無限之塔高樓層的獎勵倍率只加在金幣和掉寶上，經驗最多 ×1.6，不會再爬幾層就狂升級']]},
  {v:'0.19.1',d:'11/25',t:'結算小動畫',items:[['新增','每場打完的結算畫面上方多了一段小動畫，用你自己的狗狗和身上的時裝：贏了會在彩帶和金骨頭前開心跳跳；輸了會趴在地上、頭上飄著小雨雲；撤退是背著小包袱在夕陽下走回家；魔王逃走時狗狗坐著歪頭冒問號，魔王一溜煙跑掉；無限之塔是坐在樓梯頂端，旁邊插著寫了層數的小旗子']]},
  {v:'0.19.0',d:'11/25',t:'狗狗職業・流派重做',items:[['調整','所有職業改成狗狗職業：護衛犬系、巫犬系、獵犬系、療癒犬系、跑腿犬系、搗蛋犬系、超級幼犬系、牛仔犬系，招式名稱也全部換成狗狗版（例如飛盤盾、臭襪攻擊、舔舔治療、天降大骨頭）；原本的進度、轉職和流派選擇都會保留'],['調整','流派重做：每個職業線的每一種流派都有一招自己的「流派招式」，開場就送（例如護衛犬的飛盤盾連發、巫犬的流星雨、搗蛋犬的臭襪毒霧），以前有些職業選了流派卻沒有對應招式的問題解決了'],['調整','流派差距拉大：近戰／遠程／範圍流派的主打招式傷害 +50～60%、冷卻大幅縮短，其他招式傷害 -25%；開場只帶主打類型的招式，升級時幾乎只出主打類型；近戰更耐打還會吸血、遠程跑更快、範圍招式更大；會心流爆擊更痛但沒爆擊時較弱；招式比較少的流派，主打招式會再額外加強；均衡流全部招式 +10% 而且升級變成四選一'],['新增','小地圖用小圖示標出寶箱、磁鐵、回血大骨頭和祭壇，會閃動比較好找；暫停選單有圖示說明'],['新增','裝備上的卡片可以拿下來了：在裝備旁按「卡片」，花 500 金幣把卡片拔下來放回收藏'],['新增','無限之塔：每打通 10 層解鎖一個新起點，結算畫面可以直接挑戰最高的起點；塔裡和每日副本都可以加速 ×2'],['新增','結算畫面多了「直接挑戰下一關／再挑戰一次」按鈕，不用回城鎮'],['調整','魔王出現後 2 分 30 秒還沒打倒就會逃走並結算（卡片副本等不會再卡住結束不了），魔王血條下方有倒數'],['調整','升級速度放慢：經驗獲得減少，Base／Job 等級越高需要的經驗越多'],['調整','怪物的子彈改成暗紅色、帶尖刺外框，和自己的招式更好分辨'],['修正','招式說明的傷害數字不會再出現一長串小數'],['修正','切到別的 App 或分頁時會靜音，切回來聲音會恢復（以前常常切回來就沒聲音）'],['修正','無限之塔每上一層就立刻記錄最高層數，中途被手機關掉也不會不見；登入雲端時會自動用比較新的那份存檔'],['修正','進塔或關卡後馬上撤退不會再拿到骨頭和任務進度（修正可以無限刷骨頭的問題）']]},
  {v:'0.18.2',d:'11/24',t:'搬新家',items:[['新增','遊戲搬到新網址 wangwang-survivors.pages.dev，網址更好記，也更適合分享給朋友'],['新增','打開舊網址會跳出「搬家了」視窗，按「帶著存檔搬過去」就會把這台裝置上的進度（包含還沒打完的關卡）一起帶到新網址'],['調整','雲端存檔、線上主城、拜訪狗屋都照常運作；有登入雲端帳號的話，到新網址登入同一個帳號就好']]},
@@ -1495,7 +1515,7 @@ function renderHub(){
     H.innerHTML=`<h3>${SKM[curSkin()].n}・${j.n}</h3>
       <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
       <div class="box"><strong>流派</strong>　<span class="note">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西</span><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></div>
-      <div class="box"><strong>轉職</strong>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
+      <div class="box"><strong>轉職</strong>　<button class="btn sm ghost" id="jobGuide">職業介紹・轉職路線</button>${jobBox}${(()=>{const mt=Math.max(SV.maxTier||0,t);if(mt<1)return '';const lines=[...new Set(JOBS.map(r=>r[2]))].filter(l=>l!=='nov');return `<p class="note" style="margin-top:8px">自由換職業：你已經到過「${TIERN[mt]}」，所以任何職業線裡 ${TIERN[mt]} 以內的職業都可以隨時免費換過去，Job Lv 會照每一轉分別記住。</p><div class="jsw">${lines.map(l=>`<div class="jline">${JOBS.filter(r=>r[2]===l&&r[3]>=1&&r[3]<=mt).map(r=>`<button class="btn sm ${r[0]===SV.job?'':'ghost'}" data-swjob="${r[0]}" ${r[0]===SV.job?'disabled':''}>${r[1]}</button>`).join('')}</div>`).join('')}</div>`})()}</div>
       <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b>（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
       <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
       <div class="box"><strong>換一隻狗</strong><p class="note">等級、職業、裝備都會保留，只換外表。</p><button class="btn sm ghost" id="chgDog">換狗</button></div>
@@ -1626,6 +1646,7 @@ function hubClick(e){
   if(d.tower){newRun(0,null,{mode:'tower',floor:+d.tower});return}
   if(d.dung){if(dailyLeft()<=0)return;SV.daily.n--;save();newRun(dungStage(),null,{mode:'dungeon',dtype:d.dung});return}
   if(b.id==='doJob'){openJob();return}
+  if(b.id==='jobGuide'){openJob('browse');return}
   if(d.build){SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build;sfx('ui');save();renderHub();return}
   if(d.swjob){switchJob(d.swjob);return}
   if(b.id==='chgDog'){openBreeds('change');return}
@@ -1643,12 +1664,37 @@ function hubClick(e){
   if(d.ref){const it=SV.eq[d.ref];const c=refCost(it);if(SV.zeny>=c&&it.ref<10){SV.zeny-=c;it.ref++;save();renderHub()}return}
   if(d.buy!==undefined){const s=SV.stage,c=d.buy==='1'?Math.round(1800*(1+s*2.2)):Math.round(250*(1+s*1.8));if(SV.zeny<c||SV.inv.length>=BAG)return;SV.zeny-=c;const it=genItem(s,d.buy==='1'?2:0);SV.inv.push(it);save();renderHub();$('shopRes').innerHTML=`<p>開出了：</p>`+itemHTML(it,'');paintItems($('shopRes'));sfx('drop');return}
 }
-function openJob(){
-  jobsNow=kids(SV.job);const nt=JM[SV.job].tier+1;
-  $('jobT').textContent=`${TIERN[nt]}！選擇你的新職業`;
-  $('jobs').innerHTML=jobsNow.map((id,i)=>{const j=JM[id],nx=kids(id).map(k=>JM[k].n).join('、');return `<button class="jb" data-i="${i}"><canvas width="240" height="200" data-dog="${id}"></canvas><strong>${j.n}</strong>${j.sk.map((s,si)=>`<div class="sk"><b>${s.n}</b>${si===0?'（開局就有）':''}：${MECH[s.k].d(skDmg(s,1),1,s.x)}</div>`).join('')}${nx?`<div class="sk note">之後可轉：${nx}</div>`:''}</button>`}).join('');
-  for(const pc of $('jobs').querySelectorAll('canvas[data-dog]'))portrait(pc,curSkin(),pc.dataset.dog);
-  show('jobov');
+const LINE_INFO={nov:['幼犬見習生','剛出門冒險的小狗，什麼都會一點，Job Lv 10 就能轉職'],sw:['護衛犬系','衝在最前面保護大家：近身猛撲、甩尾巴，血厚很耐打'],mg:['巫犬系','站在後面施法：火焰、冰霜、雷電和天降大骨頭，大範圍清怪，身體比較脆'],ar:['獵犬系','遠距離射骨頭、放陷阱、帶獵鷹；也可以走唱歌（嚎歌犬）或跳舞（舞步犬）路線'],ac:['療癒犬系','會舔舔治療的聖光狗狗，打怪也能回血；也可以走肉球拳的功夫路線'],me:['跑腿犬系','丟金幣、推購物車、做機器和藥水，打怪順便多賺錢'],th:['搗蛋犬系','動作很快的偷襪小賊：連咬、飛骨鏢、臭襪毒霧，越打越快'],sn:['超級幼犬系','永遠的小狗狗，什麼招式都會一點，花招最多'],gs:['牛仔犬系','戴牛仔帽的神槍手，連發、散彈、追蹤子彈，遠程火力最猛']};
+const CATN={melee:['近戰','#ff8a5a'],ranged:['遠程','#5aa8ff'],area:['範圍','#b07aff']};
+const subTree=id=>{const a=[id];for(const k of kids(id))a.push(...subTree(k));return a};
+const pathsFrom=id=>{const k=kids(id);if(!k.length)return [[id]];return k.flatMap(c=>pathsFrom(c).map(p=>[id,...p]))};
+function jobMix(id){const ids=subTree(id).filter(x=>x!=='novice'),m={melee:0,ranged:0,area:0};let n=0;for(const x of ids)for(const s of JM[x].sk){for(const c in BCAT)if(BCAT[c].includes(s.k)){m[c]++;n++}}for(const c in m)m[c]=n?m[c]/n:0;return m}
+const skChip=(s,tag)=>`<div class="skc"><b style="background:${s.c}">${s.g}</b><span><strong>${s.n}${tag?`<em>${tag}</em>`:''}</strong>${MECH[s.k].d(skDmg(s,1),1,s.x)+skX(s.x)}</span></div>`;
+let jobSel=0,jobMode='promote',jobView=null;
+function openJob(mode){jobMode=mode||'promote';
+  if(jobMode==='promote'){jobsNow=kids(SV.job);const nt=JM[SV.job].tier+1;$('jobT').textContent=`${TIERN[nt]}！選擇你的新職業`;$('jobSub').textContent='點一下職業可以看外型、招式和以後的轉職路線，決定好再按「選」。轉職後已經點過的天賦會保留。'}
+  else{jobsNow=JOBS.filter(r=>r[3]===1).map(r=>r[0]);$('jobT').textContent='職業介紹';$('jobSub').textContent='點職業或下面路線裡的任何一隻，看牠長怎樣、會什麼招式。'}
+  jobSel=Math.max(0,jobsNow.indexOf(chain(SV.job).find(x=>jobsNow.includes(x))));jobView=jobsNow[jobSel];$('jobCancel').textContent=jobMode==='promote'?'先不要':'關閉';
+  $('jobs').innerHTML=jobsNow.map((id,i)=>{const j=JM[id],L=LINE_INFO[j.line]||LINE_INFO.nov,mx=jobMix(id),top=Object.keys(mx).sort((a,b)=>mx[b]-mx[a]).filter(c=>mx[c]>=.25).map(c=>CATN[c][0]).join('・');return `<button class="jb${i===jobSel?' on':''}" data-i="${i}"><canvas width="192" height="160" data-dog="${id}"></canvas><strong>${j.n}</strong><small>${jobMode==='browse'?L[0]+'・':''}${top}</small></button>`}).join('');
+  for(const pc of $('jobs').querySelectorAll('canvas[data-dog]'))portrait(pc,curSkin(),pc.dataset.dog,0,false,{},1);
+  renderJobD();show('jobov');
+}
+function renderJobD(){const id=jobView,j=JM[id],L=LINE_INFO[j.line]||LINE_INFO.nov,mx=jobMix(id),recB=Object.keys(REC).filter(b=>REC[b].includes(L[0].replace('系',''))).map(b=>B[b][0]);
+  const anc=chain(id).filter(x=>x!=='novice'&&x!==id),paths=pathsFrom(id),node=(x,cls)=>`<button class="jn ${cls||''}" data-jd="${x}"><canvas width="112" height="92" data-dog="${x}"></canvas><span>${JM[x].n}</span><small>${TIERN[JM[x].tier]}・${JM[x].sk[0].n}</small></button>`;
+  const tree=paths.map(p=>`<div class="jrow">${anc.map(x=>node(x,'past')+'<span class="jarr">›</span>').join('')}${p.map((x,i)=>node(x,x===id?'cur':'')).join('<span class="jarr">›</span>')}</div>`).join('');
+  const later=[...new Set(paths.flatMap(p=>p.slice(1)))].map(x=>JM[x]).filter(x=>x.tier===4).map(x=>x.sk[0]);
+  const bsk=['melee','ranged','area'].map(b=>buildSkill(id,b));
+  $('jobD').innerHTML=`<div class="jdh"><canvas width="300" height="250" data-dog="${id}"></canvas><div style="flex:1;min-width:200px"><h3>${j.n}<span class="tier">${TIERN[j.tier]}</span></h3><p><b>${L[0]}</b>：${L[1]}</p>
+   <div class="meter">${Object.keys(CATN).map(c=>`<span>${CATN[c][0]}</span><i><b style="width:${Math.round(8+mx[c]*92)}%;background:${CATN[c][1]}"></b></i>`).join('')}</div>${recB.length?`<p class="note" style="margin-top:6px">推薦犬種：${recB.join('、')}</p>`:''}</div></div>
+   <div class="jsec"><strong>這個職業的招式</strong><div class="skl">${j.sk.map((s,i)=>skChip(s,i===0?'開局就有':'')).join('')}</div></div>
+   ${later.length?`<div class="jsec"><strong>練到三轉會學到的招牌招式</strong><div class="skl">${later.map(s=>skChip(s,JM[s.job].n)).join('')}</div></div>`:''}
+   <div class="jsec"><strong>流派招式（出戰前選流派，開場就送）</strong><div class="skl">${bsk.map((s,i)=>skChip(s,buildName(id,['melee','ranged','area'][i]))).join('')}</div></div>
+   <div class="jsec"><strong>轉職路線</strong><div class="jtree">${tree}</div></div>`;
+  for(const pc of $('jobD').querySelectorAll('canvas[data-dog]'))portrait(pc,curSkin(),pc.dataset.dog,0,false,{},1);
+  const ok=$('jobOk');
+  if(jobMode==='promote'){const can=jobsNow.includes(id);ok.disabled=!can;ok.textContent=can?`選「${j.n}」`:`這次要先選「${JM[chain(id).find(x=>jobsNow.includes(x))].n}」`}
+  else{const mt=Math.max(SV.maxTier||0,JM[SV.job].tier),can=id!==SV.job&&j.tier<=mt&&j.tier>=1;ok.disabled=!can;ok.textContent=id===SV.job?'這是你現在的職業':can?`換成「${j.n}」`:`要先轉到${TIERN[j.tier]}才能換`}
+  $('jobTry').textContent=`試玩「${j.n}」`;
 }
 function chooseJob(i){const id=jobsNow[i];if(!id)return;sfx('job');SV.jobsGot=SV.jobsGot||[];if(!SV.jobsGot.includes(id)){SV.jobsGot.push(id);SV.bones+=5}stashTier();SV.job=id;const rec=(SV.tierLv||{})[JM[id].tier];if(rec){SV.jlv=rec.lv;SV.jxp=rec.xp}else{SV.jlv=1;SV.jxp=0}SV.maxTier=Math.max(SV.maxTier||0,JM[id].tier);save();tab='char';renderHub();show('hub')}
 function stashTier(){SV.tierLv=SV.tierLv||{};const t=JM[SV.job].tier;SV.tierLv[t]={lv:SV.jlv,xp:SV.jxp};SV.maxTier=Math.max(SV.maxTier||0,t)}
@@ -1816,7 +1862,7 @@ function hud(){
 }
 
 /* ---------- portraits & dex ---------- */
-function portrait(pc,skid,jid,t,mv,wear){const c=pc.getContext('2d'),w=pc.width,h=pc.height,k=Math.min(w,h)/40;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);c.translate(w/2-3*k,h*.62);c.scale(k,k);drawDog(c,skid||'shiba0',jid,0,0,t||0,1,!!mv,wear===undefined?SV.wear:wear)}
+function portrait(pc,skid,jid,t,mv,wear,fit){const c=pc.getContext('2d'),w=pc.width,h=pc.height,k=Math.min(w,h)/(fit?46:40);c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,w,h);c.translate(w/2-3*k,h*(fit?.68:.62));c.scale(k,k);drawDog(c,skid||'shiba0',jid,0,0,t||0,1,!!mv,wear===undefined?SV.wear:wear)}
 function buildDex(){
   const bk=curSkin();
   $('dex').innerHTML=`<div class="line"><h3>起點</h3><div class="grid">${card('novice')}</div></div>`+LINES.map(([ln,name])=>`<div class="line"><h3>${name}</h3><div class="grid">${JOBS.filter(r=>r[2]===ln).map(r=>card(r[0])).join('')}</div></div>`).join('');
@@ -1977,7 +2023,10 @@ frame.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.vo
 $('breeds').addEventListener('click',e=>{const b=e.target.closest('.br');if(b)pickBreed(b.dataset.b)});
 $('breedCancel').addEventListener('click',()=>show('hub'));
 $('breedLogin').addEventListener('click',openAcct);
-$('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(b)chooseJob(+b.dataset.i)});
+$('jobs').addEventListener('click',e=>{const b=e.target.closest('.jb');if(!b)return;jobSel=+b.dataset.i;jobView=jobsNow[jobSel];for(const x of $('jobs').querySelectorAll('.jb'))x.classList.toggle('on',x===b);sfx('ui');renderJobD();if(innerWidth<700)try{$('jobD').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){}});
+$('jobD').addEventListener('click',e=>{const b=e.target.closest('[data-jd]');if(!b)return;jobView=b.dataset.jd;const top=chain(jobView).find(x=>jobsNow.includes(x));if(top){jobSel=jobsNow.indexOf(top);for(const x of $('jobs').querySelectorAll('.jb'))x.classList.toggle('on',+x.dataset.i===jobSel)}sfx('ui');renderJobD()});
+$('jobOk').addEventListener('click',()=>{if($('jobOk').disabled)return;if(jobMode==='promote')chooseJob(jobsNow.indexOf(jobView));else{switchJob(jobView);show('hub')}});
+$('jobTry').addEventListener('click',()=>{if(!SV.breed)return;newRun(0,jobView)});
 $('jobCancel').addEventListener('click',()=>show('hub'));
 $('dex').addEventListener('click',e=>{const b=e.target.closest('.dc');if(!b)return;if(!SV.breed){SV.breed='shiba';save()}if(state==='hub'||state==='town'||state==='house')newRun(0,b.dataset.trial)});
 $('choices').addEventListener('click',e=>{const b=e.target.closest('.ch');if(b)choose(+b.dataset.i)});
