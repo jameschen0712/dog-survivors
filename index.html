@@ -2135,9 +2135,18 @@ function myBest(){try{syncChar()}catch(e){}const cs=(SV.chars&&SV.chars.length?S
   return{name:cleanName(b.name)||'狗狗',sk:(SV.skin&&SV.skin[b.breed])||BASE[b.breed]||BASE.shiba,j:b.job||'novice',w:b.wear||{},reb:Math.min(10,b.reb||0),lv:Math.min(99,Math.max(1,b.blv||1)),para:b.para||0,tower:Math.max(0,...cs.map(c=>c.towerBest||0),SV.towerBest||0)}}
 function rankPush(){if(!CLOUD()||!DogCloud.status().loggedIn||!DogCloud.putScore)return;const r=myBest();if(!r)return;const k=JSON.stringify(r);if(k===rankKey)return;rankKey=k;DogCloud.putScore(r).then(()=>{RANK.t=0}).catch(()=>{rankKey=''})}
 async function rankLoad(force){if(!CLOUD()||!DogCloud.topScores)return;if(!force&&Date.now()-RANK.t<90000)return;RANK.t=Date.now();try{const [a,b]=await Promise.all([DogCloud.topScores('lv',50),DogCloud.topScores('tower',50)]);RANK.lv=a;RANK.tower=b;RANK.err=''}catch(e){RANK.err=e.message||String(e)}rankStatues();if(!$('rankov').classList.contains('hide'))renderRank()}
-function rankStatues(){for(let i=NPCS.length-1;i>=0;i--)if(NPCS[i].rank!==undefined)NPCS.splice(i,1);const pos=[[0,-292],[-96,-276],[96,-276]];
-  RANK.lv.slice(0,3).forEach((r,i)=>NPCS.push({id:'rank'+i,n:`第${i+1}名・${r.name||r.username||'狗狗'}`,r:'排行榜',x:pos[i][0],y:pos[i][1],skin:SKM[r.sk]?r.sk:BASE.shiba,job:JM[r.j]?r.j:'novice',rank:i,rd:r,open:()=>openRank('lv')}))}
-function drawPed(c,n,t){const col=['#f5c542','#cfd6e0','#d89a5a'][n.rank],x=n.x,y=n.y;rr(c,x-24,y+6,48,18,5,'#8a8578');rr(c,x-24,y+4,48,8,4,'#a8a396');rr(c,x-24,y+4,48,3,2,col);c.font='900 11px Fredoka,sans-serif';c.textAlign='center';c.fillStyle=col;c.fillText(['1st','2nd','3rd'][n.rank],x,y+21);if(n.rank===0){c.globalAlpha=.25+.15*Math.sin(t*3);circ(c,x,y-6,26,'#fff6b0');c.globalAlpha=1}}
+function rankStatues(){for(let i=NPCS.length-1;i>=0;i--)if(NPCS[i].rank!==undefined)NPCS.splice(i,1);const pos=PODIUM.map(q=>[q[0],q[1]]);
+  RANK.lv.slice(0,3).forEach((r,i)=>NPCS.push({id:'rank'+i,n:r.name||r.username||'狗狗',r:'',x:pos[i][0],y:pos[i][1],skin:SKM[r.sk]?r.sk:BASE.shiba,job:JM[r.j]?r.j:'novice',rank:i,rd:r,open:()=>openRank('lv')}))}
+/* 頒獎台：中間第 1 名最高，左邊第 2 名，右邊第 3 名 [x, 台面 y, 寬] */
+const PODIUM=[[0,-274,72],[-74,-256,72],[74,-248,72]],POD_BASE=-204;
+function drawPodium(c,t){const cols=['#f5c542','#cfd6e0','#d89a5a'];c.save();c.globalAlpha=.18;ell(c,0,POD_BASE+4,118,12,0,'#000');c.globalAlpha=1;
+  [1,2,0].forEach(i=>{const [x,y,w]=PODIUM[i],h=POD_BASE-y,col=cols[i];rr(c,x-w/2,y,w,h,4,'#e8e1d2');rr(c,x-w/2,y,w,7,4,'#fbf7ee');rr(c,x-w/2,y+5,w,3,0,col);c.strokeStyle='rgba(90,70,40,.25)';c.lineWidth=1.5;c.strokeRect(x-w/2+.5,y+.5,w-1,h-1);
+    const r=RANK.lv[i],ny=r?y+24:y+(h+20)/2+4;c.font='900 '+(i?18:22)+'px Fredoka,sans-serif';c.textAlign='center';c.lineWidth=4;c.strokeStyle='#fff';c.strokeText(String(i+1),x,ny);c.fillStyle=shade(col,-.25);c.fillText(String(i+1),x,ny);if(r){c.font='800 9px "Noto Sans TC",sans-serif';c.fillStyle='#5a4020';c.fillText(lvTxt(r),x,POD_BASE-7)}
+    if(!RANK.lv[i]){c.font='700 10px "Noto Sans TC",sans-serif';c.fillStyle='rgba(90,70,40,.55)';c.fillText('虛位以待',x,y-6)}});
+  if(RANK.lv[0]){c.globalAlpha=.22+.12*Math.sin(t*3);circ(c,PODIUM[0][0],PODIUM[0][1]-14,30,'#fff6b0');c.globalAlpha=1}
+  c.font='800 11px "Noto Sans TC",sans-serif';c.textAlign='center';c.fillStyle='rgba(60,40,20,.7)';c.fillText('🏆 等級排行榜',0,POD_BASE+16);c.restore()}
+function drawPed(c,n,t){}
+function drawPedOld(c,n,t){const col=['#f5c542','#cfd6e0','#d89a5a'][n.rank],x=n.x,y=n.y;rr(c,x-24,y+6,48,18,5,'#8a8578');rr(c,x-24,y+4,48,8,4,'#a8a396');rr(c,x-24,y+4,48,3,2,col);c.font='900 11px Fredoka,sans-serif';c.textAlign='center';c.fillStyle=col;c.fillText(['1st','2nd','3rd'][n.rank],x,y+21);if(n.rank===0){c.globalAlpha=.25+.15*Math.sin(t*3);circ(c,x,y-6,26,'#fff6b0');c.globalAlpha=1}}
 function lvTxt(r){return `${r.reb?r.reb+' 轉 ':''}Lv ${r.lv}${r.para?' ★'+r.para:''}`}
 function openRank(tab){RANK.tab=tab||RANK.tab;$('rankov').classList.remove('hide');renderRank();rankPush();rankLoad(true)}
 function renderRank(){const me=DogCloud_me(),L=RANK.tab==='tower'?RANK.tower:RANK.lv;
@@ -2155,8 +2164,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.29.0';
+const VERSION='0.29.1';
 const NEWS=[
+ {v:'0.29.1',d:'11/25',t:'頒獎台・拔河繩子',items:[['調整','主城排行榜改成三階頒獎台：中間最高是第 1 名、左邊第 2 名、右邊第 3 名，台子上寫著轉生、等級和巔峰等級；還沒有人的位置會顯示「虛位以待」'],['修正','主城狗狗自己玩拔河時沒有繩子，現在會看到繩子了']]},
  {v:'0.29.0',d:'11/25',t:'流派 2.0：屬性・奧義・共鳴・熟練度',items:[['新增','流派改成獨立的「流派配置」畫面，分成五頁：主流派、屬性、奧義、共鳴、熟練度（角色分頁和出戰分頁都有按鈕）'],['新增','屬性（Base Lv 15 解鎖）：火焰（燃燒）、冰霜（緩速、打 6 下冰凍）、雷電（連鎖閃電）、劇毒（疊毒，滿層易傷）、神聖（打菁英和魔王更痛、擊倒回血、每 40 隻放聖光）'],['新增','奧義：12 種有好有壞的強力特性，例如玻璃大砲、背水一戰、處決者、越戰越勇、元素共振、不屈之魂；Base Lv 30、Lv 60、1 轉各開一格'],['新增','共鳴：主流派和屬性剛好配對會觸發 10 種額外效果，例如近戰＋火焰「爆炎拳」（燃燒的怪被打倒會連鎖爆炸）、範圍＋雷電「雷暴」、會心＋劇毒「毒刃」'],['新增','流派熟練度：用哪個流派出戰就累積哪個的熟練度，最高 Lv 10，每級加傷害，Lv 3／6／10 有里程碑，練滿得到「大師」稱號；每隻狗狗分開算'],['說明','屬性、奧義、熟練度只在單人模式生效，組隊副本只看主流派']]},
  {v:'0.28.0',d:'11/25',t:'10 轉・巔峰等級・排行榜',items:[['新增','轉生上限從 5 轉提高到 10 轉，而且有里程碑：1 轉經驗 +20%、天賦點 +1；之後每轉經驗再 +10%；3 轉「轉生勇者」稱號、開場多一次升級；5 轉招式傷害 +10%；7 轉「傳說之犬」、生命 +10%；10 轉「彩虹橋守護神」、金色光環、傷害再 +10%'],['新增','巔峰等級：Base Lv 99 之後的經驗不會浪費，會累積成巔峰等級（顯示成 Lv99 ★12），每升一級得 1 點，可以加在攻擊、體魄、專注、精準，沒有上限（冷卻和爆擊有上限）；轉生也會保留'],['新增','排行榜：選單上方「排行榜」可以看等級榜（轉生 → 等級 → 巔峰）和無限之塔榜，每個帳號用最強的那隻狗上榜'],['新增','等級榜前三名的狗狗會變成立牌，站在主城冒險之門前的台座上（金、銀、銅），點牠們可以直接看排行榜']]},
  {v:'0.27.0',d:'11/25',t:'新地圖：黃沙金字塔、玩具時計塔',items:[['新增','第 6 關「黃沙金字塔」（推薦 Lv75）：聖甲蟲、仙人掌怪、繃帶木乃伊、沙蟲；魔王「法老貓王」會朝你射出一整排流沙、召喚木乃伊'],['新增','第 7 關「玩具時計塔」（推薦 Lv90）：氣球怪、齒輪精、發條士兵、玩具箱怪；魔王「時計魔王」兩根指針會一直轉圈掃過地面，還會叫發條士兵出來'],['新增','8 張新怪物卡和 2 張魔王卡；新地圖有自己的地面、音樂和裝備（黃沙、玩具系列）'],['調整','無限之塔 51 層以後、每日副本、本週魔王也會用到新地圖']]},
@@ -3241,7 +3251,7 @@ function drawTree(c,x,y,s){shadow(c,x,y+4,16*s,5*s);rr(c,x-4*s,y-18*s,8*s,22*s,2
 /* town update & render */
 function townTargets(){const o=NPCS.map(n=>({n,x:n.x,y:n.y,r:n.b&&n.b.k==='myhouse'?ENTERY:0}));const d=digToday();for(let i=0;i<DIGS.length;i++)if(!d.got.includes(i))o.push({dig:i,x:DIGS[i][0],y:DIGS[i][1]});for(const dg of TDOGS)o.push({dog:dg,x:dg.x,y:dg.y});return o}
 function digToday(){const td=new Date().toDateString();if(!SV.dig||SV.dig.d!==td)SV.dig={d:td,got:[]};return SV.dig}
-function actLabel(a){if(a.dog&&(a.dog.lines||a.dog.n==='公主・巴塔'||a.dog.n==='襪子獵人・庫里'))return `跟 ${a.dog.n} 說話`;return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
+function actLabel(a){if(a.n&&a.n.rank!==undefined)return `看排行榜（第 ${a.n.rank+1} 名・${a.n.n}）`;if(a.dog&&(a.dog.lines||a.dog.n==='公主・巴塔'||a.dog.n==='襪子獵人・庫里'))return `跟 ${a.dog.n} 說話`;return a.n?(a.n.id==='home'?'回家':a.n.id==='board'?'看公告欄（任務・成就）':`跟 ${a.n.n} 說話（${a.n.r}）`):a.dig!==undefined?'挖挖看':a.dog?`摸摸${a.dog.n}`:''}
 function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
  if(a.n){if(a.n.id==='home'){enterHouse();return}a.n.open();return}
  if(a.dig!==undefined){const d=digToday();if(d.got.includes(a.dig))return;d.got.push(a.dig);const h=homeData(),r=Math.random(),st=SV.stage||0;let msg;
@@ -3305,18 +3315,18 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  for(const [x,y,col] of FLOWERS){if(Math.abs(x)<210&&Math.abs(y)<160)continue;circ(c,x,y,2.2,col);circ(c,x,y,1,'#ffe27a')}
  c.save();c.translate(0,-6);drawFountain(c,t);c.restore();
  // drawables sorted by y
- const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{if(n.rank!==undefined)drawPed(c,n,t);c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
+ const ds=[{y:-330,f:()=>drawPodium(c,t)}];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{if(n.rank!==undefined)drawPed(c,n,t);c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
  for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{},dg.P||undefined);c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
  if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;ds.push({y:p.y,f:()=>{{const du=NET.duo;if(du&&(du.a===p.id||du.b===p.id)){const dp=duoPose(du,du.a===p.id?'a':'b');drawEmoteDog(c,p.sk,p.j,dp.x,dp.y,t+p.x*.01,dp.face,dp.mv,p.w,null,1.2,{pose:dp.P})}else drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit})}if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
- drawBalls(c);duoFxDraw(c,t);
+ drawBalls(c);duoFxDraw(c,t);for(const dg of TDOGS)if(dg.duo&&dg.duo.a===dg&&dg.duo.b&&dg.duo.b.duo===dg.duo)duoFxDraw(c,t,dg.duo);
  if(NET.walk){const me=myId(),pos=id=>id===me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(id),L=pos(NET.walk.leader),F=pos(NET.walk.follower);if(L&&F){const ax=L.x+(L.face||1)*8,ay=L.y-6,bx=F.x+(F.face||1)*8,by=F.y-6;c.strokeStyle='#d0503a';c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+16,bx,by);c.stroke()}}
  // labels
  if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);drawHalo(c,p.x,p.y-46,t,p.rb||0);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
  if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=dogName();c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
- c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
+ c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';if(n.r){const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14)}
    const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
  for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26);if(dg.say){const al=Math.min(1,(3-dg.say.t)*2);drawBubble(c,dg.x,dg.y-34,dg.say.s,al);if(dg.say.h){c.globalAlpha=al;for(let q=0;q<dg.say.h;q++)heart(c,dg.x-(dg.say.h-1)*5+q*10,dg.y-64-Math.sin(townT*4+q)*2,4,'#ff5a7a');c.globalAlpha=1}if(dg.say.q){c.globalAlpha=al;c.font='900 16px Fredoka,sans-serif';c.fillStyle='#fff6b0';for(let q=0;q<3;q++)c.fillText('?',dg.x+14+q*7,dg.y-60-Math.abs(Math.sin(townT*5+q))*5);c.globalAlpha=1}}}
  drawGuideArrow(c,t);for(const f of townFx){c.globalAlpha=Math.min(1,f.life);if(f.p)circ(c,f.x,f.y,f.dust?4:3,f.dust?'#efe4c8':'#9a7048');else{c.font='900 14px "Noto Sans TC",sans-serif';c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(f.s,f.x,f.y);c.fillStyle=f.s==='♥'?'#ff5a7a':'#fff6b0';c.fillText(f.s,f.x,f.y)}c.globalAlpha=1}
@@ -3531,7 +3541,7 @@ function duoTick(dt){const du=NET.duo;if(!du)return;du.t+=dt;const me=myId(),oth
  if(du.k==='tug'&&!du.fx&&du.t>3.2){du.fx=1;const winA=du.sd<.5,wn=winA===(du.a===me)?'你':o.n;townFx.push({x:du.ax,y:du.ay-44,s:`${wn} 贏了拔河！`,life:1.8});sfx('s_pop',1,.1)}
  if(du.k==='wrestle'&&Math.random()<dt*10&&du.t>.4&&du.t<2.4)townFx.push({p:1,x:du.ax+R(-18,18),y:du.ay+8,vx:R(-50,50),vy:R(-60,-20),life:.5,dust:1});
  if(du.t>=du.dur){const k=du.k;NET.duo=null;friendGain(o.id,o.n,2);townFx.push({x:TP.x,y:TP.y-50,s:`和 ${o.n} ${DUOS[k].n}！`,life:1.8});if(NET.ctl){NET.lastDest=[Math.round(TP.x),Math.round(TP.y)];NET.ctl.send('mv',{tx:NET.lastDest[0],ty:NET.lastDest[1]})}socReward('duo','一起玩得好開心！')}}
-function duoFxDraw(c,t){const du=NET.duo;if(!du)return;const me=myId(),pa=duoPose(du,'a'),pb=duoPose(du,'b'),mouth=p=>[p.x+p.face*16,p.y-4];
+function duoFxDraw(c,t,du){du=du||NET.duo;if(!du)return;const me=myId(),pa=duoPose(du,'a'),pb=duoPose(du,'b'),mouth=p=>[p.x+p.face*16,p.y-4];
  if(du.k==='tug'){const [ax,ay]=mouth(pa),[bx,by]=mouth(pb);if(du.t<3.2){c.strokeStyle='#d0503a';c.lineWidth=3;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+4+Math.sin(t*12)*2,bx,by);c.stroke();circ(c,(ax+bx)/2,(ay+by)/2+4,3,'#ffd23a')}else{const w=du.sd<.5?pa:pb,[wx,wy]=mouth(w);c.strokeStyle='#d0503a';c.lineWidth=3;c.beginPath();c.moveTo(wx,wy);c.quadraticCurveTo(wx+w.face*8,wy+10,wx+w.face*2,wy+16);c.stroke()}}
  if(du.k==='boop'&&du.t>.8&&du.t<2){const k=(du.t-.8)/1.2;c.globalAlpha=1-k;heart(c,du.ax,du.ay-16-k*18,4.5,'#ff5a7a');c.globalAlpha=1}
  if((du.k==='groom'||du.k==='cuddle')&&du.t>.6){for(let q=0;q<2;q++){const k=((du.t*.8+q*.5)%1);c.globalAlpha=1-k;heart(c,du.ax+(q?8:-6),du.ay-30-k*24,3.5,'#ff7a9a')}c.globalAlpha=1}
