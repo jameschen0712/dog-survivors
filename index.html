@@ -75,6 +75,7 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .tg{font:900 16px "Noto Sans TC",sans-serif;fill:#fff;text-anchor:middle;pointer-events:none}.tr{font:700 11px Fredoka,sans-serif;fill:#cfd4ea;pointer-events:none}.tbn{font:900 14px "Noto Sans TC",sans-serif;text-anchor:middle}.troot{fill:#3a2a10;stroke:#f5c542;stroke-width:4;filter:drop-shadow(0 0 8px #f5c542)}
 .tdet{position:sticky;bottom:0;z-index:2;margin-top:8px;background:#fff;border:3px solid #ddd;border-radius:14px;padding:8px 12px;box-shadow:0 -6px 16px rgba(0,0,0,.18)}.tdet p{margin:6px 0}
 #guideBox{position:absolute;left:50%;transform:translateX(-50%);top:74px;width:min(420px,calc(100% - 20px));pointer-events:auto}.guide{background:rgba(255,248,230,.95);color:#3a2a10;border:2px solid #f5c542;border-radius:12px;padding:6px 8px;box-shadow:0 4px 12px rgba(0,0,0,.22);display:grid;grid-template-columns:1fr auto;gap:0 6px;align-items:center}.guide b{font-size:13px;line-height:1.35}.guide small{grid-column:1/-1;font-size:11px;color:#6a5a3a;line-height:1.4}.guide .gbtns{display:flex;gap:4px;grid-row:1;grid-column:2}.guide .btn.sm{padding:4px 8px;font-size:12px;min-height:0}
+.synrow{display:flex;flex-direction:column;gap:2px;padding:8px 10px;margin:6px 0;border-radius:12px;background:#fffaf0;border:2px solid #eadfc8}.synrow.on{border-color:#f0a040;background:#fff1d6}.synrow small{color:#7a6a50}.synrow em{font-style:normal;font-weight:900;color:#c0601a;font-size:13px}.bmbar{height:8px;border-radius:6px;background:#eadfc8;overflow:hidden}.bmbar i{display:block;height:100%;background:linear-gradient(90deg,#ffb347,#f5c542)}
 .ranklist{max-height:58vh;overflow:auto;margin:8px 0}.rrow{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed rgba(0,0,0,.1)}.rrow.me{background:#fff6d0;border-radius:10px}.rrow canvas{width:54px;height:40px}.rrow span{flex:1;display:flex;flex-direction:column;min-width:0}.rrow small{color:#777}.rrow em{font-style:normal;font-weight:900;color:#5a3410;white-space:nowrap}.rno{width:28px;text-align:center;font:900 16px Fredoka,sans-serif;color:#8a7a5a}.rno.r0{color:#e0a800;font-size:20px}.rno.r1{color:#8a98a8;font-size:18px}.rno.r2{color:#b8743a;font-size:18px}
 .ch.evo{border-color:#f5c542;background:linear-gradient(90deg,#fff8dc,#fff)}
 .ch b,.ico{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:900 22px "Noto Sans TC",sans-serif;color:#1b1408}
@@ -249,6 +250,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="breedov"><div class="card wide"><h2>選一隻狗狗當你的夥伴</h2><div class="intro" id="breedIntro"><b>汪汪倖存者</b>是一款打怪生存遊戲：狗狗會<b>自動攻擊</b>，你只要<b>移動閃躲</b>、撿寶石升級挑強化，撐到時間到再打倒魔王！打完回城鎮轉職、換裝備、抽時裝，越來越強。</div><p class="sub">每隻狗只是外表不同，能力都一樣，選你最喜歡的就好（之後也能換）。其他毛色可以在城鎮「毛色」抽到。</p><div class="breeds" id="breeds"></div><button class="btn ghost hide" id="breedCancel">取消</button><p class="note" style="margin-top:8px">已經有帳號？<button class="btn sm ghost" id="breedLogin">登入讀取雲端存檔</button></p></div></div>
       <div class="ov hide" id="jobov"><div class="card wide" style="text-align:left"><h2 id="jobT" style="text-align:center">轉職</h2><p class="note" id="jobSub" style="text-align:center;margin:-6px 0 8px"></p><div id="jobs" class="jobs"></div><div id="jobD" class="jobd"></div><div class="jbtns"><button class="btn" id="jobOk">選這個職業</button><button class="btn ghost" id="jobTry">試玩看看</button><button class="btn ghost" id="jobCancel">先不要</button></div></div></div>
       <div class="ov hide" id="askov" style="z-index:90"><div class="card"><p id="askT"></p><div class="tcp" style="justify-content:center"><button class="btn" id="askOk">確定</button><button class="btn ghost" id="askNo">取消</button></div></div></div>
+      <div class="ov hide" id="bldov" style="z-index:34"><div class="card" style="max-width:560px;width:100%;display:grid;grid-template-rows:auto auto auto 1fr auto;max-height:86vh"><h2 style="margin:0 0 4px">流派配置</h2><p class="note" id="styHead" style="margin:0 0 6px"></p><div class="tcp" style="justify-content:center;flex-wrap:wrap" id="styTabs"></div><div id="styBody" style="overflow:auto;min-height:0;margin:8px 0"></div><p style="text-align:center;margin:0"><button class="btn" id="styClose">完成</button></p></div></div>
       <div class="ov hide" id="rankov" style="z-index:35"><div class="card" style="max-width:480px;width:100%"><h2>排行榜</h2><div class="tcp" style="justify-content:center" id="rankTabs"></div><div id="rankList" class="ranklist"></div><p style="text-align:center"><button class="btn" id="rankClose">關閉</button></p></div></div>
       <div class="ov hide" id="raidov" style="z-index:40"><div class="card" id="raidc"></div></div>
       <div id="invbox" class="hide"></div>
@@ -466,6 +468,77 @@ const buildSkill=(jid,b)=>BCAT[b]?SKL[jid+'_b'+b[0]]:null;
 const buildName=(jid,b)=>b==='balance'||!BUILDS[b]?'均衡流':(BNAME[JM[jid].line]||BNAME.nov)[b];
 const buildCount=(jid,b)=>BCAT[b]?chain(jid).filter(id=>id==='novice'?jid==='novice':1).reduce((a,id)=>a+JM[id].sk.filter(s=>BCAT[b].includes(s.k)).length,0)+1:99;
 function curBuild(jid){jid=jid||SV.job;const b=(SV.builds||{})[JM[jid].line]||'balance';return BUILDS[b]?b:'balance'}
+/* ---------- 流派 2.0：屬性、奧義、共鳴、熟練度 ---------- */
+const ELEM={fire:{n:'火焰',g:'🔥',c:'#ff7a3a',d:'命中讓怪物燃燒 3 秒，總共再受到這一下傷害 30% 的灼燒（同時只算最痛的那一次）'},
+ ice:{n:'冰霜',g:'❄️',c:'#7fd6ff',d:'命中讓怪物緩速 1.5 秒；同一隻怪被打 6 下就冰凍 1 秒（冰凍中受到傷害 +50%）；魔王不會被冰凍，改成長時間緩速'},
+ thunder:{n:'雷電',g:'⚡',c:'#ffe45a',d:'命中有 20% 機率放出閃電，連鎖打到附近 2 隻怪，造成這一下傷害的 50%'},
+ poison:{n:'劇毒',g:'☠️',c:'#9be36a',d:'命中疊 1 層毒（最多 10 層、持續 4 秒），每層每秒造成這一下傷害的 3%；疊滿 10 層的怪受到的所有傷害 +15%'},
+ holy:{n:'神聖',g:'✨',c:'#f5d76e',d:'對菁英怪和魔王傷害 +20%；每擊倒一隻怪回復 0.5 生命；每擊倒 40 隻放出一次聖光，對周圍造成大量傷害'}};
+const KEYS={glass:{n:'玻璃大砲',g:'💥',d:'傷害 +35%，生命上限 -35%',f:g=>{g.st.dmg*=1.35;g.p.max=Math.round(g.p.max*.65);g.p.hp=g.p.max}},
+ iron:{n:'鋼鐵之軀',g:'🛡️',d:'受到傷害 -25%，但移動速度 -15%、傷害 -10%',f:g=>{g.st.dr+=.25;g.st.spd-=.15;g.st.dmg*=.9}},
+ bers:{n:'背水一戰',g:'❤️‍🔥',d:'每少 1% 生命，傷害 +1%（最多 +60%）；自然回復減半',f:g=>{g.st.regen*=.5}},
+ grow:{n:'越戰越勇',g:'📈',d:'開場 60 秒傷害 -15%，之後每 30 秒傷害 +4%（最多 +40%）'},
+ vamp:{n:'嗜血',g:'🩸',d:'擊倒怪物回復 +3 生命，但自然回復歸零',f:g=>{g.st.leech+=3;g.st.regen=0}},
+ swift:{n:'疾風',g:'💨',d:'移動速度 +25%、冷卻 -10%，生命上限 -15%',f:g=>{g.st.spd+=.25;g.st.cd*=.9;g.p.max=Math.round(g.p.max*.85);g.p.hp=g.p.max}},
+ exe:{n:'處決者',g:'🪓',d:'對生命低於 30% 的怪傷害 +80%；對生命高於 70% 的怪傷害 -10%'},
+ giant:{n:'巨像',g:'🗿',d:'招式範圍 +35%，冷卻 +15%',f:g=>{g.st.area+=.35;g.st.cd*=1.15}},
+ lucky:{n:'幸運星',g:'🍀',d:'爆擊率 +10%、經驗和金幣 +15%，傷害 -10%',f:g=>{g.st.crit+=.1;g.st.exp*=1.15;g.st.zeny*=1.15;g.st.dmg*=.9}},
+ reso:{n:'元素共振',g:'🌀',d:'屬性效果全部 ×2（要先選屬性才有用），傷害 -10%',f:g=>{g.st.dmg*=.9}},
+ magnet:{n:'磁力核心',g:'🧲',d:'撿東西範圍 ×2、金幣 +25%，傷害 -5%',f:g=>{g.st.mag*=2;g.st.zeny*=1.25;g.st.dmg*=.95}},
+ undying:{n:'不屈之魂',g:'👼',d:'每局多一次原地復活，生命上限 -10%',f:g=>{g.revive=(g.revive||0)+1;g.p.max=Math.round(g.p.max*.9);g.p.hp=g.p.max}}};
+const SYN={melee_fire:['爆炎拳','擊倒燃燒中的怪會爆炸，對周圍造成 4 倍灼燒傷害（可以連鎖）'],area_fire:['燎原','燃燒時間變 2 倍，灼燒傷害 +30%'],
+ ranged_ice:['冰晶箭','打緩速中的怪傷害 +25%'],melee_ice:['霜鎧','受到傷害 -10%；冰凍只要打 4 下'],
+ area_thunder:['雷暴','閃電機率 ×2，而且連鎖 3 隻'],crit_thunder:['閃雷','爆擊一定會放出閃電'],
+ crit_poison:['毒刃','爆擊一次疊 3 層毒'],ranged_poison:['淬毒','毒最多疊到 20 層'],
+ balance_holy:['聖光','神聖的所有效果 ×2'],melee_holy:['聖騎士','擊倒回血再 +1，每秒回復 +1 生命']};
+const elemOK=()=>SV.blv>=15||(SV.reb||0)>0;
+const ksSlots=()=>((SV.blv>=30||SV.reb>0)?1:0)+((SV.blv>=60||SV.reb>0)?1:0)+((SV.reb||0)>=1?1:0);
+const activeKeys=()=>(SV.keys||[]).filter(k=>KEYS[k]).slice(0,ksSlots());
+const bmNeed=l=>240*(l+1);
+function bmInfo(b){let x=(SV.bm||{})[b]||0,l=0;while(l<10&&x>=bmNeed(l)){x-=bmNeed(l);l++}return{l,x,need:l<10?bmNeed(l):0}}
+const bmLv=b=>bmInfo(b).l;
+const synKey=(bk,el)=>el&&SYN[bk+'_'+el]?bk+'_'+el:'';
+function applyStyle(g,bk){const el=elemOK()&&ELEM[SV.elem]?SV.elem:'',ks=activeKeys(),lvm=bmLv(bk);let E=1;if(ks.includes('reso')&&el)E*=2;if(lvm>=6)E*=1.25;if(lvm>=10)E*=1.25;const syn=synKey(bk,el);
+  g.sty={el,E,ks:Object.fromEntries(ks.map(k=>[k,1])),syn,bk,hk:0,avg:0,pmax:syn==='ranged_poison'?20:10,dt:0};
+  if(BCAT[bk]&&g.bdm)g.bdm*=1+.02*lvm;if(bk==='balance')g.st.dmg*=1+.01*lvm;if(bk==='crit'){g.st.critD+=.05*lvm;if(lvm>=3)g.st.crit+=.03}
+  if(lvm>=3&&g.bsk&&g.wep[g.bsk.id])g.wep[g.bsk.id].l++;if(lvm>=3&&bk==='balance')g.st.exp*=1.05;if(lvm>=10)g.st.dmg*=1.05;
+  for(const k of ks)if(KEYS[k].f)KEYS[k].f(g);if(syn==='melee_ice')g.st.dr+=.1;if(syn==='melee_holy')g.st.regen+=1}
+function styHit(e,d){const S=G.sty,p=G.p;if(S.ks.exe){if(e.hp<e.max*.3)d*=1.8;else if(e.hp>e.max*.7)d*=.9}if(S.ks.bers)d*=1+Math.min(.6,Math.max(0,1-p.hp/p.max));if(S.ks.grow)d*=G.t<60?.85:1+Math.min(.4,.04*Math.floor(G.t/30));
+  if(S.el==='holy'&&(e.elite||e.boss))d*=1+.2*S.E*(S.syn==='balance_holy'?2:1);if(S.syn==='ranged_ice'&&e.slow>0)d*=1.25;if(S.el==='poison'&&e.ps>=S.pmax)d*=1.15;S.avg=S.avg?S.avg*.97+d*.03:d;return d}
+function styProc(e,d,crit){const S=G.sty,E=S.E;
+  if(S.el==='fire'){const lf=S.syn==='area_fire',dps=d*.1*E*(lf?1.3:1);e.bd=e.bt>0?Math.max(e.bd,dps):dps;e.bt=lf?6:3}
+  else if(S.el==='ice'){e.slow=Math.max(e.slow||0,1.5);e.fz=(e.fz||0)+1;const need=Math.max(3,Math.round((S.syn==='melee_ice'?4:6)/E));if(e.fz>=need){e.fz=0;if(e.boss)e.slow=Math.max(e.slow,3);else{e.stun=Math.max(e.stun||0,1);sparks(e.x,e.y,8,'#bfefff',140,.4)}}}
+  else if(S.el==='thunder'){let ch=Math.min(.6,.2*E*(S.syn==='area_thunder'?2:1));if(crit&&S.syn==='crit_thunder')ch=1;if(Math.random()<ch){const n=S.syn==='area_thunder'?3:2,L=[];near(e.x,e.y,160,t=>{if(t!==e&&!t.dead)L.push([Math.hypot(t.x-e.x,t.y-e.y),t])});L.sort((a,b)=>a[0]-b[0]);let src=e;for(const [dd,t] of L.slice(0,n)){if(dd>160)break;lightning(src.x,src.y,t.x,t.y,'#ffe45a',3);hurt(t,d*.5,0,0,0,'#ffe45a',1);src=t}}}
+  else if(S.el==='poison'){const add=crit&&S.syn==='crit_poison'?3:1,pd=d*.03*E;e.pd=e.pt>0?Math.max(e.pd,pd):pd;e.ps=Math.min(S.pmax,(e.ps||0)+add);e.pt=4}}
+function styKill(e){const S=G.sty;
+  if(S.syn==='melee_fire'&&e.bt>0){const dm=e.bd*4;fx({k:'ring',x:e.x,y:e.y,R:75,c:'#ff7a3a',life:.35,max:.35,fill:1});near(e.x,e.y,90,t=>{if(!t.dead&&Math.hypot(t.x-e.x,t.y-e.y)<75+t.r)hurt(t,dm,0,0,0,'#ff7a3a',1)})}
+  if(S.el==='holy'){const m=S.syn==='balance_holy'?2:1;heal(.5*S.E*m+(S.syn==='melee_holy'?1:0));S.hk++;if(S.hk>=40){S.hk=0;const p=G.p,dm=Math.max(30,S.avg)*3*S.E*m;fx({k:'ring',x:p.x,y:p.y,R:170,c:'#fff2a8',life:.6,max:.6,fill:1});sparks(p.x,p.y,24,'#fff2a8',260,.6);near(p.x,p.y,190,t=>{if(!t.dead&&Math.hypot(t.x-p.x,t.y-p.y)<170+t.r)hurt(t,dm,0,0,0,'#f5d76e',1)})}}}
+function tickDots(dt){const S=G.sty;if(!S||!S.el)return;S.dt+=dt;const tk=S.dt>=.5;if(tk)S.dt-=.5;
+  for(const e of G.E){if(e.dead)continue;if(e.bt>0){e.bt-=dt;e.ba=(e.ba||0)+e.bd*dt}if(e.pt>0){e.pt-=dt;e.pa=(e.pa||0)+e.pd*e.ps*dt;if(e.pt<=0)e.ps=0}
+    if(tk){if(e.ba>0){const a=e.ba;e.ba=0;hurt(e,a,0,0,0,'#ff9a4a',1)}if(!e.dead&&e.pa>0){const a=e.pa;e.pa=0;hurt(e,a,0,0,0,'#9be36a',1)}}}}
+function styleSum(){const bk=curBuild(),el=elemOK()&&ELEM[SV.elem]?SV.elem:'',ks=activeKeys(),sy=synKey(bk,el);return `<b>${buildName(SV.job,bk)}</b>${bmLv(bk)?' Lv'+bmLv(bk):''}・${el?ELEM[el].g+ELEM[el].n:'無屬性'}・${ks.length?ks.map(k=>KEYS[k].g+KEYS[k].n).join('、'):'沒有奧義'}${sy?`・共鳴<b style="color:#b8501a">「${SYN[sy][0]}」</b>`:''}`}
+let styTab='main';
+function openStyle(t){styTab=t||styTab;$('bldov').classList.remove('hide');renderStyle();sfx('ui')}
+function renderStyle(){const bk=curBuild(),el=SV.elem||'',ks=activeKeys(),sl=ksSlots(),sy=synKey(bk,elemOK()?el:'');
+  const tabs=[['main','主流派'],['elem','屬性'],['keys','奧義'],['syn','共鳴'],['mast','熟練度']];
+  let h='';
+  if(styTab==='main')h=`<p class="note">同一個職業可以選不同打法，出戰前隨時可以換。流派會決定開場招式、升級時出現的招式和主打加成。</p><div class="builds">${bldButtons()}</div>`;
+  else if(styTab==='elem')h=!elemOK()?'<p class="note">Base Lv 15 解鎖屬性。</p>':`<p class="note">讓所有招式帶上一種屬性。每隻狗狗只能選一種，出戰前隨時可以換。屬性和主流派配對會觸發「共鳴」。</p><div class="builds"><button class="bld${!ELEM[el]?' on':''}" data-elem=""><b>無屬性</b><small>不附加任何效果</small></button>${Object.entries(ELEM).map(([k,v])=>`<button class="bld${el===k?' on':''}" data-elem="${k}"><b>${v.g} ${v.n}</b><small>${v.d}</small><small class="note">共鳴：${Object.keys(SYN).filter(x=>x.endsWith('_'+k)).map(x=>`${buildName(SV.job,x.split('_')[0])}→「${SYN[x][0]}」`).join('、')}</small></button>`).join('')}</div>`;
+  else if(styTab==='keys')h=`<p class="note">奧義是有好有壞的強力特性。已裝備 <b>${ks.length} / ${sl}</b> 個（Base Lv 30、Lv 60、1 轉各開一格；轉生過的狗狗三格全開）。點一下裝上或拿下。</p><div class="builds">${Object.entries(KEYS).map(([k,v])=>`<button class="bld${ks.includes(k)?' on':''}" data-ks="${k}"><b>${v.g} ${v.n}</b><small>${v.d}</small>${k==='reso'&&!ELEM[el]?'<small class="note" style="color:#c0392b">你還沒選屬性，裝了沒效果</small>':''}</button>`).join('')}</div>`;
+  else if(styTab==='syn')h=`<p class="note">主流派 + 屬性剛好配對時，會觸發額外的共鳴效果。每個流派都有自己的名字，下面用你現在的職業顯示。</p>${Object.entries(SYN).map(([k,v])=>{const [b,e2]=k.split('_');return `<div class="synrow${sy===k?' on':''}"><b>${ELEM[e2].g} ${v[0]}</b><small>需要：${buildName(SV.job,b)} + ${ELEM[e2].n}</small><span>${v[1]}</span>${sy===k?'<em>生效中</em>':''}</div>`}).join('')}`;
+  else h=`<p class="note">用某個流派出戰，就會累積那個流派的熟練度（撐越久越多，通關 ×1.5，難度越高越多）。每隻狗狗分開算。</p>${['balance','melee','ranged','area','crit'].map(b=>{const m=bmInfo(b);return `<div class="synrow${b===bk?' on':''}"><b>${buildName(SV.job,b)}　Lv ${m.l} / 10${m.l>=10?' 🏅 大師':''}</b><div class="bmbar"><i style="width:${m.l>=10?100:Math.round(m.x/m.need*100)}%"></i></div><small>${b==='balance'?'每級所有傷害 +1%':b==='crit'?'每級爆擊傷害 +5%':'每級主打招式傷害 +2%'}　目前 +${b==='crit'?m.l*5:b==='balance'?m.l:m.l*2}%</small></div>`}).join('')}<div class="synrow"><b>里程碑</b><span>Lv 3：流派招式開場多 1 級（均衡：經驗 +5%；會心：爆擊率 +3%）<br>Lv 6：屬性效果 +25%<br>Lv 10：屬性效果再 +25%、所有傷害 +5%、得到「大師」稱號</span></div>`;
+  $('styHead').innerHTML=`目前：${styleSum()}`;
+  $('styTabs').innerHTML=tabs.map(([k,n])=>`<button class="btn sm${styTab===k?'':' ghost'}" data-st="${k}">${n}</button>`).join('');
+  $('styBody').innerHTML=h+'<p class="note" style="margin-top:8px">屬性、奧義和熟練度只在單人模式生效；組隊副本只看主流派。</p>'}
+function bldButtons(){return ['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}
+function styleClick(e){const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(b.id==='styClose'){$('bldov').classList.add('hide');if(state==='hub')renderHub();return}
+  if(d.st){styTab=d.st;renderStyle();sfx('ui');return}
+  if(d.build){SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build}
+  else if(d.elem!==undefined){if(!elemOK())return;SV.elem=d.elem}
+  else if(d.ks){let k=activeKeys();if(k.includes(d.ks))k=k.filter(x=>x!==d.ks);else{if(!ksSlots()){say('Base Lv 30 才會開第一格奧義。');return}if(k.length>=ksSlots()){say(`奧義格子滿了（${ksSlots()} 格），先點一個已裝上的拿下來。`);return}k.push(d.ks)}SV.keys=k}
+  else return;
+  sfx('ui');save();const sc=$('styBody').scrollTop;renderStyle();$('styBody').scrollTop=sc}
 const runSkills=()=>{const a=[];for(const jid of chain(G.job))if(jid==='novice'?G.job==='novice':1)a.push(...JM[jid].sk);if(G.bsk)a.push(G.bsk);return a};
 const bMul=k=>G&&G.bfav?(G.bfav.includes(k)?G.bdm:BNF):G&&G.build==='balance'?1.1:1;
 const LINES=[['sw','護衛犬系'],['mg','巫犬系'],['ar','獵犬系'],['ac','療癒犬系'],['me','跑腿犬系'],['th','搗蛋犬系'],['sn','超級幼犬系'],['gs','牛仔犬系']];
@@ -624,7 +697,7 @@ let MOVED=0;
   localStorage.setItem(SAVE_KEY,JSON.stringify(d.s));if(d.r)localStorage.setItem('dog-run-v1',d.r);else localStorage.removeItem('dog-run-v1');MOVED=1}catch(e){}})();
 let SV=loadSave();
 /* ---------- 多隻狗狗角色：每隻各自的職業、等級、天賦、屬性、身上裝備；其他東西帳號共用 ---------- */
-const CHAR_KEYS=['para','pxp','pAlloc','inv','name','breed','job','blv','bxp','jlv','jxp','tpe','tal','stats','reb','eq','wear','maxTier','tierLv','jobsGot','builds','towerBest','best'];
+const CHAR_KEYS=['para','pxp','pAlloc','inv','name','breed','job','blv','bxp','jlv','jxp','tpe','tal','stats','reb','eq','wear','maxTier','tierLv','jobsGot','builds','towerBest','best','elem','keys','bm'];
 const SLOT_MAX=9,SLOT_COSTS=[20,30,45,60,80,100],slotCost=()=>SLOT_COSTS[Math.max(0,Math.min(SLOT_COSTS.length-1,(SV.slots||3)-3))];
 const newCharData=()=>({para:0,pxp:0,pAlloc:{},inv:[],name:'',breed:null,job:'novice',blv:1,bxp:0,jlv:1,jxp:0,tpe:0,tal:{},stats:{},reb:0,eq:{weapon:null,armor:null,acc:null},wear:{},maxTier:0,tierLv:{},jobsGot:[],builds:{},towerBest:0,best:{}});
 function charSnap(){const o={};for(const k of CHAR_KEYS)o[k]=SV[k]===undefined?null:JSON.parse(JSON.stringify(SV[k]));return o}
@@ -1104,7 +1177,7 @@ function drawEnemy(c,e,t){
   const q=e.sq||0;c.save();c.translate(e.x,e.y+q*e.r*.5);c.scale(s*e.face*(1+q),s*(1-q*.7));
   if(cached){const ang=((t*6+e.ph)%TAU+TAU)%TAU,fr=Math.floor(ang/TAU*EC_FR)%EC_FR;c.drawImage(enemySprite(e.type,fr,G?G.stage:0),-EC_SZ,-EC_SZ,EC_SZ*2,EC_SZ*2)}else drawEnemyBody(c,e,t);
   c.restore();
-  if(e.slow>0){c.globalAlpha=.25;circ(c,e.x,e.y,e.r,'#8ee8ff');c.globalAlpha=1}
+  if(e.slow>0){c.globalAlpha=.25;circ(c,e.x,e.y,e.r,'#8ee8ff');c.globalAlpha=1}if(e.bt>0){c.globalAlpha=.2+.08*Math.sin(t*14+e.ph);circ(c,e.x,e.y,e.r,'#ff7a3a');c.globalAlpha=1}if(e.ps>0){c.globalAlpha=Math.min(.45,.08+.03*e.ps);circ(c,e.x,e.y,e.r*.8,'#7fd65a');c.globalAlpha=1}
   if(e.hit>0){c.globalAlpha=Math.min(1,e.hit*8)*.55;circ(c,e.x,e.y,e.r,'#fff');c.globalAlpha=1}
   if(e.elite){c.beginPath();c.arc(e.x,e.y,e.r+4,0,TAU);c.strokeStyle='rgba(245,197,66,.85)';c.lineWidth=2.5;c.stroke();c.font='700 12px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.6)';const nm=(e.aff?e.aff.map(a=>AFFN[a]).join('・')+' ':'菁英・')+EN[e.type];c.strokeText(nm,e.x,e.y-e.r-10);c.fillStyle='#ffd35a';c.fillText(nm,e.x,e.y-e.r-10);rr(c,e.x-16,e.y-e.r-6,32,3,1,'rgba(0,0,0,.5)');rr(c,e.x-16,e.y-e.r-6,32*Math.max(0,e.hp/e.max),3,1,'#ff6b5a');if(e.shield>0){c.globalAlpha=.35+.15*Math.sin(t*6);c.strokeStyle='#8ec5ff';c.lineWidth=3;c.beginPath();c.arc(e.x,e.y,e.r+8,0,TAU);c.stroke();c.globalAlpha=1}}
   if(e.boss){c.font='900 14px "Noto Sans TC", sans-serif';c.textAlign='center';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.6)';const nm=G?(e.guard?'守衛・':'')+STAGES[G.stage].boss:'';c.strokeText(nm,e.x,e.y-e.r-22);c.fillStyle='#ff8a6a';c.fillText(nm,e.x,e.y-e.r-22)}
@@ -1173,7 +1246,7 @@ function newRun(stage,trialJob,o){
     st:mkRunSt(st),
     pet:SV.pet&&PM[SV.pet]&&!trialJob?{id:SV.pet,x:-30,y:10,cd:1,dmg:(10+SV.blv*1.2)*(1+.2*((SV.pets[SV.pet]||1)-1))}:null,revive:st.revive,wep:{},pas:{},E:[],P:[],B:[],J:[],Z:[],FX:[],TX:[],spawn:1,eliteT:60,boss:null,bossDone:false,winT:0,shake:0,banner:null,ring2:0,ring4:0,
     rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[],bones:0}};
-  const lv0=1+st.bonusLv;initLoadout(G,job,trialJob?'balance':curBuild(job),lv0);
+  const lv0=1+st.bonusLv;initLoadout(G,job,trialJob?'balance':curBuild(job),lv0);if(!trialJob&&mode!=='raid'&&mode!=='def')applyStyle(G,curBuild(job));
   if(st.freePick)G.pend=1;
   G.cur.drop*=guildDrop()*(1+.2*(G.heat||0));
   if(G.mul.gap>=3)setTimeout(()=>{if(G&&state==='play')banner(`越級挑戰：比推薦低 ${G.mul.gap} 級，怪物血量 ×${(1+GAP_HP*G.mul.gap).toFixed(2)}、攻擊 ×${(1+GAP_DMG*G.mul.gap).toFixed(2)}`)},3200);
@@ -1209,9 +1282,11 @@ function spawnEnemy(type,elite,x,y){
 const AFFN={fast:'迅捷',big:'巨大',split:'分裂',shield:'護盾',boom:'自爆',regen:'再生'};
 function pickType(t){const PL=STAGES[G.stage].pool,UT=[0,20,50,110,180];const pool=PL.map((k,i)=>[k,t<UT[i]?0:i===0?Math.max(1.5,6-t/40):i>=3?3:4]);let s=0;for(const q of pool)s+=q[1];let r=Math.random()*s;for(const q of pool){r-=q[1];if(r<=0)return q[0]}return 'sprout'}
 function ring(type,n){const p=G.coop?coopRandP():G.p,d=Math.hypot(W,H)/S/2+10;for(let i=0;i<n;i++){const a=i*TAU/n;spawnEnemy(type,false,p.x+Math.cos(a)*d,p.y+Math.sin(a)*d)}banner('被包圍了！')}
-function hurt(e,d,kx,ky,kb,col){
-  if(!e||e.dead)return;if(G.vis){e.hit=.12;return}if(e.inv){if(Math.random()<.15)txt(e.x,e.y-e.r-4,'護盾','#d8c8ff');return}if(e.stun>0)d*=1.5;d*=G.st.dmg;const CC=Math.min(.75,G.st.crit),CD=G.st.critD+Math.max(0,G.st.crit-.75)*1.5;if(e.shield>0){const ab=Math.min(e.shield,d*.6);e.shield-=ab;d-=ab;if(e.shield<=0)sparks(e.x,e.y,14,'#8ec5ff',220)}if((e.elite||e.boss)&&G.st.bossDmg)d*=1+G.st.bossDmg;let crit=false;if(Math.random()<CC){d*=CD;crit=true}else if(G.critOnly)d*=.9;
-  e.hp-=d;e.hit=.12;e.sq=.22;
+function hurt(e,d,kx,ky,kb,col,raw){
+  if(!e||e.dead)return;if(G.vis){e.hit=.12;return}if(e.inv){if(Math.random()<.15)txt(e.x,e.y-e.r-4,'護盾','#d8c8ff');return}
+  if(raw){if(e.stun>0)d*=1.5;e.hp-=d;e.hit=Math.max(e.hit,.05);if(Math.random()<.6)txt(e.x+R(-8,8),e.y-e.r-2,Math.round(d),col||'#ffb070');if(e.hp<=0)kill(e);return}if(e.stun>0)d*=1.5;d*=G.st.dmg;const CC=Math.min(.75,G.st.crit),CD=G.st.critD+Math.max(0,G.st.crit-.75)*1.5;if(e.shield>0){const ab=Math.min(e.shield,d*.6);e.shield-=ab;d-=ab;if(e.shield<=0)sparks(e.x,e.y,14,'#8ec5ff',220)}if((e.elite||e.boss)&&G.st.bossDmg)d*=1+G.st.bossDmg;let crit=false;if(Math.random()<CC){d*=CD;crit=true}else if(G.critOnly)d*=.9;
+  const SY=G.sty&&!G.coop;if(SY)d=styHit(e,d);
+  e.hp-=d;e.hit=.12;e.sq=.22;if(SY&&G.sty.el&&e.hp>0)styProc(e,d,crit);
   if(!e.boss&&kb){const k=kb*1.25/(e.elite?3:1);e.kx+=kx*k;e.ky+=ky*k}
   if((crit||d>e.max*.3||(e.boss&&d>300))&&!(G.hsCd>0)){G.hs=crit?.05:.03;G.hsCd=.15;if(crit)G.shake=Math.max(G.shake,.08)}
   {const n=crit?6:3,bx=kx||R(-1,1),by=ky||R(-1,1);for(let i=0;i<n;i++)fx({k:'pt',x:e.x,y:e.y,vx:bx*R(140,340)+R(-90,90),vy:by*R(140,340)+R(-90,90),s:R(1.2,2.6),c:crit?'#ffd35a':'#ffffff',life:.22,max:.22})}
@@ -1220,7 +1295,7 @@ function hurt(e,d,kx,ky,kb,col){
   if(e.hp<=0)kill(e);
 }
 function kill(e){
-  e.dead=true;G.kills++;if(e.elite)G.eliteKills=(G.eliteKills||0)+1;if(e.aff){if(e.aff.includes('split'))for(let i=0;i<4;i++){const s2=spawnEnemy(e.type,false,e.x+R(-20,20),e.y+R(-20,20));s2.hp*=2;s2.max=s2.hp}if(e.aff.includes('boom'))G.Z.push({k:'bz',x:e.x,y:e.y,R:90,life:.9,max:.9,dmg:Math.round(e.dmg*1.2),c:'#ff6a2e'})}if(G.st.leech)heal(G.st.leech);if(e.boss)G.bossKills=(G.bossKills||0)+1;const ec=EC[e.type]||'#e8f5c8';fx({k:'poof',x:e.x,y:e.y,R:e.r*1.8,c:ec,life:.28,max:.28});for(let i=0;i<(e.boss?30:7);i++){const a=R(0,TAU),v=R(80,240);fx({k:'chunk',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-140,s:R(2,4.5)*(e.r/12),c:ec,life:.5,max:.5,g:700})}
+  e.dead=true;G.kills++;if(G.sty&&!G.coop)styKill(e);if(e.elite)G.eliteKills=(G.eliteKills||0)+1;if(e.aff){if(e.aff.includes('split'))for(let i=0;i<4;i++){const s2=spawnEnemy(e.type,false,e.x+R(-20,20),e.y+R(-20,20));s2.hp*=2;s2.max=s2.hp}if(e.aff.includes('boom'))G.Z.push({k:'bz',x:e.x,y:e.y,R:90,life:.9,max:.9,dmg:Math.round(e.dmg*1.2),c:'#ff6a2e'})}if(G.st.leech)heal(G.st.leech);if(e.boss)G.bossKills=(G.bossKills||0)+1;const ec=EC[e.type]||'#e8f5c8';fx({k:'poof',x:e.x,y:e.y,R:e.r*1.8,c:ec,life:.28,max:.28});for(let i=0;i<(e.boss?30:7);i++){const a=R(0,TAU),v=R(80,240);fx({k:'chunk',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-140,s:R(2,4.5)*(e.r/12),c:ec,life:.5,max:.5,g:700})}
   const sg=STAGES[G.stage],xp=e.boss?200:e.elite?20:ET[e.type].xp;
   const xm=2.25*sg.rw*G.st.exp*Math.min(G.mul.rw,1.6)*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*.6*(e.guard?.4:1);
   {const zv=Math.round((e.boss?(e.guard?150:600):e.elite?60:R(1,4)/.4)*sg.rw*G.st.zeny*G.mul.rw*G.mul.zeny),nc=e.boss?10:e.elite?5:(Math.random()<.4?1:0);for(let i=0;i<nc;i++)G.J.push({x:e.x+R(-18,18),y:e.y+R(-18,18),v:0,coin:Math.max(1,Math.round(zv/nc)),m:false})}
@@ -1336,7 +1411,7 @@ function update(dt){
   if(updWorld(dt))return;
   buildGrid();
   updWeapons(dt);if(G.coop)coopMatesWeapons(dt);
-  updProj(dt);updZones(dt);updEnemies(dt);updBullets(dt);updGems(dt);updFx(dt);
+  updProj(dt);updZones(dt);updEnemies(dt);if(G.sty&&!G.coop)tickDots(dt);updBullets(dt);updGems(dt);updFx(dt);
   if(G.coop){coopHostPost(dt);return}
   updLevel();
 }
@@ -1530,6 +1605,7 @@ function end(win){
     if(G.coop){SV.raidTok=(SV.raidTok||0)+G.coop.tok;ST.raids=(ST.raids||0)+1;if(win)ST.raidWins=(ST.raidWins||0)+1;save();lines.push(`<div><b style="color:#7a4ad8">團隊徽章 +${G.coop.tok}</b>（共 ${SV.raidTok} 個，到「團隊」頁兌換）</div>`)}
     if(G.mode==='tower')lines.push(`<div><b>這次通過了 ${fl} 層</b>${towerNew?'（新紀錄！）':''}　最高紀錄 ${SV.towerBest||0} 層</div>`);
     lines.push(`<div>Base 經驗 +${bx}${SV.blv>b0?` <b>→ Base Lv ${SV.blv}！</b>`:''}${(SV.para||0)>p0?` <b style="color:#b86a10">→ 巔峰 ★${SV.para}！</b>`:''}</div>`);
+    if(G.sty){const bk=G.sty.bk,l0=bmLv(bk),gain=Math.round(Math.min(t,600)*(win?1.5:1)*(1+.25*(G.heat||0)));SV.bm=SV.bm||{};SV.bm[bk]=(SV.bm[bk]||0)+gain;const l1=bmLv(bk);save();lines.push(`<div>流派熟練度 +${gain}（${buildName(SV.job,bk)} Lv ${l1}${l1>l0?` <b style="color:#b8501a">升級了！</b>`:''}）</div>`)}
     lines.push(`<div>Job 經驗 +${jx}${SV.jlv>j0?` <b>→ Job Lv ${SV.jlv}！獲得 ${SV.jlv-j0} 天賦點</b>`:''}${SV.jlv>=JCAP[tier]?'（已達上限）':''}</div>`);
     lines.push(`<div>金幣 +${zn}${win?'（通關加成 ×1.3）':''}　🦴 狗骨頭 +${bones}${firstClear?'（首次通關 +10）':''}${heatFirst?`（首次通過難度 ${G.heat} +${5*G.heat}）`:''}</div>`);
     {const good=rw.items.filter(it=>it.rar>=2).sort((a,b)=>b.rar-a.rar),cnt=[0,0,0,0,0];for(const it of rw.items)cnt[it.rar]++;
@@ -2079,8 +2155,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.28.0';
+const VERSION='0.29.0';
 const NEWS=[
+ {v:'0.29.0',d:'11/25',t:'流派 2.0：屬性・奧義・共鳴・熟練度',items:[['新增','流派改成獨立的「流派配置」畫面，分成五頁：主流派、屬性、奧義、共鳴、熟練度（角色分頁和出戰分頁都有按鈕）'],['新增','屬性（Base Lv 15 解鎖）：火焰（燃燒）、冰霜（緩速、打 6 下冰凍）、雷電（連鎖閃電）、劇毒（疊毒，滿層易傷）、神聖（打菁英和魔王更痛、擊倒回血、每 40 隻放聖光）'],['新增','奧義：12 種有好有壞的強力特性，例如玻璃大砲、背水一戰、處決者、越戰越勇、元素共振、不屈之魂；Base Lv 30、Lv 60、1 轉各開一格'],['新增','共鳴：主流派和屬性剛好配對會觸發 10 種額外效果，例如近戰＋火焰「爆炎拳」（燃燒的怪被打倒會連鎖爆炸）、範圍＋雷電「雷暴」、會心＋劇毒「毒刃」'],['新增','流派熟練度：用哪個流派出戰就累積哪個的熟練度，最高 Lv 10，每級加傷害，Lv 3／6／10 有里程碑，練滿得到「大師」稱號；每隻狗狗分開算'],['說明','屬性、奧義、熟練度只在單人模式生效，組隊副本只看主流派']]},
  {v:'0.28.0',d:'11/25',t:'10 轉・巔峰等級・排行榜',items:[['新增','轉生上限從 5 轉提高到 10 轉，而且有里程碑：1 轉經驗 +20%、天賦點 +1；之後每轉經驗再 +10%；3 轉「轉生勇者」稱號、開場多一次升級；5 轉招式傷害 +10%；7 轉「傳說之犬」、生命 +10%；10 轉「彩虹橋守護神」、金色光環、傷害再 +10%'],['新增','巔峰等級：Base Lv 99 之後的經驗不會浪費，會累積成巔峰等級（顯示成 Lv99 ★12），每升一級得 1 點，可以加在攻擊、體魄、專注、精準，沒有上限（冷卻和爆擊有上限）；轉生也會保留'],['新增','排行榜：選單上方「排行榜」可以看等級榜（轉生 → 等級 → 巔峰）和無限之塔榜，每個帳號用最強的那隻狗上榜'],['新增','等級榜前三名的狗狗會變成立牌，站在主城冒險之門前的台座上（金、銀、銅），點牠們可以直接看排行榜']]},
  {v:'0.27.0',d:'11/25',t:'新地圖：黃沙金字塔、玩具時計塔',items:[['新增','第 6 關「黃沙金字塔」（推薦 Lv75）：聖甲蟲、仙人掌怪、繃帶木乃伊、沙蟲；魔王「法老貓王」會朝你射出一整排流沙、召喚木乃伊'],['新增','第 7 關「玩具時計塔」（推薦 Lv90）：氣球怪、齒輪精、發條士兵、玩具箱怪；魔王「時計魔王」兩根指針會一直轉圈掃過地面，還會叫發條士兵出來'],['新增','8 張新怪物卡和 2 張魔王卡；新地圖有自己的地面、音樂和裝備（黃沙、玩具系列）'],['調整','無限之塔 51 層以後、每日副本、本週魔王也會用到新地圖']]},
  {v:'0.26.1',d:'11/25',t:'主城狗狗會自己玩了',items:[['新增','主城的狗狗不再只會走來走去：會坐下、趴著睡覺、伸懶腰、追尾巴轉圈、唱歌、冒愛心'],['新增','附近有別的狗狗時，牠們會一起玩雙人互動：碰鼻子、拔河、追逐、摔角、理毛、依偎、擊掌，和玩家之間的雙人動作一樣']]},
@@ -2222,7 +2299,7 @@ function renderHub(){
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}；好裝備機率提高、卡片掉率 ×${(1+.2*h).toFixed(1)}${h>=5?'、魔王寶物全部史詩以上':h>=3?'、魔王寶物必有史詩':''}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">流派：${styleSum()}　<button class="btn sm ghost" data-style="main" style="margin:0">流派配置</button></p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}；好裝備機率提高、卡片掉率 ×${(1+.2*h).toFixed(1)}${h>=5?'、魔王寶物全部史詩以上':h>=3?'、魔王寶物必有史詩':''}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
       <h3 style="margin-top:18px" data-anchor="weekly">本週魔王　<span class="note">每週一換一隻，可以重複挑戰</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>強化版${STAGES[weeklyStage()].boss}</b>（${STAGES[weeklyStage()].n}）<p class="note" style="margin:2px 0 0">怪物血量 ×1.7、攻擊 ×1.4，魔王 2:30 就出現而且血量 ×2.6；金幣經驗 ×2、卡片掉率 ×2，魔王寶物至少史詩。${weeklyDone()?'<b style="color:#2f7a3e">本週已擊破 ✓</b>':'<b>每週第一次擊破：🦴20、團隊徽章 5、史詩裝備</b>'}</p></div><button class="btn sm" data-weekly="1">挑戰</button></div>
       <h3 style="margin-top:18px">團隊副本　<span class="note">徽章 ${SV.raidTok||0} 個</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><p class="note" style="margin:0;flex:1;min-width:200px">和好友或隨機玩家 2／4／6 人一起打「灰霧大魔王討伐」或「守護彩虹橋」，湊不到人會補 AI 狗狗。</p><button class="btn sm" data-tab="team">前往團隊副本</button></div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
@@ -2236,7 +2313,7 @@ function renderHub(){
     H.innerHTML=`<h3>${esc(dogName())}・${j.n}　<button class="btn sm ghost" id="renameBtn">改名字</button> <button class="btn sm ghost" id="storyBtn">故事回顧</button></h3><p class="note" style="margin:-6px 0 8px">毛色：${SKM[curSkin()].n}</p>${rosterHTML()}
       <div class="kv"><div><span>生命</span><b>${st.hp}</b></div><div><span>閃避</span><b>${Math.round((st.dodge||0)*1000)/10}%</b></div><div><span>傷害</span><b>${Math.round(st.dmg*100)}%</b></div><div><span>物理／遠程／魔法</span><b>${Math.round(st.phy*100)}／${Math.round(st.rng*100)}／${Math.round(st.mgc*100)}%</b></div><div><span>爆擊率</span><b>${Math.round(Math.min(.75,st.crit)*100)}%${st.crit>.75?'（上限）':''}</b></div><div><span>爆擊傷害</span><b>${Math.round((st.critD+Math.max(0,st.crit-.75)*1.5)*100)}%</b></div><div><span>冷卻</span><b>${Math.round(st.cd*100)}%</b></div><div><span>範圍</span><b>${Math.round(st.area*100)}%</b></div><div><span>移速</span><b>${Math.round(st.spd*100)}%</b></div><div><span>回復/秒</span><b>${st.regen.toFixed(1)}</b></div><div><span>減傷</span><b>${Math.round(st.dr*100)}%</b></div><div><span>經驗加成</span><b>${Math.round(st.exp*100)}%</b></div><div><span>金幣加成</span><b>${Math.round(st.zeny*100)}%</b></div><div><span>出戰次數</span><b>${SV.runs}</b></div></div>
       ${statBox()}
-      <details class="box bldbox" ${bldOpen?'open':''}><summary><strong>流派：${buildName(SV.job,curBuild())}</strong>　<span class="note">點開看各流派、免費更換</span></summary><p class="note" style="margin:6px 0">同一個職業可以選不同打法，出戰前隨時可以換，不用花任何東西。</p><div class="builds">${['balance','melee','ranged','area','crit'].map(b=>{const n=buildCount(SV.job,b),on=curBuild()===b,bs=buildSkill(SV.job,b);return `<button class="bld${on?' on':''}" data-build="${b}"><b>${buildName(SV.job,b)}</b><small>${BUILDS[b].d}</small>${bs?`<small class="note">流派招式：<b style="color:#3a2a10"><span style="display:inline-block;width:.8em;height:.8em;border-radius:50%;background:${bs.c};box-shadow:0 0 0 1.5px #0004;margin-right:3px;vertical-align:-1px"></span>${bs.n}</b>（${MECH[bs.k].d(skDmg(bs,1),1,bs.x).replace(/，?傷害.*$/,'')}）・這一類招式共 ${n} 招${n<4?`（招式少，主打傷害再 +${8*(4-n)}%）`:''}</small>`:''}</button>`}).join('')}</div></details>
+      <div class="box"><strong>流派配置</strong>　<button class="btn sm" data-style="main">打開流派配置</button><p class="note" style="margin:6px 0 0">${styleSum()}</p><div class="tcp" style="margin-top:6px">${[['main','主流派'],['elem','屬性'],['keys','奧義'],['syn','共鳴'],['mast','熟練度']].map(([k,n])=>`<button class="btn sm ghost" data-style="${k}">${n}</button>`).join('')}</div></div>
       <div class="box"><strong>轉職</strong>　<button class="btn sm ghost" id="jobGuide">職業介紹・轉職路線</button>${jobBox}<p class="note" style="margin-top:8px">轉職後就不能換回別的職業；想玩其他職業，可以在上面「我的狗狗們」開一隻新狗狗。</p></div>
       <div class="box"><strong>目前會的招式</strong>${chain(SV.job).map(jid=>JM[jid].sk.map(s=>`<div style="font-size:14px;margin-top:4px"><b style="color:${shade(s.c,-.45)}">${s.n}</b> ${dtTag(s)}（${JM[jid].n}）${s.sig?' · 開局就有':' · 局內升級學'}<br><span class="note">${skDesc(s,1)}</span></div>`).join('')).join('')}</div>
       <div class="box"><strong>聲音</strong><div class="vol" style="margin-top:8px"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><p class="note">音樂和音效都是原創、用程式即時合成的。</p></div>
@@ -2385,6 +2462,7 @@ function hubClick(e){
   if(b.id==='stAuto'){SV.stats=SV.stats||{};statAuto();sfx('lvl');save();renderHub();return}
   if(b.id==='stReset'){if(statSpent())ask('把所有屬性點重置，重新分配嗎？（免費）','重置').then(y=>{if(y){SV.stats={};save();renderHub()}});return}
   if(b.id==='rebBtn'){openRebirth();return}
+  if(d.style){openStyle(d.style);return}
   if(d.build){bldOpen=true;SV.builds=SV.builds||{};SV.builds[JM[SV.job].line]=d.build;sfx('ui');save();renderHub();return}
   
   if(b.id==='chgDog'){openBreeds('change');return}
@@ -2904,7 +2982,7 @@ addEventListener('pagehide',auHide);addEventListener('pageshow',()=>auWake());
 /* ---------- input ---------- */
 $('hub').addEventListener('click',e=>{if(e.target.closest('button'))sfx('ui');hubClick(e)});
 $('raidov').addEventListener('click',lobbyClick);
-$('rankBtn').addEventListener('click',()=>openRank());$('rankClose').addEventListener('click',()=>$('rankov').classList.add('hide'));$('rankTabs').addEventListener('click',e=>{const b=e.target.closest('[data-rk]');if(b){RANK.tab=b.dataset.rk;renderRank()}});
+$('rankBtn').addEventListener('click',()=>openRank());$('bldov').addEventListener('click',styleClick);$('rankClose').addEventListener('click',()=>$('rankov').classList.add('hide'));$('rankTabs').addEventListener('click',e=>{const b=e.target.closest('[data-rk]');if(b){RANK.tab=b.dataset.rk;renderRank()}});
 setTimeout(()=>{rankPush();rankLoad(true)},3000);setInterval(()=>{if(document.hidden)return;if(state==='town')rankLoad()},30000);
 $('storyov').addEventListener('click',e=>{if(e.target.closest('#stSkip')){if(ST){sfx('ui');stEnd()}return}stClick()});
 $('stLogX').addEventListener('click',()=>$('stlogov').classList.add('hide'));$('stLogL').addEventListener('click',e=>{const b=e.target.closest('[data-story]');if(b){$('stlogov').classList.add('hide');playStory(b.dataset.story,()=>openStoryLog())}});
@@ -3069,7 +3147,7 @@ function backToTown(){blurActive();show(null);state=inHouse?'house':'town';last=
 function goTown(){G=null;inHouse=false;state='town';show(null);document.body.classList.add('app');document.body.classList.remove('playing');TP.x=0;TP.y=110;TP.go=TP.tgt=null;playMusic('town');renderTownUI();blurActive();
   showTip('town2','歡迎來到主城！','・<b>走路</b>：電腦用方向鍵／WASD；手機按住畫面拖曳，或點一下想去的地方<br>・<b>使用功能</b>：直接<b>點 NPC</b>，狗狗會自己走過去打開；或走到 NPC 旁邊按下方黃色按鈕（電腦可按 E／空白鍵／Enter）<br>・NPC 頭上的<b>黃色標籤</b>是他負責的功能，有紅色 <b>!</b> 代表有事要處理<br>・不想走路也可以按下方「出戰」「選單」<br>・按 <kbd>Esc</kbd> 可以關掉視窗')}
 function blurActive(){try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()}catch(e){}}
-const MODALS=['rankov','stlogov','rebov','nameov','moveov','acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
+const MODALS=['bldov','rankov','stlogov','rebov','nameov','moveov','acctov','newsov','tipov','pullov','resumeov','breedov','jobov','chestov','shrineov'];
 const modalOpen=()=>MODALS.some(id=>{const el=$(id);return el&&!el.classList.contains('hide')});
 function escClose(){if(!$('acctov').classList.contains('hide')){$('acctov').classList.add('hide');return true}if(!$('newsov').classList.contains('hide')){$('newsov').classList.add('hide');return true}if(!$('pullov').classList.contains('hide')){closePull();return true}if(!$('tipov').classList.contains('hide')){closeTip();return true}if(!$('jobov').classList.contains('hide')){show('hub');return true}if(!$('breedov').classList.contains('hide')&&!$('breedCancel').classList.contains('hide')){show('hub');return true}return false}
 function enterHouse(){VISIT=null;loadMyVisits();endWalk(true);inHouse=true;state='house';houseEdit=false;houseSel=null;const L=HOUSE_LV[homeData().lv];TP.x=0;TP.y=L.h*22-30;TP.go=TP.tgt=null;sfx('ui');renderTownUI()}
