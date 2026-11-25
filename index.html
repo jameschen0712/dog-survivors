@@ -655,6 +655,7 @@ const wLineName=wt=>WLINE[wt]||'所有職業';
 function canWear(it,job){if(!it||it.slot!=='weapon')return true;const ln=JM[job||SV.job].line;return FREEW.includes(ln)||!it.wt||FREEW.includes(it.wt)||it.wt===ln}
 function weaponCheck(){const w=SV.eq&&SV.eq.weapon;if(w&&!canWear(w)){SV.inv.push(w);SV.eq.weapon=null;SV.wpOff=w.n}}
 function rarOdds(stage,minR){const w=[60,26,10,3.4,.6].map((v,i)=>v*(1+stage*.35*i)),t=w.reduce((a,b)=>a+b),p=w.map(v=>v/t);if(minR){let low=0;for(let i=0;i<minR;i++){low+=p[i];p[i]=0}p[minR]+=low}return p}
+function guildHTML(){return `<h3 style="margin-top:14px" data-anchor="guild">狗狗公會設施　<span class="note">花金幣永久升級，你所有的狗狗都吃得到；越升越貴，最高 Lv${GUILD_MAX}</span></h3><div class="slots">${GUILD.map(g=>{const l=guildLv(g[0]),mx=l>=GUILD_MAX,c=guildCost(g);return `<div class="box"><strong>${g[1]} <span class="note">Lv ${l}/${GUILD_MAX}</span></strong><p class="note">${g[2]} +${g[4]*l}${g[5]}${mx?'（已滿）':`　→ 下一級 +${g[4]*(l+1)}${g[5]}`}</p><button class="btn sm" data-guild="${g[0]}" ${mx||SV.zeny<c?'disabled':''}>${mx?'已經滿級':c.toLocaleString()+' 金幣'}</button></div>`}).join('')}</div>`}
 function shopInfo(s){const pct=v=>(v*100<1?(v*100).toFixed(1):Math.round(v*100))+'%';
   const row=(n,minR)=>{const p=rarOdds(s,minR);return `<tr><th>${n}</th>${p.map((v,i)=>`<td style="color:${RAR[i].c};font-weight:700">${v?pct(v):'—'}</td>`).join('')}</tr>`};
   const mr=(base,per)=>RAR.map(r=>Math.round((base+s*per)*r.m));
@@ -667,7 +668,8 @@ function shopInfo(s){const pct=v=>(v*100<1?(v*100).toFixed(1):Math.round(v*100))
 function rollRar(stage,minR){const w=[60,26,10,3.4,.6].map((v,i)=>v*(1+stage*.35*i));let r=0;const s=w.reduce((a,b)=>a+b);let x=Math.random()*s;for(let i=0;i<5;i++){x-=w[i];if(x<=0){r=i;break}}return Math.max(r,minR||0)}
 function genItem(stage,minR,o){o=o||{};
   const myLn=JM[SV.job].line,wls=Object.keys(WLINE),wt=o.wt||(FREEW.includes(myLn)?(Math.random()<.5?'nov':wls[Math.floor(Math.random()*wls.length)]):(Math.random()<.75?myLn:wls[Math.floor(Math.random()*wls.length)]));
-  const slot=o.slot||['weapon','armor','acc'][Math.floor(Math.random()*3)],rar=rollRar(stage,minR),RR=RAR[rar];
+  const rb=(typeof G!=='undefined'&&G&&G.heat&&state!=='hub')?G.heat*.6:0;
+  const slot=o.slot||['weapon','armor','acc'][Math.floor(Math.random()*3)],rar=rollRar(stage+rb,minR),RR=RAR[rar];
   const main=slot==='weapon'?Math.round((10+stage*12)*RR.m):slot==='armor'?Math.round((25+stage*40)*RR.m):Math.round((2+stage*1.5)*RR.m);
   const keys2=Object.keys(AFF).sort(()=>Math.random()-.5).slice(0,RR.a);
   const aff=keys2.map(k=>{let v=AFF[k][2]*(1+stage*.6)*R(.7,1.25)*RR.m;v=k==='regen'?Math.round(v*10)/10:Math.max(1,Math.round(v));return[k,v]});
@@ -737,6 +739,11 @@ const STAT_REC={nov:{str:2,vit:2,agi:2},sw:{str:3,vit:2,agi:1},mg:{int:3,dex:2,v
 function jobDT(jid){const c={phy:0,rng:0,mag:0};for(const id of chain(jid))for(const sk of JM[id].sk)if(id!=='novice'||jid==='novice')c[sk.dt]+=JM[id].tier+1;return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]}
 const STAT_DT={phy:{str:3,vit:2,agi:1},rng:{dex:3,agi:2,luk:1},mag:{int:3,dex:1,vit:2}};
 function statAuto(){const w=JM[SV.job].line==='sn'?STAT_REC.sn:STAT_DT[jobDT(SV.job)];let guard=2000;while(guard--){let best=null,bs=1e9;for(const k in w){const v=stv(k);if(v>=STAT_MAX||statLeft()<statCost(v))continue;const sc=v/w[k];if(sc<bs){bs=sc;best=k}}if(!best)break;SV.stats[best]=stv(best)+1}}
+/* 狗狗公會設施：整個帳號共用、所有狗狗都吃得到的永久加成，越升越貴 */
+const GUILD=[['train','訓練場','所有傷害','atk',1,'%',20000],['clinic','醫護站','生命','hp',20,'',15000],['school','學堂','經驗','exp',2,'%',18000],['vault','金庫','金幣','zeny',3,'%',18000],['lucky','幸運神社','裝備和卡片掉率','drop',3,'%',25000],['track','跑步場','移動速度','spd',1,'%',22000],['dojo','道場','爆擊傷害','critD',3,'%',24000]];
+const GUILD_MAX=20,guildLv=id=>((SV.guild||{})[id])||0,guildCost=g=>Math.round(g[6]*1.3**guildLv(g[0]));
+function guildMods(st){for(const g of GUILD){const l=guildLv(g[0]);if(l&&g[3]!=='drop')applyMod(st,g[3],g[4]*l)}}
+const guildDrop=()=>1+guildLv('lucky')*.03;
 function calcStats(){
   const t=k=>SV.tal[k]||0;
   const st={dmg:1+(SV.blv-1)*.022+t('a1')*.04,crit:.05+t('a2')*.02,critD:1.5+t('a4')*.1,sig:1+t('a3')*.08,cd:1-t('b1')*.03,area:1+t('b2')*.04,mag:75*(1+t('b3')*.1),exp:1+t('b3')*.05,zeny:1+t('b4')*.1,hp:100+(SV.blv-1)*6+t('c1')*15,regen:t('c2')*.3,spd:1+t('c3')*.03,dr:t('c4')*.03,revive:t('c5'),bonusLv:t('a5'),freePick:t('b5'),bossDmg:t('a6')*.03,hpPct:t('c6')*.02,leech:t('c7')*.3};
@@ -745,6 +752,7 @@ function calcStats(){
     if(s==='weapon')st.dmg+=mv/100;else if(s==='armor')st.hp+=mv;else st.crit+=mv/100;
     for(const [k,v] of it.aff)applyMod(st,k,v*(1+.12*(it.star||0)));for(const cid of (it.cards||[]))if(CM[cid])for(const [k,v] of CM[cid].mods)applyMod(st,k,v)}
   for(const [k,v] of Object.entries(collectionMods().m))applyMod(st,k,v);
+  guildMods(st);
   {const a=k=>stv(k)-1;st.phy=1+a('str')*.008;st.rng=1+a('dex')*.008;st.mgc=1+a('int')*.008;st.spd+=a('agi')*.0025;st.dodge=Math.min(.35,a('agi')*.0015);st.cd*=1-a('agi')*.001;st.hp+=a('vit')*3;st.hpPct+=a('vit')*.006;st.dr+=a('vit')*.001;st.area+=a('int')*.003;st.cd*=1-a('dex')*.0015;st.crit+=a('luk')*.002;st.critD+=a('luk')*.004;st.zeny+=a('luk')*.003}
   st.exp+=comfortExp()/100;
   if(SV.pet&&PM[SV.pet]){const [k,v]=petBon(SV.pet);applyMod(st,k,v)}
@@ -1119,21 +1127,26 @@ function initLoadout(g,job,bk,lv0){
 }
 const GAP_HP=.04,GAP_DMG=.03;
 function applyGap(mul,gap){mul.gap=gap;if(gap>0){mul.hp*=1+GAP_HP*gap;mul.dmg*=1+GAP_DMG*gap}}
+const weekNo=()=>Math.floor((Date.now()/86400000+3)/7);
+const weeklyStage=()=>weekNo()%((SV.stage||0)+1);
+const weeklyDone=()=>SV.wk&&SV.wk.k===weekKey()&&SV.wk.done;
 function newRun(stage,trialJob,o){
   o=o||{};const st=calcStats(),job=trialJob||SV.job,mode=o.mode||'stage',heat=mode==='stage'?(o.heat||0):0;
   let mul={hp:1+.35*heat,dmg:1+.2*heat,rw:1+.3*heat,exp:1,zeny:1,card:1};
   if(mode==='tower'){stage=towerStage(o.floor);mul=towerMul(o.floor)}
   if(mode==='dungeon'){mul={hp:1.4,dmg:1.25,rw:1.5,exp:1,zeny:1,card:1,...DUNG[o.dtype].mul}}
+  if(mode==='weekly'){mul={hp:1.7,dmg:1.4,rw:2,exp:1,zeny:1,card:2}}
   const gap=(mode==='raid'||mode==='def'||trialJob)?0:Math.max(0,STAGES[mode==='dungeon'?dungStage():stage].rec+(mode==='dungeon'?5:0)-SV.blv);applyGap(mul,gap);
-  G={heat,cur:{spawn:1+.12*heat,taken:1,hp:1,drop:1},t:0,mode,floor:o.floor||0,startFloor:o.floor||0,ft:0,dtype:o.dtype,mul,speed:1,bossT:mode==='dungeon'?180:BOSS_T,eliteGap:mode==='dungeon'?30:60,stage,trial:!!trialJob,job,skin:curSkin(),kills:0,lvl:1,xp:0,need:xpNeed(1),pend:0,
+  G={heat,cur:{spawn:1+.12*heat,taken:1,hp:1,drop:1},t:0,mode,floor:o.floor||0,startFloor:o.floor||0,ft:0,dtype:o.dtype,mul,speed:1,bossT:mode==='dungeon'?180:mode==='weekly'?150:BOSS_T,eliteGap:mode==='dungeon'?30:60,stage,trial:!!trialJob,job,skin:curSkin(),kills:0,lvl:1,xp:0,need:xpNeed(1),pend:0,
     p:{x:0,y:0,r:13,hp:st.hp,max:st.hp,spd:150,fx:1,fy:0,face:1,inv:0,mv:false},
     st:mkRunSt(st),
     pet:SV.pet&&PM[SV.pet]&&!trialJob?{id:SV.pet,x:-30,y:10,cd:1,dmg:(10+SV.blv*1.2)*(1+.2*((SV.pets[SV.pet]||1)-1))}:null,revive:st.revive,wep:{},pas:{},E:[],P:[],B:[],J:[],Z:[],FX:[],TX:[],spawn:1,eliteT:60,boss:null,bossDone:false,winT:0,shake:0,banner:null,ring2:0,ring4:0,
     rw:{bxp:0,jxp:0,zeny:0,items:[],cards:[],bones:0}};
   const lv0=1+st.bonusLv;initLoadout(G,job,trialJob?'balance':curBuild(job),lv0);
   if(st.freePick)G.pend=1;
+  G.cur.drop*=guildDrop()*(1+.2*(G.heat||0));
   if(G.mul.gap>=3)setTimeout(()=>{if(G&&state==='play')banner(`越級挑戰：比推薦低 ${G.mul.gap} 級，怪物血量 ×${(1+GAP_HP*G.mul.gap).toFixed(2)}、攻擊 ×${(1+GAP_DMG*G.mul.gap).toFixed(2)}`)},3200);
-  banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
+  banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='weekly'?`本週魔王：強化版${STAGES[stage].boss}！2:30 出現`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
   $('spdb').classList.toggle('hide',!!trialJob||!(mode!=='stage'||(SV.cleared||0)>stage));$('spdb').textContent='×1';
   state='play';show(null);$('pbtn').classList.remove('hide');$('dashb').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
   try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
@@ -1181,7 +1194,7 @@ function kill(e){
   const xm=2.25*sg.rw*G.st.exp*Math.min(G.mul.rw,1.6)*G.mul.exp;G.rw.bxp+=xp*xm*(e.guard?.4:1);G.rw.jxp+=xp*xm*.6*(e.guard?.4:1);
   {const zv=Math.round((e.boss?(e.guard?150:600):e.elite?60:R(1,4)/.4)*sg.rw*G.st.zeny*G.mul.rw*G.mul.zeny),nc=e.boss?10:e.elite?5:(Math.random()<.4?1:0);for(let i=0;i<nc;i++)G.J.push({x:e.x+R(-18,18),y:e.y+R(-18,18),v:0,coin:Math.max(1,Math.round(zv/nc)),m:false})}
   if(!G.trial){const cr=(G.dtype==='card'&&e.boss&&!e.guard)?1:(e.boss?(e.guard?.08:CARD_RATE.boss):e.elite?CARD_RATE.elite:CARD_RATE.normal)*G.mul.card*G.cur.drop;if(Math.random()<cr){const cid=e.boss?'c_b'+G.stage:'c_'+e.type;if(CM[cid]){G.rw.cards.push(cid);txt(e.x,e.y-44,`獲得 ${CM[cid].n}！`,'#ff9ec4',true);sfx('job');fx({k:'ring',x:e.x,y:e.y,R:60,c:'#ff9ec4',life:.5,max:.5,fill:1})}}
-    if(e.guard){G.rw.items.push(genItem(G.stage,G.floor%10===0?2:G.floor%5===0?1:0))}else if(e.boss){G.bossPick=[genItem(G.stage,2),genItem(G.stage,2),genItem(G.stage,Math.random()<.35?3:2)]}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004*G.cur.drop)G.rw.items.push(genItem(G.stage,0))}
+    if(e.guard){G.rw.items.push(genItem(G.stage,G.floor%10===0?2:G.floor%5===0?1:0))}else if(e.boss){const hr=(G.heat||0)>=5||G.mode==='weekly'?3:(G.heat||0)>=3?[2,2,3]:null;G.bossPick=hr===3?[genItem(G.stage,3),genItem(G.stage,3),genItem(G.stage,Math.random()<.3?4:3)]:hr?[genItem(G.stage,2),genItem(G.stage,2),genItem(G.stage,3)]:[genItem(G.stage,2),genItem(G.stage,2),genItem(G.stage,Math.random()<.35?3:2)]}else if(e.elite){G.rw.items.push(genItem(G.stage,0));txt(e.x,e.y-30,'掉落裝備！','#ffab3d',true);sfx('drop')}else if(Math.random()<.004*G.cur.drop)G.rw.items.push(genItem(G.stage,0))}
   if(e.guard){floorUp();return}
   if(e.boss&&G.coop&&G.coop.mode==='def'){G.boss=null;banner(`${sg.boss}被打倒了！`);flash=.4;return}
   if(e.boss){G.bossDone=true;G.boss=null;G.winT=1.6;banner(G.coop?'灰霧大魔王被打倒了！':`${sg.boss}倒下了！`);flash=.6;return}
@@ -1324,7 +1337,7 @@ function updWorld(dt){const p=G.p;
   G.shT=(G.shT||70)-dt;if(G.shT<=0&&!G.boss){G.shT=75;const a=R(0,TAU);G.Z.push({k:'shrine',x:p.x+Math.cos(a)*260,y:p.y+Math.sin(a)*260,life:35,max:35});banner('附近出現了祭壇！')}
   if(G.mode!=='tower'&&!G.warned&&G.t>=G.bossT-15){G.warned=1;banner(`${STAGES[G.stage].boss}即將出現！`);sfx('bossin')}
   if(G.mode!=='tower'&&G.boss&&!G.bossDone&&G.t>=G.bossT+BOSS_ESC&&!G.winT){G.escaped=1;sfx('lose');end(false);return true}
-  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp*(G.heat?1:([.75,.95][G.stage]||1));
+  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp*(G.mode==='weekly'?2.6:G.heat?1:([.75,.95][G.stage]||1));
     const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};if(G.stage===0)e.dmg=Math.round(e.dmg*.75);
     e.ent=2.5;G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin');bossRoar()}
   if(G.winT>0){G.winT-=dt;if(G.winT<=0){end(true);return true}}
@@ -1463,7 +1476,7 @@ function choose(i){
 /* ---------- run end & rewards ---------- */
 function end(win){
   if(state==='over')return;state='over';clearRun();const t=Math.floor(G.t),sg=STAGES[G.stage],rw=G.rw;if(win)for(const j of G.J)if(j.coin&&!j.got)rw.zeny+=j.coin;stopMusic();sfx(win?'win':'lose');
-  $('ovT').textContent=G.coop?(win?`${RAIDM[G.coop.mode].n}成功！`:`${RAIDM[G.coop.mode].n}失敗`):G.mode==='tower'?`無限之塔：到達第 ${G.floor} 層`:win?`通關！${sg.boss}倒下了`:G.escaped?`時間到，${sg.boss}逃走了`:G.retreat?'撤退回城鎮':'你倒下了';
+  $('ovT').textContent=G.mode==='weekly'?(win?`擊破本週魔王・強化版${sg.boss}！`:G.escaped?`本週魔王逃走了`:'你倒下了'):G.coop?(win?`${RAIDM[G.coop.mode].n}成功！`:`${RAIDM[G.coop.mode].n}失敗`):G.mode==='tower'?`無限之塔：到達第 ${G.floor} 層`:win?`通關！${sg.boss}倒下了`:G.escaped?`時間到，${sg.boss}逃走了`:G.retreat?'撤退回城鎮':'你倒下了';
   {let cause=$('ovCause');if(!cause){cause=document.createElement('p');cause.id='ovCause';cause.className='note';cause.style.margin='-4px 0 6px';$('ovT').after(cause)}const died=!win&&!G.retreat&&!G.escaped&&G.p.hp<=0;cause.textContent=G.coop?(G.coop.why||''):died&&G.lastHit?`被「${G.lastHit}」打倒了`:'';cause.classList.toggle('hide',!cause.textContent)}
   $('ovS').innerHTML=`<div><b>${fmt(t)}</b><span>存活時間</span></div><div><b>${G.lvl}</b><span>本局等級</span></div><div><b>${G.kills}</b><span>擊倒數</span></div>`;
   let lines=[];
@@ -1480,6 +1493,7 @@ function end(win){
     const mats=runMats();if(mats){const hm=homeData().mat;for(const k in mats)hm[k]=(hm[k]||0)+mats[k];G.matsGot=mats}
     SV.runs++;if(win&&G.mode==='stage'){SV.stage=Math.max(SV.stage,Math.min(STAGES.length-1,G.stage+1));SV.cleared=Math.max(SV.cleared||0,G.stage+1)}
     if(G.mode==='stage'&&(!SV.best[G.stage]||t>SV.best[G.stage]))SV.best[G.stage]=t;save();if(CLOUD())DogCloud.flush(VERSION);
+    if(G.mode==='weekly'&&win&&!weeklyDone()){SV.wk={k:weekKey(),done:1};SV.bones+=20;SV.raidTok=(SV.raidTok||0)+5;rw.items.push(genItem(G.stage,3));save();lines.push('<div><b style="color:#c0407a">本週魔王首次擊破！🦴+20、團隊徽章 +5、史詩裝備 1 件</b>（下週一會換新的魔王）</div>')}
     if(G.coop){SV.raidTok=(SV.raidTok||0)+G.coop.tok;ST.raids=(ST.raids||0)+1;if(win)ST.raidWins=(ST.raidWins||0)+1;save();lines.push(`<div><b style="color:#7a4ad8">團隊徽章 +${G.coop.tok}</b>（共 ${SV.raidTok} 個，到「團隊」頁兌換）</div>`)}
     if(G.mode==='tower')lines.push(`<div><b>這次通過了 ${fl} 層</b>${towerNew?'（新紀錄！）':''}　最高紀錄 ${SV.towerBest||0} 層</div>`);
     lines.push(`<div>Base 經驗 +${bx}${SV.blv>b0?` <b>→ Base Lv ${SV.blv}！</b>`:''}</div>`);
@@ -2017,8 +2031,10 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.25.2';
+const VERSION='0.26.1';
 const NEWS=[
+ {v:'0.26.1',d:'11/25',t:'主城狗狗會自己玩了',items:[['新增','主城的狗狗不再只會走來走去：會坐下、趴著睡覺、伸懶腰、追尾巴轉圈、唱歌、冒愛心'],['新增','附近有別的狗狗時，牠們會一起玩雙人互動：碰鼻子、拔河、追逐、摔角、理毛、依偎、擊掌，和玩家之間的雙人動作一樣']]},
+ {v:'0.26.0',d:'11/25',t:'本週魔王・公會設施・高難度掉寶',items:[['新增','本週魔王（出戰頁）：每週一換一隻強化版魔王，2:30 就出現、血量 ×2.6；可以重複挑戰，每週第一次擊破送 🦴20、團隊徽章 5、史詩裝備一件，魔王寶物至少史詩'],['新增','狗狗公會設施（商店頁）：花金幣永久升級訓練場（傷害）、醫護站（生命）、學堂（經驗）、金庫（金幣）、幸運神社（掉寶率）、跑步場（移速）、道場（爆擊傷害），全帳號所有狗狗都吃得到，每級越來越貴，最高 Lv20'],['新增','高難度掉更好的東西：每升一級難度，掉落裝備的品質提高、卡片掉率 +20%；難3 以上魔王寶物必有一件史詩，難5 魔王寶物全部史詩以上']]},
  {v:'0.25.2',d:'11/25',t:'越級挑戰變難・難度倍率看得到',items:[['平衡','越級打怪變難：等級每比關卡推薦等級低 1 級，怪物血量 +4%、攻擊 +3%（例如低 24 級：血量 ×1.96、攻擊 ×1.72）。每日副本、無限之塔也一樣；團隊副本照全隊平均等級算。關卡卡片和開場都會寫出現在的倍率'],['調整','選難度時會直接顯示那一級的倍率：怪物血量、攻擊、數量各變幾倍，經驗和金幣幾倍，第一次通過送幾根骨頭']]},
  {v:'0.25.1',d:'11/25',t:'團隊副本場地邊界看得到了',items:[['修正','團隊副本的場地有邊界，之前是看不到的牆，走到邊緣會突然卡住；現在邊界外面是一圈灰霧，邊緣有虛線，走到邊上會提示'],['調整','團隊副本的場地變大：討伐魔王 1100、守護彩虹橋 760（原本 820、640）']]},
  {v:'0.25.0',d:'11/25',t:'配對等待時間自己選',items:[['新增','團隊副本隨機配對可以自己選最多等多久：不等、15 秒、30 秒、60 秒，時間到湊不滿就補 AI'],['新增','配對中多了「不等了，補 AI 開打」按鈕，隨時可以直接開打']]},
@@ -2156,7 +2172,8 @@ function renderHub(){
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">目前流派：<b>${buildName(SV.job,curBuild())}</b>（到「角色」分頁或找轉職教官更換）</p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>SV.stage;return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}；好裝備機率提高、卡片掉率 ×${(1+.2*h).toFixed(1)}${h>=5?'、魔王寶物全部史詩以上':h>=3?'、魔王寶物必有史詩':''}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
+      <h3 style="margin-top:18px" data-anchor="weekly">本週魔王　<span class="note">每週一換一隻，可以重複挑戰</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>強化版${STAGES[weeklyStage()].boss}</b>（${STAGES[weeklyStage()].n}）<p class="note" style="margin:2px 0 0">怪物血量 ×1.7、攻擊 ×1.4，魔王 2:30 就出現而且血量 ×2.6；金幣經驗 ×2、卡片掉率 ×2，魔王寶物至少史詩。${weeklyDone()?'<b style="color:#2f7a3e">本週已擊破 ✓</b>':'<b>每週第一次擊破：🦴20、團隊徽章 5、史詩裝備</b>'}</p></div><button class="btn sm" data-weekly="1">挑戰</button></div>
       <h3 style="margin-top:18px">團隊副本　<span class="note">徽章 ${SV.raidTok||0} 個</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><p class="note" style="margin:0;flex:1;min-width:200px">和好友或隨機玩家 2／4／6 人一起打「灰霧大魔王討伐」或「守護彩虹橋」，湊不到人會補 AI 狗狗。</p><button class="btn sm" data-tab="team">前往團隊副本</button></div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
       <div class="box"><p class="note" style="margin-top:0">一路往上爬：每層撐 40 秒後打倒守衛就上樓，招式和強化會一直帶著，每 10 層換一個區域、越爬越難。每通過 5 層多拿 1 根骨頭。每 10 層是存檔點，可以直接從那裡開始。</p><div class="tcp">${(()=>{const cps=[1];for(let f=11;f<=(SV.towerBest||0)+1;f+=10)cps.push(f);return cps.reverse().map((f,i)=>`<button class="btn sm${i?' ghost':''}" data-tower="${f}">第 ${f} 層<small>${STAGES[towerStage(f)].n}${i===0?'・最高':''}</small></button>`).join('')})()}</div><p class="note">每打通 10 層就會解鎖下一個起點，可以直接從那裡開始。塔裡可以按右下角「×1／×2」加速。</p></div>
@@ -2231,7 +2248,7 @@ function renderHub(){
   }else if(tab==='team'){H.innerHTML=teamHTML();setTimeout(paintFriends,0);
   }else if(tab==='shop'){
     const s=SV.stage,c1=Math.round(250*(1+s*1.8)),c2=Math.round(1800*(1+s*2.2));
-    H.innerHTML=`<h3>商店</h3><div class="slots"><div class="box"><strong>冒險寶箱</strong><p class="note">隨機一件「${MAT[s]}」等級的裝備，任何品質都可能。</p><button class="btn" data-buy="0" ${SV.zeny<c1?'disabled':''}>${c1} 金幣</button></div><div class="box"><strong>黃金寶箱</strong><p class="note">至少「稀有」品質，有機會開出史詩、傳說。</p><button class="btn" data-buy="1" ${SV.zeny<c2?'disabled':''}>${c2} 金幣</button></div></div><div id="shopRes"></div>${shopInfo(s)}`;
+    H.innerHTML=`<h3>商店</h3><div class="slots"><div class="box"><strong>冒險寶箱</strong><p class="note">隨機一件「${MAT[s]}」等級的裝備，任何品質都可能。</p><button class="btn" data-buy="0" ${SV.zeny<c1?'disabled':''}>${c1} 金幣</button></div><div class="box"><strong>黃金寶箱</strong><p class="note">至少「稀有」品質，有機會開出史詩、傳說。</p><button class="btn" data-buy="1" ${SV.zeny<c2?'disabled':''}>${c2} 金幣</button></div></div><div id="shopRes"></div>${guildHTML()}${shopInfo(s)}`;
   }
   paintItems($('hbody'));if(tab==='char')paintRoster();portrait($('hubDog'),curSkin(),SV.job,0,false);auApply();
 }
@@ -2306,6 +2323,8 @@ function hubClick(e){
   if(d.hsel){const [si,h]=d.hsel.split(':').map(Number);SV.heatSel=SV.heatSel||{};SV.heatSel[si]=h;save();const sc=$('hbody').scrollTop;renderHub();$('hbody').scrollTop=sc;return}
   if(d.stage!==undefined){startStage(+d.stage,+(d.heat||0));return}
   if(d.tower){newRun(0,null,{mode:'tower',floor:+d.tower});return}
+  if(d.weekly){newRun(weeklyStage(),null,{mode:'weekly'});return}
+  if(d.guild){const g=GUILD.find(x=>x[0]===d.guild);if(!g||guildLv(g[0])>=GUILD_MAX)return;const c=guildCost(g);if(SV.zeny<c)return;SV.zeny-=c;SV.guild=SV.guild||{};SV.guild[g[0]]=guildLv(g[0])+1;sfx('job');save();const sc=$('hbody').scrollTop;renderHub();$('hbody').scrollTop=sc;return}
   if(d.dung){if(dailyLeft()<=0)return;SV.daily.n--;save();newRun(dungStage(),null,{mode:'dungeon',dtype:d.dung});return}
   if(b.id==='doJob'){openJob();return}
   if(b.id==='jobGuide'){openJob('browse');return}
@@ -2641,7 +2660,7 @@ function hud(){
   c.textBaseline='top';
   const T=(s,x,y,al,f)=>{c.font=f;c.textAlign=al;c.lineWidth=4;c.strokeStyle='rgba(0,0,0,.5)';c.strokeText(s,x,y);c.fillStyle='#fff';c.fillText(s,x,y)};
   T('Lv '+G.lvl,14,16,'left','700 18px Fredoka, sans-serif');
-  {const f13='700 13px "Noto Sans TC", sans-serif',a=`${j.n}${G.build&&G.build!=='balance'?'（'+buildName(G.job,G.build)+'）':''}`,b=`${G.heat?`難度${G.heat} `:''}${G.coop?RAIDM[G.coop.mode].n+'・'+RTIER[G.coop.tier].n:G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:STAGES[G.stage].n}`,mw=Math.max(80,W/2-62);
+  {const f13='700 13px "Noto Sans TC", sans-serif',a=`${j.n}${G.build&&G.build!=='balance'?'（'+buildName(G.job,G.build)+'）':''}`,b=`${G.heat?`難度${G.heat} `:''}${G.coop?RAIDM[G.coop.mode].n+'・'+RTIER[G.coop.tier].n:G.mode==='tower'?`無限之塔 第 ${G.floor} 層`:G.mode==='dungeon'?DUNG[G.dtype].n:G.mode==='weekly'?'本週魔王・'+STAGES[G.stage].n:STAGES[G.stage].n}`,mw=Math.max(80,W/2-62);
    c.font=f13;const fit=t=>{if(c.measureText(t).width<=mw)return t;while(t.length>1&&c.measureText(t+'…').width>mw)t=t.slice(0,-1);return t+'…'};
    let hy=62;if(c.measureText(a+' · '+b).width<=mw)T(a+' · '+b,14,40,'left',f13);else{T(fit(a),14,40,'left',f13);T(fit(b),14,57,'left',f13);hy=79}
    {const p=G.p,k=Math.max(0,Math.min(1,p.hp/p.max)),bw=Math.min(170,mw);rr(c,14,hy,bw,14,6,'rgba(0,0,0,.5)');rr(c,14,hy,bw*k,14,6,k>.5?'#5ad17a':k>.25?'#f5c542':'#ff5a5a');c.font='800 11px Fredoka, sans-serif';c.textAlign='left';c.fillStyle='#fff';c.fillText(`HP ${Math.max(0,Math.ceil(p.hp))} / ${Math.round(p.max)}`,20,hy+2);G.hudY=hy+20}}
@@ -3095,11 +3114,18 @@ function doAct(a){if(!a)return;TP.go=null;TP.tgt=null;
    if(r<.08){SV.bones++;msg='挖到 1 根狗骨頭！'}else if(r<.55){const k=['wood','cloth','stone'][Math.floor(Math.random()*3)],v=2+Math.floor(Math.random()*3)+st;h.mat[k]+=v;msg=`挖到 ${MATN[k]} ×${v}！`}else{const z=Math.round((80+Math.random()*120)*(1+st));SV.zeny+=z;msg=`挖到 ${z} 金幣！`}
    save();sfx('coin');townFx.push({x:DIGS[a.dig][0],y:DIGS[a.dig][1]-30,s:msg,life:2.2});for(let q=0;q<14;q++)townFx.push({p:1,x:DIGS[a.dig][0],y:DIGS[a.dig][1],vx:R(-60,60),vy:R(-120,-40),life:.7});renderTownUI();return}
  if(a.dog){const dg=a.dog;if(dg.n==='公主・巴塔'){bataTalk(dg);return}if(dg.n==='襪子獵人・庫里'){kuliTalk(dg);return}if(dg.lines){dogTalk(dg);return}dg.heart=1.6;dg.w=2;TP.heart=1.2;sfx('lvl');townFx.push({x:dg.x,y:dg.y-40,s:'♥',life:1.2})}}
-function dogTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.2;dg.face=TP.x>dg.x?1:-1;let k;do{k=Math.floor(Math.random()*dg.lines.length)}while(dg.lines.length>1&&k===dg.lastL);dg.lastL=k;dg.say={s:dg.lines[k],t:0};dg.heart=1.2;dg.w=2;TP.heart=.8;sfx('s_patted',1,.2)}
-function kuliTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.kuli=Math.min(10,(SV.npcLove.kuli||0)+1);save();dg.face=TP.x>dg.x?1:-1;
+const NPC_ACTS=[['sit',4,{legs:'sit',body:-.42,drop:1.5,tw:12,ta:.3}],['nap',6,{legs:'lie',drop:6,head:.35,hy:2.6,eyes:'closed',tw:1,ta:.1},'💤'],['bow',2.2,{legs:'bow',tw:30,ta:.6,mouth:.4,eyes:'happy'}],['spin',1.6,{tw:30,ta:.7}],['sing',2.5,{mouth:.5,head:-.15,tw:22,ta:.5},'♪'],['happy',2,{eyes:'happy',mouth:.4,tw:34,ta:.7},'♥'],['wonder',2,{head:.15},'？']];
+function npcIdle(dg){const r=Math.random();
+  if(r<.3){const pool=TDOGS.filter(o=>o!==dg&&!o.duo&&!o.act&&!o.tx&&!o.say&&!(o.zoom>0)&&Math.hypot(o.x-dg.x,o.y-dg.y)<180);if(pool.length){const o=pool[Math.floor(Math.random()*pool.length)],ks=Object.keys(DUOS),k=ks[Math.floor(Math.random()*ks.length)];
+      const du={k,t:0,dur:DUOS[k].d,ax:(dg.x+o.x)/2,ay:(dg.y+o.y)/2,sd:Math.random(),fx:0,a:dg,b:o};dg.duo=du;o.duo=du;o.tx=0;
+      if(Math.hypot(TP.x-du.ax,TP.y-du.ay)<400)townFx.push({x:du.ax,y:du.ay-50,s:DUOS[k].n,life:1.2});return true}}
+  if(r<.75){const a=NPC_ACTS[Math.floor(Math.random()*NPC_ACTS.length)];dg.act={k:a[0],t:0,d:a[1]};dg.P=Object.assign({},a[2]);dg.mv=false;if(a[3])dg.say={s:a[3],t:0};return true}
+  return false}
+function dogTalk(dg){dg.duo=null;dg.act=null;dg.P=null;if((dg.cd||0)>0)return;dg.cd=1.2;dg.face=TP.x>dg.x?1:-1;let k;do{k=Math.floor(Math.random()*dg.lines.length)}while(dg.lines.length>1&&k===dg.lastL);dg.lastL=k;dg.say={s:dg.lines[k],t:0};dg.heart=1.2;dg.w=2;TP.heart=.8;sfx('s_patted',1,.2)}
+function kuliTalk(dg){dg.duo=null;dg.act=null;dg.P=null;if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.kuli=Math.min(10,(SV.npcLove.kuli||0)+1);save();dg.face=TP.x>dg.x?1:-1;
   const L=['嘿嘿，這隻襪子是我今天的戰利品','你的襪子……聞起來好香，借我一下？','左腳的襪子都被我收集齊了，現在在找右腳的','噓！不要跟主人說襪子在我這裡','全城的臭襪子都是我的寶物！','襪子越臭，等級越高，這是常識'],L2=['好啦，送你一隻我最愛的襪子（但你不能拿走）','你是我的襪子好朋友！','下次一起去偷……不是，去「借」襪子吧！'];
   const pool=n>=6?L.concat(L2):L;dg.say={s:pool[Math.floor(Math.random()*pool.length)],t:0,h:Math.min(5,Math.ceil(n/2))};dg.heart=1.6;dg.w=2.5;dg.tx=dg.x+(Math.random()<.5?-60:60);dg.ty=dg.y;TP.heart=1;sfx('s_patted',1,.2)}
-function bataTalk(dg){if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.bata=Math.min(10,(SV.npcLove.bata||0)+1);save();dg.face=TP.x>dg.x?1:-1;const r=Math.random();
+function bataTalk(dg){dg.duo=null;dg.act=null;dg.P=null;if((dg.cd||0)>0)return;dg.cd=1.5;SV.npcLove=SV.npcLove||{};const n=SV.npcLove.bata=Math.min(10,(SV.npcLove.bata||0)+1);save();dg.face=TP.x>dg.x?1:-1;const r=Math.random();
  if(r<1/3){dg.say={s:'嗚嗚～我要找媽媽～',t:0};dg.zoom=3.2;dg.tx=0;sfx('s_howl',.7,.2)}
  else if(r<2/3){const L=n<3?'哼！本公主才不讓你隨便摸～':n<6?'嗯…勉強讓你摸一下好了':n<10?'嘿嘿，最喜歡你了！再摸一下嘛～':'你是巴塔公主專屬的騎士！';const hc=Math.max(1,Math.min(5,Math.ceil(n/2)));dg.say={s:L,t:0,h:hc};dg.heart=1.6;dg.w=2.5;TP.heart=1;sfx('s_patted',1,.2)}
  else{dg.say={s:'....???',t:0,q:1};dg.w=2.5;sfx('ui')}}
@@ -3118,7 +3144,10 @@ function updateTown(dt){dt=Math.max(0,dt);townT+=dt;menuT+=dt;netTick(dt);
  else{TP.x=Math.max(TOWN.x0+20,Math.min(TOWN.x1-20,TP.x));TP.y=Math.max(TOWN.y0+40,Math.min(TOWN.y1-20,TP.y));
    for(const dg of TDOGS){dg.heart=Math.max(0,dg.heart-dt);dg.cd=(dg.cd||0)-dt;if(dg.say){dg.say.t+=dt;if(dg.say.t>3)dg.say=null}
      if(dg.zoom>0){dg.zoom-=dt;dg.zt=(dg.zt||0)-dt;if(dg.zt<=0){dg.zt=.35;dg.zx=clampX(dg.x+R(-140,140));dg.zy=clampY(dg.y+R(-90,90))}const dx=dg.zx-dg.x,dy=dg.zy-dg.y,d=Math.hypot(dx,dy)||1;dg.x+=dx/d*Math.min(d,300*dt);dg.y+=dy/d*Math.min(d,300*dt);dg.face=dx>0?1:-1;dg.mv=true;if(dg.zoom<=0){dg.mv=false;dg.w=3}continue}
-     dg.w-=dt;if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
+     if(dg.duo){const du=dg.duo,role=du.a===dg?'a':'b',pt=role==='a'?du.b:du.a;if(role==='a')du.t+=dt;if(du.t>=du.dur||pt.duo!==du){if(role==='a'&&du.k==='tug'&&du.t>=du.dur)townFx.push({x:du.ax,y:du.ay-44,s:`${(du.sd<.5?du.a:du.b).n} 贏了拔河！`,life:1.8});dg.duo=null;dg.P=null;dg.mv=false;dg.w=2+Math.random()*4;continue}
+       const ps=duoPose(du,role),k=Math.min(1,dt*10);dg.x+=(ps.x-dg.x)*k;dg.y+=(ps.y-dg.y)*k;dg.face=ps.face;dg.mv=ps.mv;dg.P=ps.P;if(role==='a'&&du.k==='high5'&&!du.fx&&du.t>.9){du.fx=1;townFx.push({x:du.ax,y:du.ay-40,s:'啪！',life:1})}continue}
+     if(dg.act){const a=dg.act;a.t+=dt;if(a.t>=a.d){dg.act=null;dg.P=null;dg.mv=false;dg.w=1+Math.random()*3}else{if(a.k==='spin'){dg.face=Math.sin(a.t*9)>0?1:-1;dg.mv=true}continue}}
+     dg.w-=dt;if(dg.w<=0&&!dg.tx&&!dg.say&&npcIdle(dg)){continue}if(dg.w<=0&&!dg.tx){dg.tx=R(-560,560);dg.ty=R(-120,360);if(Math.random()<.35){dg.tx=R(-900,-560);dg.ty=R(-250,300)}if((dg.tx/120)**2+((dg.ty+6)/70)**2<1)dg.ty=dg.ty<0?-90:90}
      if(dg.tx){const dx=dg.tx-dg.x,dy=dg.ty-dg.y,d=Math.hypot(dx,dy);if(d<6){dg.tx=0;dg.w=2+Math.random()*5;dg.mv=false}else{dg.x+=dx/d*60*dt;dg.y+=dy/d*60*dt;dg.face=dx>0?1:-1;dg.mv=true}}}}
  TP.heart=Math.max(0,TP.heart-dt);
  for(let i=townFx.length-1;i>=0;i--){const f=townFx[i];f.life-=dt;if(f.p){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=300*dt}else f.y-=18*dt;if(f.life<=0)townFx.splice(i,1)}
@@ -3144,7 +3173,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  // drawables sorted by y
  const ds=[];for(const n of NPCS){if(n.b)ds.push({y:n.y-26+(n.b.k==='myhouse'?26:0),f:()=>drawBld(c,n,t)});if(n.skin)ds.push({y:n.id==='didi'?-1:n.y,f:()=>{c.save();c.translate(n.x,n.y);c.scale(n.id==='didi'?1.05:1.15,n.id==='didi'?1.05:1.15);drawDog(c,n.skin,n.job,0,0,t+n.x*.01,n.x>0?-1:1,false,{});c.restore();if(n.id==='didi')drawPee(c,n.x,n.y,t)}})}
  for(const [x,y,s] of TREES)ds.push({y,f:()=>drawTree(c,x,y,s)});
- for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{});c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
+ for(const dg of TDOGS)ds.push({y:dg.y,f:()=>{c.save();c.translate(dg.x,dg.y);drawDog(c,dg.skin,'novice',0,0,t+dg.x*.01,dg.face,dg.mv,dg.wear||{},dg.P||undefined);c.restore();if(dg.heart>0){c.globalAlpha=Math.min(1,dg.heart);heart(c,dg.x,dg.y-30-(1.6-dg.heart)*12,5,'#ff5a7a');c.globalAlpha=1}}});
  if(!SV.hidePeers)for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;ds.push({y:p.y,f:()=>{{const du=NET.duo;if(du&&(du.a===p.id||du.b===p.id)){const dp=duoPose(du,du.a===p.id?'a':'b');drawEmoteDog(c,p.sk,p.j,dp.x,dp.y,t+p.x*.01,dp.face,dp.mv,p.w,null,1.2,{pose:dp.P})}else drawEmoteDog(c,p.sk,p.j,p.x,p.y,t+p.x*.01,p.face,p.mv,p.w,p.em,1.2,{nap:p.nap,sit:p.sit})}if(p.pt&&PM[p.pt])drawPet(c,p.pt,p.x-p.face*26,p.y+8,t);if(p.heart>0){c.globalAlpha=Math.min(1,p.heart);heart(c,p.x,p.y-40-(1.4-p.heart)*10,4,'#ff5a7a');c.globalAlpha=1}}})}
  ds.push({y:TP.y,f:()=>drawTownPlayer(c,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
