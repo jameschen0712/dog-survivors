@@ -2166,8 +2166,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.29.4';
+const VERSION='0.30.0';
 const NEWS=[
+ {v:'0.30.0',d:'11/26',t:'全新交響樂配樂',items:[['新增','所有音樂重做成交響樂：弦樂、長笛、單簧管、雙簧管、法國號、小號、豎琴、鋼片琴、合唱、定音鼓，全部是原創曲'],['新增','主城：溫馨的圓舞曲，長笛和小提琴輪流唱旋律，豎琴伴奏'],['新增','七張地圖各有自己的主題曲：草原輕快、森林神祕、熔岩激昂、冰霜像音樂盒的圓舞曲、天空開闊、黃沙有異國風、玩具時計塔是八音盒；每首都有前奏、主旋律、換樂器的第二段和副歌'],['新增','魔王戰：兩首氣勢磅礡的魔王曲，銅管主旋律、弦樂急奏、合唱和定音鼓，每個魔王用不同的調和速度'],['說明','開啟「省電模式」時音樂會自動簡化，比較不耗電']]},
  {v:'0.29.4',d:'11/25',t:'所有角色排行榜',items:[['新增','排行榜多了「所有角色」分頁：每隻狗狗分開排名，同一個帳號的好幾隻狗都可以上榜；還可以按職業系篩選（護衛犬系、巫犬系……），看每個職業誰最強'],['調整','頒獎台往上移到冒險之門前面，不會再被公告欄和商店擋住']]},
  {v:'0.29.3',d:'11/25',t:'主城名字不見',items:[['修正','主城 NPC 頭上的名字和職稱不見、下面跳出錯誤訊息的問題（之前畫面變成一片綠色也是同一個原因）']]},
  {v:'0.29.2',d:'11/25',t:'主城畫面變成一片綠色',items:[['修正','有時候打完一局、從選單回到主城，畫面會變成只有一片綠色草地（還停在戰鬥地圖），現在主城一定會畫出主城'],['調整','畫面某個東西出錯時，遊戲不會整個卡住，會在下面顯示一行錯誤訊息，可以截圖回報']]},
@@ -2954,9 +2955,161 @@ const TRACKS={
   ch:[[60,63,67],[56,60,63],[58,62,65],[60,63,67],[60,63,67],[56,60,63],[58,62,65],[55,59,62]],bs:[36,44,46,36,36,44,46,43]}};
 for(const T of Object.values(TRACKS)){T.at={};let st=0;for(const [n,d] of T.mel){if(n)T.at[st]=[n,d];st+=d}T.len=Math.max(64,Math.ceil(st/8)*8)}
 function auBus(){if(AU.bus)return;const c=AU.ctx;AU.comp=c.createDynamicsCompressor();AU.comp.threshold.value=-18;AU.comp.ratio.value=3;AU.master.disconnect();AU.master.connect(AU.comp);AU.comp.connect(c.destination);
-  const len=Math.floor(c.sampleRate*2.2),ir=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
-  AU.rev=c.createConvolver();AU.rev.buffer=ir;AU.revG=c.createGain();AU.revG.gain.value=.32;AU.bus=c.createGain();AU.bus.connect(AU.mg);AU.bus.connect(AU.revG);AU.revG.connect(AU.rev);AU.rev.connect(AU.mg)}
+  const len=Math.floor(c.sampleRate*2.8),ir=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
+  AU.rev=c.createConvolver();AU.rev.buffer=ir;AU.revG=c.createGain();AU.revG.gain.value=.4;AU.bus=c.createGain();AU.bus.connect(AU.mg);AU.bus.connect(AU.revG);AU.revG.connect(AU.rev);AU.rev.connect(AU.mg)}
 TRACKS_EXTRA();
+/* ---------- 交響樂引擎：弦樂、木管、銅管、豎琴、鋼片琴、合唱、定音鼓（全部即時合成，原創曲） ---------- */
+const OR={};
+function orNoise(){if(!AU.noise){const c=AU.ctx,b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;AU.noise=b}return AU.noise}
+function orOut(pan,dry){const c=AU.ctx,g=c.createGain();let n=g;if(pan&&!AU.lite&&c.createStereoPanner){const p=c.createStereoPanner();p.pan.value=pan;g.connect(p);n=p}n.connect(dry?AU.mg:AU.bus);return g}
+const OR_TAIL={pizz:.6,harp:1.5,timp:1.6,bd:.8,snr:.25,wood:.12,tri:1.7,tek:.08,shk:.06,tamb:.2,dum:.45,cym:2.4},OR_REL={flute:.3,clar:.25,oboe:.25,vln:.45,str:.85,horn:.35,brass:.3,trp:.3,choir:1,cello:.2,cel:.9,swell:.1};
+function ins(k,f,t,d,v,pan){const c=AU.ctx,lite=AU.lite;d=Math.max(.04,d);const out=orOut(pan),env=out.gain,END=t+(OR_TAIL[k]!==undefined?OR_TAIL[k]:d+(OR_REL[k]||.5));
+  const O=(type,ff,det,vol,dst)=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.value=ff;o.detune.value=det||0;og.gain.value=vol;o.connect(og);og.connect(dst);o.start(t);o.stop(END);return o};
+  const vib=(os,rate,cents,dl)=>{if(lite)return;const l=c.createOscillator(),lg=c.createGain();l.frequency.value=rate;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(cents,t+dl+.2);l.connect(lg);for(const o of os)lg.connect(o.detune);l.start(t);l.stop(END)};
+  const LP=(fr,q)=>{const b=c.createBiquadFilter();b.type='lowpass';b.frequency.value=fr;b.Q.value=q||.7;b.connect(out);return b};
+  const NZ=(type,fr,q,vol,dur,st)=>{const s=c.createBufferSource(),b=c.createBiquadFilter(),g=c.createGain();s.buffer=orNoise();b.type=type;b.frequency.value=fr;b.Q.value=q||1;s.connect(b);b.connect(g);g.connect(out);const s0=st||t;g.gain.setValueAtTime(vol,s0);g.gain.exponentialRampToValueAtTime(.0005,s0+dur);s.start(s0,Math.random()*.5);s.stop(s0+dur+.05);return g};
+  const ADSR=(a,s,r)=>{env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+a);if(s!==1)env.linearRampToValueAtTime(v*s,t+a+.15);env.setValueAtTime(v*s,t+Math.max(a+.15,d));env.linearRampToValueAtTime(.0001,t+Math.max(a+.15,d)+r)};
+  switch(k){
+  case 'flute':{const lp=LP(3200);vib([O('sine',f,0,1,lp),O('triangle',f,0,.22,lp)],5,14,.18);NZ('bandpass',f*2,2,.05*v/.12,.09);ADSR(.05,.9,.16);break}
+  case 'clar':{const lp=LP(1700,.6);vib([O('square',f,0,.42,lp),O('sine',f,0,.6,lp)],5,7,.25);ADSR(.04,.9,.12);break}
+  case 'oboe':{const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=Math.min(2600,f*2.2);bp.Q.value=1.2;const lp=LP(3600);bp.connect(lp);vib([O('sawtooth',f,0,1.3,bp),O('sine',f,0,.35,lp)],5.5,11,.2);ADSR(.03,.9,.1);break}
+  case 'vln':{const lp=LP(lite?2200:2800,.8),os=[O('sawtooth',f,-9,.38,lp),O('sawtooth',f,9,.38,lp)];if(!lite)os.push(O('sawtooth',f,0,.3,lp));vib(os,5.6,15,.12);ADSR(.08,.92,.32);break}
+  case 'str':{const lp=LP(1350,.5),os=[O('sawtooth',f,-13,.45,lp),O('sawtooth',f,13,.45,lp)];vib(os,4.2,8,.3);ADSR(.38,1,.7);break}
+  case 'horn':{const lp=LP(1100,.8);lp.frequency.setValueAtTime(500,t);lp.frequency.linearRampToValueAtTime(1300,t+.08);lp.frequency.linearRampToValueAtTime(950,t+.4);const os=[O('sawtooth',f,-4,.5,lp),O('sawtooth',f,4,.5,lp)];vib(os,5,6,.3);ADSR(.07,.9,.2);break}
+  case 'brass':{const lp=LP(2400,1.1);lp.frequency.setValueAtTime(600,t);lp.frequency.linearRampToValueAtTime(2700,t+.06);lp.frequency.exponentialRampToValueAtTime(1500,t+.35);const os=[O('sawtooth',f,-6,.5,lp),O('sawtooth',f,6,.5,lp)];for(const o of os){o.detune.setValueAtTime(-35,t);o.detune.linearRampToValueAtTime(0,t+.05)}vib(os,5,6,.3);ADSR(.035,.85,.14);break}
+  case 'trp':{const lp=LP(3800,1.2);lp.frequency.setValueAtTime(900,t);lp.frequency.linearRampToValueAtTime(4200,t+.05);lp.frequency.exponentialRampToValueAtTime(2600,t+.3);const os=[O('sawtooth',f,-3,.55,lp),O('square',f,3,.22,lp)];vib(os,5.5,8,.25);ADSR(.025,.85,.12);break}
+  case 'choir':{const mix=c.createGain();mix.gain.value=2.6;const lp=LP(3000);mix.connect(lp);const src=c.createGain();const os=[O('sawtooth',f,-11,.5,src),O('sawtooth',f,11,.5,src)];if(!lite)os.push(O('sawtooth',f,0,.35,src));vib(os,5,16,.3);
+    for(const [fr,q,gv] of [[720,5,1],[1180,6,.65],[2600,8,.22]]){const b=c.createBiquadFilter();b.type='bandpass';b.frequency.value=fr;b.Q.value=q;const bg=c.createGain();bg.gain.value=gv;src.connect(b);b.connect(bg);bg.connect(mix)}
+    ADSR(.45,1,.8);break}
+  case 'cello':{const lp=LP(950,.9);lp.frequency.setValueAtTime(1800,t);lp.frequency.exponentialRampToValueAtTime(800,t+.12);O('sawtooth',f,0,.85,lp);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.012);env.exponentialRampToValueAtTime(v*.45,t+.12);env.setValueAtTime(v*.45,t+d);env.linearRampToValueAtTime(.0001,t+d+.09);break}
+  case 'pizz':{const lp=LP(2000);lp.frequency.setValueAtTime(2400,t);lp.frequency.exponentialRampToValueAtTime(380,t+.18);O('sawtooth',f,0,.75,lp);const dk=f<200?.5:.28;env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.003);env.exponentialRampToValueAtTime(.0005,t+dk);break}
+  case 'harp':{const lp=LP(4500);O('triangle',f,0,.95,lp);O('sine',f*2,2,.12,lp);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.003);env.exponentialRampToValueAtTime(v*.3,t+.25);env.exponentialRampToValueAtTime(.0005,t+1.4);break}
+  case 'cel':{const lp=LP(6000);O('sine',f,0,1,lp);O('sine',f*4,0,.22,lp);O('sine',f*2,3,.18,lp);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.003);env.exponentialRampToValueAtTime(v*.35,t+.15);env.exponentialRampToValueAtTime(.0005,t+Math.max(.8,d+.4));break}
+  case 'timp':{const lp=LP(900);const o=O('sine',f*1.06,0,1,lp);o.frequency.setValueAtTime(f*1.06,t);o.frequency.exponentialRampToValueAtTime(f,t+.08);O('sine',f*1.5,0,.25,lp);NZ('lowpass',260,.7,.6*v,.18);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.004);env.exponentialRampToValueAtTime(.0005,t+1.5);break}
+  case 'bd':{const lp=LP(500);const o=O('sine',70,0,1,lp);o.frequency.setValueAtTime(75,t);o.frequency.exponentialRampToValueAtTime(38,t+.35);NZ('lowpass',180,.7,.5*v,.2);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.004);env.exponentialRampToValueAtTime(.0005,t+.75);break}
+  case 'snr':{env.setValueAtTime(1,t);env.exponentialRampToValueAtTime(.001,t+.22);NZ('bandpass',1900,.9,v,.13);NZ('highpass',5000,.7,v*.5,.08);const lp=LP(900);const o=O('triangle',185,0,v*.6,lp);break}
+  case 'cym':{env.setValueAtTime(1,t);env.exponentialRampToValueAtTime(.001,t+2.3);NZ('highpass',5200,.6,v,2.2);NZ('bandpass',9000,1,v*.5,1.2);break}
+  case 'swell':{const s=c.createBufferSource(),b=c.createBiquadFilter();s.buffer=orNoise();s.loop=true;b.type='highpass';b.frequency.value=4500;s.connect(b);b.connect(out);env.setValueAtTime(.0001,t);env.exponentialRampToValueAtTime(v,t+d);env.linearRampToValueAtTime(.0001,t+d+.05);s.start(t);s.stop(t+d+.1);break}
+  case 'tri':{const lp=LP(12000);O('sine',4200,0,1,lp);O('sine',6150,0,.5,lp);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.002);env.exponentialRampToValueAtTime(.0005,t+1.6);break}
+  case 'wood':{const lp=LP(5000);O('sine',f||1300,0,1,lp);O('sine',(f||1300)*2.7,0,.3,lp);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.002);env.exponentialRampToValueAtTime(.0005,t+.08);break}
+  case 'tamb':{env.setValueAtTime(1,t);NZ('highpass',7000,.7,v,.16);NZ('bandpass',10500,3,v*.7,.12);break}
+  case 'shk':{env.setValueAtTime(1,t);NZ('highpass',8500,.7,v,.035);break}
+  case 'dum':{const lp=LP(600);const o=O('sine',120,0,1,lp);o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(85,t+.2);env.setValueAtTime(0,t);env.linearRampToValueAtTime(v,t+.003);env.exponentialRampToValueAtTime(.0005,t+.4);break}
+  case 'tek':{env.setValueAtTime(1,t);NZ('bandpass',3200,2,v,.05);break}
+  }}
+/* 譜面解析：旋律「e5:2」= E5 八分音符兩個（一拍），r = 休止；和弦一小節一個，「C+G」= 半小節換和弦 */
+const OR_PC={c:0,d:2,e:4,f:5,g:7,a:9,b:11},OR_Q={'':[0,4,7],m:[0,3,7],'7':[0,4,7,10],m7:[0,3,7,10],maj7:[0,4,7,11],dim:[0,3,6],sus4:[0,5,7],aug:[0,4,8]};
+const OR_MODE={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10,11],dorian:[0,2,3,5,7,9,10,11],lydian:[0,2,4,6,7,9,11],hijaz:[0,1,3,4,5,7,8,10,11]};
+function orChord(sym,tr){const m=/^([A-G])(#|b)?(maj7|m7|sus4|dim|aug|m|7)?(?:\/([A-G])(#|b)?)?$/.exec(sym);if(!m)throw new Error('chord '+sym);
+  const pc=(OR_PC[m[1].toLowerCase()]+(m[2]==='#'?1:m[2]==='b'?-1:0)+tr+24)%12,iv=OR_Q[m[3]||''];let base=pc+60;while(base>66)base-=12;while(base<55)base+=12;
+  let tones=iv.map(x=>base+x).map(x=>x>72?x-12:x).sort((a,b)=>a-b);const bpc=m[4]?(OR_PC[m[4].toLowerCase()]+(m[5]==='#'?1:m[5]==='b'?-1:0)+tr+24)%12:pc;let bass=36+bpc;if(bass<40)bass+=12;
+  return{tones,bass,pcs:iv.map(x=>(pc+x)%12)}}
+function orMel(str,tr){const ev=[];let p=0;for(const tok of str.trim().split(/\s+/)){if(!tok)continue;const [nm,ds]=tok.split(':'),d=Math.round((ds===undefined?2:+ds)*2);
+  if(nm!=='r'){const m=/^([a-g])(#|b)?(\d)$/.exec(nm);if(!m)throw new Error('note '+tok);ev.push([p,12*(+m[3]+1)+OR_PC[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0)+tr,d])}p+=d}return{ev,len:p}}
+function orHarm(n,ch,key,mode){const sc=OR_MODE[mode]||OR_MODE.major,inS=x=>sc.includes(((x-key)%12+12)%12);const cs=[n-3,n-4];return cs.find(x=>ch.pcs.includes((x%12+12)%12))??cs.find(inS)??n-4}
+function orCompile(D){const tr=D.tr||0,spb=D.meter===3?12:16,key=(OR_PC[D.key[0].toLowerCase()]+(D.key[1]==='#'?1:D.key[1]==='b'?-1:0)+tr+24)%12,bars=[];
+  for(const name of D.order){const S=D.sec[name],chs=S.ch.trim().split(/\s+/),n=chs.length,M=S.mel?orMel(S.mel,tr+(S.oct||0)):{ev:[],len:0};
+    if(S.mel&&M.len!==n*spb)throw new Error(`${D.id||''}/${name}: melody ${M.len/2} eighths ≠ ${n*spb/2}`);
+    chs.forEach((cs,i)=>{const ch=cs.split('+').map(x=>orChord(x,tr)),B={S,spb,idx:i,n,ch,mel:{},har:{},first:i===0};
+      for(const [p,nt,d] of M.ev)if(p>=i*spb&&p<(i+1)*spb){const s=p-i*spb;(B.mel[s]=B.mel[s]||[]).push([nt,d]);if(S.harm){const c2=ch[ch.length>1&&s>=spb/2?1:0];(B.har[s]=B.har[s]||[]).push([orHarm(nt,c2,key,D.mode),d])}}
+      bars.push(B)})}
+  return{orch:1,bpm:D.bpm,bars,gain:D.gain||(D.id&&D.id.startsWith('boss')?1:1.3)}}
+const OR_LV={flute:.13,clar:.12,oboe:.085,vln:.085,horn:.1,brass:.085,trp:.07,choir:.06,cel:.12,harp:.09,pizz:.12},OR_PAN={flute:-.3,clar:.25,oboe:.15,vln:-.22,horn:-.12,brass:.18,trp:.1,choir:0,cel:.3,harp:-.35};
+const OR_PAD={str:.026,choir:.03,horn:.03};
+const OACC={none(){},
+ waltz(s,B,c,t,e,V){if(s===0)ins('pizz',NOTE(c.bass),t,.4,.15*V);if(s===4||s===8)for(const n of c.tones)ins('pizz',NOTE(n),t,.25,.045*V)},
+ waltzh(s,B,c,t,e,V){OACC.waltz(s,B,c,t,e,V);if(s%2===0&&s){const N=[...c.tones,...c.tones.map(x=>x+12)];ins('harp',NOTE(N[(s>>1)%N.length]+12),t,e*2,.035*V)}},
+ harp(s,B,c,t,e,V){if(s===0)ins('pizz',NOTE(c.bass),t,.5,.13*V);if(s%2===0){const N=[...c.tones,...c.tones.map(x=>x+12),c.tones[0]+24],L=N.length,k=(s>>1)%(2*L-2),i=k<L?k:2*L-2-k;ins('harp',NOTE(N[i]),t,e*2,.055*V)}},
+ bounce(s,B,c,t,e,V){const h=B.spb/2;if(s===0)ins('pizz',NOTE(c.bass),t,.4,.15*V);else if(s===h&&B.spb===16)ins('pizz',NOTE(c.bass+7),t,.4,.11*V);if(s===4||s===12)for(const n of c.tones)ins('pizz',NOTE(n),t,.2,.05*V);if(s===14&&B.idx%2)ins('pizz',NOTE(c.bass+12),t,.2,.06*V)},
+ gallop(s,B,c,t,e,V){if([0,2,3,4,6,7,8,10,11,12,14,15].includes(s))ins('cello',NOTE(c.bass+12),t,e*.8,(s%4===0?.085:.05)*V);if(s===0&&B.idx%2===0)for(const n of c.tones)ins('brass',NOTE(n),t,e*2.5,.04*V)},
+ march(s,B,c,t,e,V){if(s%2===0)ins('cello',NOTE(c.bass+(s%4===0?0:12)),t,e*1.6,(s%8===0?.13:.08)*V);if(s===0||s===10)for(const n of c.tones)ins('brass',NOTE(n),t,e*(s?2:3),(s?.035:.05)*V)},
+ ostin(s,B,c,t,e,V){ins('cello',NOTE(c.bass+(s%2?19:12)),t,e*.7,(s%4===0?.085:.05)*V);if(s===0)ins('pizz',NOTE(c.bass),t,.5,.12*V)},
+ exotic(s,B,c,t,e,V){if(s===0||s===6||s===10)ins('pizz',NOTE(c.bass),t,.45,.15*V);if(s===4||s===12)for(const n of c.tones)ins('pizz',NOTE(n),t,.2,.045*V);if(s===14)ins('harp',NOTE(c.tones[2]+12),t,e,.04*V)},
+ mbox(s,B,c,t,e,V){if(s===0||s===8)ins('pizz',NOTE(c.bass),t,.35,.13*V);if(s%2===0){const N=[...c.tones.map(x=>x+12),c.tones[0]+24];ins('cel',NOTE(N[(s>>1)%N.length]),t,e*1.5,.04*V)}}};
+const OPERC={none(){},
+ tri(s,B,t,e,V){if(s===0&&B.idx%4===0)ins('tri',0,t,1,.035*V)},
+ light(s,B,t,e,V){if(s===0)ins('bd',0,t,.5,.32*V);if(s===8&&B.spb===16)ins('bd',0,t,.5,.18*V);if(s===4||s===12)ins('snr',0,t,.1,.045*V);if(s%2===0)ins('shk',0,t,.05,(s%4?.018:.026)*V)},
+ drive(s,B,t,e,V,c){if(s===0||s===8||s===10)ins('bd',0,t,.5,.38*V);if(s===4||s===12)ins('snr',0,t,.1,.085*V);if(s%2===0)ins('shk',0,t,.04,(s%4?.018:.026)*V);if(s===0&&B.idx%2===0){let n=c.bass+12;while(n>52)n-=12;ins('timp',NOTE(n),t,1,.22*V)}},
+ boss(s,B,t,e,V,c){let n=c.bass+12;while(n>50)n-=12;if(s===0||s===8)ins('bd',0,t,.6,.32*V);if(s===0)ins('timp',NOTE(n),t,1,.3*V);if(s===8)ins('timp',NOTE(n+7>55?n-5:n+7),t,1,.24*V);if(s===12)ins('snr',0,t,.1,.13*V);if(s===14||s===15)ins('snr',0,t,.1,.05*V);
+   if(B.idx%4===3&&s>=12)ins('timp',NOTE(n),t,.5,(.1+.05*(s-12))*V);if(s===0&&B.first)ins('cym',0,t,2,.22*V);if(s%4===2)ins('shk',0,t,.04,.02*V)},
+ roll(s,B,t,e,V,c){const k=(B.idx*B.spb+s)/(B.n*B.spb);ins('snr',0,t,.1,(.015+.09*k)*V);if(s%4===0){let n=c.bass+12;while(n>50)n-=12;ins('timp',NOTE(n),t,.6,(.06+.18*k)*V)}if(B.idx===B.n-1&&s===0)ins('swell',0,t,e*B.spb,.12*V)},
+ exotic(s,B,t,e,V){if(s===0||s===10)ins('dum',0,t,.4,.3*V);if(s===3||s===6||s===13||s===14)ins('tek',0,t,.05,.06*V);if(s===4||s===12)ins('tamb',0,t,.15,.05*V);if(s%2===1)ins('shk',0,t,.04,.012*V)},
+ toy(s,B,t,e,V){if(s%4===2)ins('wood',s%8===2?1500:1150,t,.1,.06*V);if(s===0&&B.idx%2===0)ins('tri',0,t,1,.03*V);if(s===0)ins('bd',0,t,.4,.2*V);if(s===8)ins('snr',0,t,.1,.035*V)}};
+function orStep(T,B,s,t,e){const S=B.S,V=(S.v||1)*(T.gain||1),c=B.ch[B.ch.length>1&&s>=B.spb/2?1:0];
+  for(const [n,d] of B.mel[s]||[]){const lv=(S.lv||OR_LV[S.lead]||.1)*V;ins(S.lead,NOTE(n),t,d*e*.94,lv,OR_PAN[S.lead]);if(S.dbl)ins(S.dbl,NOTE(n+(S.dblOct||0)),t,d*e*.94,(OR_LV[S.dbl]||.1)*V*.55,OR_PAN[S.dbl])}
+  for(const [n,d] of B.har[s]||[])ins(S.harmIns||S.lead,NOTE(n),t,d*e*.94,(OR_LV[S.harmIns||S.lead]||.1)*V*.6,-(OR_PAN[S.harmIns||S.lead]||0));
+  if(S.pad&&(s===0||(B.ch.length>1&&s===B.spb/2))){const dur=(B.ch.length>1?B.spb/2:B.spb)*e+.06;for(const n of c.tones)ins(S.pad,NOTE(S.pad==='choir'?n+12:n),t,dur,OR_PAD[S.pad]*V,0)}
+  (OACC[S.acc]||OACC.none)(s,B,c,t,e,V);(OPERC[S.perc]||OPERC.none)(s,B,t,e,V,c)}
+function orSched(){const T=AU.T,c=AU.ctx,e=60/T.bpm/4;if(AU.seqT<c.currentTime)AU.seqT=c.currentTime+.05;
+  while(AU.seqT<c.currentTime+.25){const B=T.bars[AU.bar%T.bars.length];try{orStep(T,B,AU.s,AU.seqT,e)}catch(err){}AU.s++;if(AU.s>=B.spb){AU.s=0;AU.bar++}AU.seqT+=e}}
+
+/* ---------- 曲目（全部原創） ---------- */
+const OSC={};
+OSC.town={id:'town',key:'F',mode:'major',meter:3,bpm:96,order:['in','A','B','A2'],sec:{
+ in:{ch:'F Bb F C',acc:'harp',pad:'str',perc:'tri',v:.85},
+ A:{ch:'F C Dm Bb F C F C F C Dm Bb Gm C F F',lead:'flute',acc:'waltz',pad:'str',perc:'tri',
+  mel:'a4 c5 f5 e5:3 d5:1 c5 d5 f5 a5 g5:4 f5 f5 e5:1 f5:1 a5 g5:4 c5 a5 g5:1 f5:1 e5:1 f5:1 g5:6 a4 c5 f5 e5:3 d5:1 c5 d5 f5 a5 bb5:4 a5 g5 bb5 d6 c6:3 bb5:1 e5 f5:6 r:6'},
+ B:{ch:'Bb F Gm C Am Dm Bb C',lead:'vln',acc:'waltzh',pad:'horn',perc:'tri',
+  mel:'d6:3 c6:1 bb5 a5:4 f5 g5 a5 bb5 c6:4 r c6:3 b5:1 a5 d6 a5 f5 g5 bb5 d6 c6 bb5 g5'},
+ A2:{ch:'F C Dm Bb F C F C F C Dm Bb Gm C F F',lead:'vln',harm:1,harmIns:'clar',acc:'waltzh',pad:'str',perc:'tri',
+  mel:'a4 c5 f5 e5:3 d5:1 c5 d5 f5 a5 g5:4 f5 f5 e5:1 f5:1 a5 g5:4 c5 a5 g5:1 f5:1 e5:1 f5:1 g5:6 a4 c5 f5 e5:3 d5:1 c5 d5 f5 a5 bb5:4 a5 g5 bb5 d6 c6:3 bb5:1 e5 f5:6 r:6'}}};
+const BOSS_A={key:'D',mode:'minor',meter:4,bpm:138,order:['in','A','A2','B','br'],sec:{
+ in:{ch:'Dm Dm Bb A',acc:'march',pad:'horn',perc:'roll',v:.85},
+ A:{ch:'Dm Dm Bb C Dm Gm A A',lead:'brass',dbl:'trp',dblOct:12,acc:'march',pad:'str',perc:'boss',
+  mel:'d4:3 d4:1 a4:4 f4 e4:1 d4:1 a4 g4:1 f4:1 bb4:3 a4:1 g4 f4 e4 g4 c5:4 d5:3 c5:1 a4 f4 g4 bb4 d5 c5:1 bb4:1 a4:3 g4:1 e4 c#5 a4:8'},
+ A2:{ch:'Dm Dm Bb C Dm Gm A A',lead:'vln',oct:12,dbl:'brass',dblOct:-12,acc:'gallop',pad:'choir',perc:'boss',
+  mel:'d4:3 d4:1 a4:4 f4 e4:1 d4:1 a4 g4:1 f4:1 bb4:3 a4:1 g4 f4 e4 g4 c5:4 d5:3 c5:1 a4 f4 g4 bb4 d5 c5:1 bb4:1 a4:3 g4:1 e4 c#5 a4:8'},
+ B:{ch:'F C Dm Bb Gm Dm Bb A',lead:'vln',dbl:'choir',dblOct:-12,acc:'ostin',pad:'horn',perc:'boss',
+  mel:'a5:4 c6:4 g5:6 e5 f5:4 a5 d6 d6:4 c6 bb5 bb5:4 d6:4 a5:6 f5 g5 bb5 d6 f6 e6:4 c#6:4'},
+ br:{ch:'Dm Dm Bb A',acc:'gallop',pad:'horn',perc:'roll',v:.9}}};
+const BOSS_B={key:'E',mode:'minor',meter:4,bpm:148,order:['in','A','B','A2','br'],sec:{
+ in:{ch:'Em C Am B',acc:'ostin',pad:'str',perc:'roll',v:.85},
+ A:{ch:'Em C Am B Em C D B',lead:'vln',dbl:'brass',dblOct:-12,acc:'ostin',pad:'horn',perc:'boss',
+  mel:'e5:1 f#5:1 g5 b5 g5 c6:3 b5:1 a5 g5 a5 e5 a5 c6 b5:4 d#5:4 e5:1 f#5:1 g5 b5 e6 e6:3 d6:1 c6 b5 a5 f#5 d6 a5 b5:6 r'},
+ B:{ch:'C D Bm Em Am B Em B',lead:'vln',dbl:'choir',dblOct:-12,acc:'gallop',pad:'str',perc:'boss',
+  mel:'g5:4 e5 g5 a5:4 f#5 a5 b5:4 d6 f#6 e6:8 c6:4 a5 c6 b5:4 a5 f#5 g5:4 f#5 e5 d#5:8'},
+ A2:{ch:'Em C Am B Em C D B',lead:'trp',dbl:'vln',dblOct:12,harm:1,harmIns:'horn',acc:'march',pad:'choir',perc:'boss',
+  mel:'e5:1 f#5:1 g5 b5 g5 c6:3 b5:1 a5 g5 a5 e5 a5 c6 b5:4 d#5:4 e5:1 f#5:1 g5 b5 e6 e6:3 d6:1 c6 b5 a5 f#5 d6 a5 b5:6 r'},
+ br:{ch:'Em Em C B',acc:'ostin',pad:'choir',perc:'roll',v:.9}}};
+function stageSc(id,key,mode,meter,bpm,chA,melA,chB,melB,o){const L=o.leads;return{id,key,mode,meter,bpm,order:['in','A','A2','B','A3'],sec:{
+  in:{ch:chA.split(' ').slice(0,2).join(' '),acc:o.acc,pad:o.pad||'str',perc:o.perc,v:.85},
+  A:{ch:chA,mel:melA,lead:L[0],acc:o.acc,pad:o.pad||'str',perc:o.perc},
+  A2:{ch:chA,mel:melA,lead:L[1],harm:1,harmIns:L[2],acc:o.acc,pad:o.pad2||'horn',perc:o.perc},
+  B:{ch:chB,mel:melB,lead:L[3],acc:o.accB||o.acc,pad:o.pad||'str',perc:o.percB||o.perc},
+  A3:{ch:chA,mel:melA,lead:L[4],dbl:L[5],dblOct:o.dblOct||0,acc:o.acc,pad:o.pad2||'horn',perc:o.perc3||o.percB||o.perc}}}}
+OSC.s0=stageSc('s0','G','major',4,124,'G D Em C G D C D',
+ 'd5:1 g5:1 b5 a5:1 g5:1 d5 f#5 a5 d6:3 r:1 e5:1 g5:1 b5 a5:1 g5:1 e5 c5 e5 g5:4 b5:1 a5:1 g5 d6 b5 a5:3 g5:1 f#5 d5 e5 g5 c6 b5:1 a5:1 a5:6 r',
+ 'C D Bm Em Am D G D','e6:3 d6:1 c6 g5 f#5:3 g5:1 a5:4 b5:3 a5:1 f#5 d5 e5:4 g5 b5 c6:3 b5:1 a5 e5 f#5 a5 d6 c6 b5:4 g5 d5 a5 b5 c6 a5',
+ {leads:['flute','vln','clar','oboe','cel','flute'],acc:'bounce',accB:'harp',perc:'light',perc3:'drive'});
+OSC.s1=stageSc('s1','D','dorian',4,108,'Dm G Dm G F C G A',
+ 'd5 f5:1 a5:1 g5 f5 e5 d5:1 b4:1 d5:4 a5 c6:1 a5:1 g5 f5 g5:3 a5:1 b5:4 c6 a5 f5 a5 g5 e5 c5:4 d5 g5 b5 d6 c#6:6 r',
+ 'Bb F Gm Dm Bb C A A','d6:4 f5 bb5 a5:4 c6:4 bb5 a5 g5 d5 f5:6 r f5 bb5 d6 c6 e6:4 c6:4 e5 a5 c#6 e6 e6:6 r',
+ {leads:['clar','flute','clar','vln','oboe','harp'],acc:'harp',accB:'bounce',perc:'tri',percB:'light'});
+OSC.s2=stageSc('s2','E','minor',4,136,'Em Em C D Em Em C B',
+ 'e5:1 e5:1 b4:1 e5:1 g5 f#5:1 e5:1 b5:3 a5:1 g5 f#5 g5:1 g5:1 e5:1 g5:1 c6 b5:1 a5:1 a5:3 g5:1 f#5 d5 e5:1 e5:1 b4:1 e5:1 g5 b5 e6:3 d6:1 b5 g5 a5 c6 e6 d6:1 c6:1 b5:4 d#5:4',
+ 'Am Em Am B C G Am B','a5:4 c6 e6 d6 b5 g5:4 c6 a5 e5 a5 b5:6 r e6 d6 c6 g5 d6:4 b5:4 c6 b5 a5 f#5 d#6:4 b5:4',
+ {leads:['brass','vln','horn','vln','trp','vln'],dblOct:12,acc:'gallop',accB:'march',perc:'drive',pad2:'str'});
+OSC.s3=stageSc('s3','A','minor',3,100,'Am F C E Am Dm E E',
+ 'e5 a5 c6 c6:3 b5:1 a5 g5 e5 c6 b5:4 g#5 a5 c6 e6 f6:3 e6:1 d6 e6 b5 g#5 b5:6',
+ 'F G C Am Dm E Am E','a5 c6 f6 d6:4 b5 c6 e6 g6 e6:6 f6 d6 a5 g#5:4 b5 a5 e5 c6 b5:6',
+ {leads:['cel','flute','clar','vln','cel','flute'],acc:'waltzh',accB:'harp',perc:'tri'});
+OSC.s4=stageSc('s4','G','lydian',4,116,'G A G A Em C D D',
+ 'd5 g5 b5 d6 c#6:4 a5 e5 d6:3 b5:1 g5 d5 e5 a5 c#6:4 b5:3 a5:1 g5 e5 g5 c6 e6:4 d6 a5 f#5 a5 d6:6 r',
+ 'C D Bm Em C D G D','e6:4 g6:4 f#6:4 d6 a5 b5:4 d6:4 e6:6 r c6 e6 g6 e6 f#6 d6 a5:4 b5:4 d6 g6 a6:6 r',
+ {leads:['vln','flute','vln','horn','vln','flute'],dblOct:12,acc:'harp',accB:'bounce',perc:'light'});
+OSC.s5=stageSc('s5','D','hijaz',4,108,'Dm Dm Gm A Dm Bb A A',
+ 'd5:1 e5:1 f5 e5:1 d5:1 c#5 d5 a5:4 g5:1 f5:1 g5:1 a5:1 bb5 a5:1 g5:1 f5:1 e5:1 f5 e5 c#5:4 a5:1 bb5:1 a5 g5:1 f5:1 e5 f5 g5:1 f5:1 e5 d5 e5 c#5 e5 g5 a5:4 r:4',
+ 'Bb A Gm Dm Bb C A A','d6:4 c6 bb5 a5:4 c#6 e6 d6 bb5 g5 bb5 a5:6 r f5 bb5 d6 f6 e6:4 c6 g5 a5 bb5:1 a5:1 g5:1 f5:1 e5 c#5:4 e5:4',
+ {leads:['oboe','flute','oboe','vln','oboe','clar'],dblOct:-12,acc:'exotic',perc:'exotic',pad2:'str'});
+OSC.s6=stageSc('s6','C','major',4,128,'C G Am F C G F G',
+ 'e5:1 g5:1 c6:1 g5:1 e5:1 g5:1 c6 d6:1 b5:1 g5:1 b5:1 d6:4 c6:1 a5:1 e5:1 a5:1 c6 e6 f6 e6:1 d6:1 c6 a5 g5:1 c6:1 e6:1 c6:1 g5 e5 f5:1 g5:1 b5:1 d6:1 g6:4 a5 c6:1 f6:1 e6 d6 d6 b5 g5 r',
+ 'F C F G Em Am Dm G','a5:3 g5:1 f5 a5 g5:4 e5:4 f5 a5 c6 f6 e6:4 d6:4 b5 e6 g6 e6 c6:4 a5:4 d6 f6 a6 f6 g6 f6 d6 b5',
+ {leads:['cel','clar','cel','flute','cel','pizz'],acc:'mbox',accB:'bounce',perc:'toy'});
+const mkB=(base,id,tr,bpm,ov)=>{const D=JSON.parse(JSON.stringify(base));D.id=id;D.tr=tr;D.bpm=bpm;if(ov)for(const [k,v] of Object.entries(ov))Object.assign(D.sec[k],v);return D};
+OSC.boss0=mkB(BOSS_A,'boss0',0,138);OSC.boss1=mkB(BOSS_B,'boss1',-2,140);OSC.boss2=mkB(BOSS_A,'boss2',-2,146,{A:{lead:'horn'}});OSC.boss3=mkB(BOSS_B,'boss3',-4,136,{A:{dbl:'cel',dblOct:12}});
+OSC.boss4=mkB(BOSS_A,'boss4',2,150);OSC.boss5=mkB(BOSS_B,'boss5',-2,142,{A:{lead:'oboe',dbl:'brass'}});OSC.boss6=mkB(BOSS_A,'boss6',3,152,{A2:{lead:'cel',dbl:'vln',dblOct:0}});OSC.boss=mkB(BOSS_A,'boss',-2,126,{A:{lead:'horn',dbl:'choir',dblOct:12},A2:{lead:'choir',dbl:'vln',dblOct:0}});
+for(const [k,D] of Object.entries(OSC)){try{TRACKS[k]=orCompile(D)}catch(err){console.error('score',k,err)}}
+
 function voice(f,t,d,kind,v){const c=AU.ctx,g=c.createGain(),lp=c.createBiquadFilter();lp.type='lowpass';g.connect(AU.bus);lp.connect(g);
   const osc=(type,ff,det,vol)=>{const o=c.createOscillator(),og=c.createGain();o.type=type;o.frequency.value=ff;o.detune.value=det||0;og.gain.value=vol;o.connect(og);og.connect(lp);o.start(t);o.stop(t+d+1.2)};
   if(kind==='bell'){lp.frequency.value=5000;osc('sine',f,0,1);osc('sine',f*2,3,.35);osc('sine',f*3,0,.12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.005);g.gain.exponentialRampToValueAtTime(.0008,t+Math.max(.6,d+.5))}
@@ -2970,10 +3123,10 @@ function drum(kind,t,v){const c=AU.ctx;
 function playMusic(name,force){AU.want=name;if(!AU.ctx)return;if(AU.cur===name&&!force)return;AU.cur=name;
   if(AU.el){AU.el.pause();AU.el=null}
   const f=AU.files[name];if(f){AU.el=f;AU.T=null;f.currentTime=0;f.loop=true;f.volume=AU.vol.on?AU.vol.m:0;f.play().catch(()=>{});return}
-  auBus();const T=TRACKS[name];AU.T=T||null;if(!T)return;AU.step=0;AU.seqT=AU.ctx.currentTime+.15;
+  auBus();const T=TRACKS[name];AU.T=T||null;if(!T)return;AU.step=0;AU.bar=0;AU.s=0;AU.lite=!!(typeof lowPower==='function'&&lowPower());AU.seqT=AU.ctx.currentTime+.15;
   if(!AU.timer)AU.timer=setInterval(sched,25)}
 function stopMusic(){AU.cur=null;AU.want=null;AU.T=null;if(AU.el){AU.el.pause();AU.el=null}}
-function sched(){if(!AU.ctx||!AU.T||AU.ctx.state!=='running')return;const T=AU.T,c=AU.ctx,e8=60/T.bpm/2;
+function sched(){if(!AU.ctx||!AU.T||AU.ctx.state!=='running')return;if(AU.T.orch){orSched();return}const T=AU.T,c=AU.ctx,e8=60/T.bpm/2;
   if(AU.seqT<c.currentTime)AU.seqT=c.currentTime+.05;
   while(AU.seqT<c.currentTime+.2){const st=AU.step%T.len,bar=Math.floor(st/8)%T.ch.length,i=st%8,t=AU.seqT,ch=T.ch[bar];
     const m=T.at[st];if(m)voice(NOTE(m[0]),t,m[1]*e8*.95,T.lead,T.lead==='pluck'?.11:T.lead==='bell'?.16:.13);
