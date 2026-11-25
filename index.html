@@ -1939,8 +1939,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.23.2';
+const VERSION='0.23.3';
 const NEWS=[
+ {v:'0.23.3',d:'11/25',t:'修正名字顯示',items:[['修正','登入帳號後，主城裡自己狗狗頭上顯示的是帳號名稱，現在改成顯示你幫狗狗取的名字']]},
  {v:'0.23.2',d:'11/25',t:'狗狗格子價格',items:[['調整','開新的狗狗格子改成越開越貴：第 4 格 20 根骨頭，之後依序 30、45、60、80，第 9 格 100 根（前 3 格一樣免費）']]},
  {v:'0.23.1',d:'11/25',t:'狗狗格子變多',items:[['調整','狗狗角色最多可以開到 9 隻（先送 3 格，之後每格 30 根骨頭）']]},
  {v:'0.23.0',d:'11/25',t:'一個帳號養好幾隻狗',items:[['新增','一個帳號可以養好幾隻狗狗（像 RO 開好幾個角色）：「角色」分頁最上面的「我的狗狗們」可以開新狗狗、切換、刪除'],['新增','先送 3 個格子，可以用 30 根骨頭開新格子，最多 6 隻'],['說明','每隻狗的名字、品種、職業、Base／Job 等級、天賦、屬性、轉生次數、身上穿的裝備和時裝、無限之塔紀錄都各自分開；金幣、骨頭、背包、卡片、毛色、時裝收藏、寵物、狗屋、任務和關卡解鎖都整個帳號共用（新狗狗可以直接去打已經解鎖的關卡）'],['調整','轉職改成選了就固定，不能再換回其他職業；轉職前會跳出確認提醒，想玩別的職業就開一隻新狗狗'],['說明','原本的進度會變成你的第一隻狗狗，職業維持你現在選的那個，等級、天賦、屬性都保留']]},
@@ -3052,7 +3053,7 @@ function renderTown(){const c=ctx,t=townT;c.setTransform(DPR,0,0,DPR,0,0);const 
  if(NET.walk){const me=myId(),pos=id=>id===me?{x:TP.x,y:TP.y,face:TP.face}:NET.peers.get(id),L=pos(NET.walk.leader),F=pos(NET.walk.follower);if(L&&F){const ax=L.x+(L.face||1)*8,ay=L.y-6,bx=F.x+(F.face||1)*8,by=F.y-6;c.strokeStyle='#d0503a';c.lineWidth=2;c.beginPath();c.moveTo(ax,ay);c.quadraticCurveTo((ax+bx)/2,(ay+by)/2+16,bx,by);c.stroke()}}
  // labels
  if(!SV.hidePeers){c.textAlign='center';for(const p of NET.peers.values()){if((SV.block||[]).includes(p.u||p.n))continue;c.font='700 11px "Noto Sans TC",sans-serif';const lbl=`${p.n}・Lv${p.lv}`;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lbl,p.x,p.y-30);c.fillStyle='#bfe6ff';c.fillText(lbl,p.x,p.y-30);drawHalo(c,p.x,p.y-46,t,p.rb||0);if(p.say)drawBubble(c,p.x,p.y-42,PHRASES[p.say.k],Math.min(1,(4-p.say.t)*2))}}
- if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=DogCloud.status().username;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
+ if(NET.ctl){c.textAlign='center';c.font='700 11px "Noto Sans TC",sans-serif';const lb=dogName();c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(lb,TP.x,TP.y-30);c.fillStyle='#fff6b0';c.fillText(lb,TP.x,TP.y-30)}
  c.textAlign='center';for(const n of NPCS){if(!n.skin)continue;const ly=n.y-34;c.font='700 11px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.55)';c.strokeText(n.n,n.x,ly);c.fillStyle='#fff';c.fillText(n.n,n.x,ly);c.font='900 11px "Noto Sans TC",sans-serif';const rw=c.measureText(n.r).width+12;rr(c,n.x-rw/2,ly-26,rw,16,8,'#ffd23a');c.fillStyle='#4a2a00';c.fillText(n.r,n.x,ly-14);
    const bang=(n.id==='jobm'&&canJob())||(n.id==='elder'&&SV.tpe-tSpent()>0);if(bang){c.font='900 18px Fredoka,sans-serif';c.fillStyle='#ff4a5a';c.fillText('!',n.x+rw/2+6,ly-12+Math.sin(t*6)*2)}}
  for(const dg of TDOGS){c.font='700 10px "Noto Sans TC",sans-serif';c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.45)';c.strokeText(dg.n,dg.x,dg.y-26);c.fillStyle='#fff';c.fillText(dg.n,dg.x,dg.y-26);if(dg.say){const al=Math.min(1,(3-dg.say.t)*2);drawBubble(c,dg.x,dg.y-34,dg.say.s,al);if(dg.say.h){c.globalAlpha=al;for(let q=0;q<dg.say.h;q++)heart(c,dg.x-(dg.say.h-1)*5+q*10,dg.y-64-Math.sin(townT*4+q)*2,4,'#ff5a7a');c.globalAlpha=1}if(dg.say.q){c.globalAlpha=al;c.font='900 16px Fredoka,sans-serif';c.fillStyle='#fff6b0';for(let q=0;q<3;q++)c.fillText('?',dg.x+14+q*7,dg.y-60-Math.abs(Math.sin(townT*5+q))*5);c.globalAlpha=1}}}
