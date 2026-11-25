@@ -124,7 +124,7 @@ h1{font:900 clamp(28px,4vw,40px)/1.05 "Noto Sans TC",sans-serif;margin:0;color:v
 .townui{position:absolute;inset:0;pointer-events:none;z-index:5}.townui>*{pointer-events:auto}
 .tinfo{position:absolute;top:10px;left:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 12px;display:grid;font-size:12px;line-height:1.45;max-width:calc(100% - 20px)}.tinfo b{font-size:15px}.tinfo.t2{top:76px}
 .tbtns{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap}.tbtns .btn{margin:0;min-height:44px;padding:8px 16px;font-size:16px}.tbtns .btn.ghost{background:#fff8e6;color:#5a3a10;border-color:#fff8e6}@media(max-width:520px){.tbtns{gap:5px;left:8px;right:56px;transform:none;justify-content:center;flex-wrap:wrap}.tbtns .btn{padding:6px 10px;font-size:14px;min-height:40px}}
-.talkb{position:absolute;bottom:68px;left:50%;transform:translateX(-50%);margin:0;min-height:44px;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:pop .9s ease-in-out infinite alternate}@keyframes pop{to{transform:translateX(-50%) scale(1.06)}}
+.talkb{position:absolute;bottom:68px;left:0;right:0;width:fit-content;margin:0 auto;min-height:44px;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:tpop .9s ease-in-out infinite alternate}@keyframes tpop{to{transform:scale(1.06)}}@keyframes pop{to{transform:translateX(-50%) scale(1.06)}}
 .editbar{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:42%;overflow:auto}.editbar p{margin:0 0 6px;font-size:13px}
 .netchip{position:absolute;top:10px;right:10px;background:rgba(16,38,26,.8);color:#fff;border-radius:12px;padding:6px 10px;font-size:12px;max-width:52%;cursor:pointer}.netchip b{color:#7fe36b}.netchip[data-s=error] b,.netchip[data-s=guest]{color:#ffe27a}
 .emoteb{position:absolute;left:8px;right:8px;bottom:66px;background:rgba(255,248,230,.97);color:var(--pink);border-radius:14px;padding:8px 10px;max-height:46%;overflow:auto}.emr{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.emr .btn{margin:0}
@@ -2005,8 +2005,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.24.2';
+const VERSION='0.24.3';
 const NEWS=[
+ {v:'0.24.3',d:'11/25',t:'對話按鈕置中',items:[['修正','主城的「跟 ○○ 說話」按鈕有時候會偏到右邊（換成比較長的名字時，iPhone 的動畫會用到舊的寬度），現在固定在正中間']]},
  {v:'0.24.2',d:'11/25',t:'新手目標引導',items:[['新增','主城上方多了「🎯 下一步」目標：告訴你現在該做什麼（出戰、打魔王、點屬性、穿裝備、點天賦、轉職、打第二關），按「帶我去」直接打開；目標 NPC 頭上會有黃色箭頭，每完成一個送 🦴2'],['調整','第一次進主城的說明改短，先講清楚這遊戲在玩什麼：出戰撿寶石升級打魔王 → 回城變強 → 打下一關']]},
  {v:'0.24.1',d:'11/25',t:'修正畫質模糊・最新消息視窗',items:[['修正','手機上「最新消息」內容太長時，文字會跑到「關閉」按鈕底下，現在內容改成在框框裡面捲動'],['修正','手機畫面變模糊：省電模式（每秒 30 張）被誤判成「手機太卡」，戰鬥中會一路把畫質降到最低，而且回到城鎮也不會恢復。現在改成照省電模式的速度判斷，離開戰鬥會恢復清晰度，手機上的解析度也調高']]},
  {v:'0.24.0',d:'11/25',t:'天賦樹・裝備跟著狗狗走・職業平衡',items:[['新增','天賦頁改成天賦樹：三條分支從中間往上長，點圖示看說明和加點，已點的會發光'],['調整','背包改成每隻狗各自一個，另外新增所有狗共用的「倉庫」（300 格），裝備可以放進倉庫給別隻狗用；原本背包裡的裝備都先放進倉庫'],['調整','武器分職業：每把武器標示「護衛犬系／巫犬系／獵犬系……」，只能裝自己職業系的武器（幼犬見習生、超級幼犬什麼都能用）；掉落的武器大多是自己職業系，商店開出的一定是'],['調整','毛色只能換成自己這隻狗品種的毛色，不能再換品種；其他品種的毛色還是算收藏加成，可以開那個品種的狗狗來穿'],['新增','商店列出寶箱的內容：各品質機率、各部位主數值、額外詞條數和卡槽數'],['調整','難度按鈕標示「通過前一級才會打開下一級」，還沒開的會顯示鎖頭'],['調整','金幣換骨頭改成每天最多 10 根，價格 1000、2000、3000…一根比一根貴（之前金幣太多可以無限換）'],['平衡','依照全職業模擬調整：牛仔犬系、療癒犬、舞步犬、功夫犬、影子犬、嚎歌犬系、怪盜犬、獒犬戰神等偏弱的職業加強；聖光守護神犬、瘋狂博士犬、小巫犬、跑腿犬等偏強的稍微調降'],['平衡','單體招式加強：骨頭箭／子彈每發多貫穿 1 隻、追蹤彈可以貫穿、三連肉球拳最後一下會震開周圍、連斬最後會掃過周圍']]},
