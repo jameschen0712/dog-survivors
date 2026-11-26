@@ -255,7 +255,7 @@ kbd{font:700 13px Fredoka,sans-serif;background:#24452d;border-radius:6px;paddin
       <div class="ov hide" id="rankov" style="z-index:35"><div class="card" style="max-width:480px;width:100%"><h2>排行榜</h2><div class="tcp" style="justify-content:center" id="rankTabs"></div><div id="rankList" class="ranklist"></div><p style="text-align:center"><button class="btn" id="rankClose">關閉</button></p></div></div>
       <div class="ov hide" id="raidov" style="z-index:40"><div class="card" id="raidc"></div></div>
       <div id="invbox" class="hide"></div>
-      <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><div id="choices" class="choices"></div><p class="hint" id="lvHint">也可以按數字鍵選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
+      <div class="ov hide" id="lvlup"><div class="card"><h2>升級！選一項強化</h2><p class="note" id="slotInfo" style="text-align:center;margin:-4px 0 6px"></p><div id="choices" class="choices"></div><p class="hint" id="lvHint">也可以按數字鍵選擇</p><button class="btn sm ghost" id="autoOnLv">之後都自動幫我選</button></div></div>
       <div class="ov hide" id="pause"><div class="card"><h2>暫停中</h2><div class="plist" id="plist"></div><div class="vol"><span>音樂</span><input type="range" min="0" max="1" step="0.05" data-vol="m" aria-label="音樂音量"><span>音效</span><input type="range" min="0" max="1" step="0.05" data-vol="s" aria-label="音效音量"></div><button class="btn ghost" id="autoPickBtn"></button><button class="btn ghost" id="miniBtn"></button><p class="note" style="margin:2px 0 6px;font-size:12px">小地圖：<b style="color:#ffb43a">■</b> 寶箱　<b style="color:#e84a5f">∩</b> 磁鐵　<b style="color:#5fe38a">✚</b> 大骨頭（回血）　<b style="color:#fff6b0">★</b> 祭壇　<b style="color:#ffa53a">●</b> 菁英　<b style="color:#c45aff">●</b> 魔王</p><button class="btn ghost" id="lowPowBtn"></button><br><button class="btn" id="resume">繼續</button><button class="btn ghost" id="quit">撤退回城鎮</button></div></div>
       <div class="ov hide" id="moveov" style="z-index:40"><div class="card" style="max-width:440px"><h2>🏠 汪汪倖存者搬家了！</h2><p>新網址：<br><b style="font-size:1.05em;white-space:nowrap;user-select:all">wangwang-survivors.pages.dev</b></p><p style="font-size:.92em;opacity:.85">按下面的按鈕，會把這台裝置上的進度一起帶過去。<br>有登入雲端存檔的話，到新網址登入同一個帳號也可以。</p><p><button class="btn" id="moveGo">帶著存檔搬過去</button></p><p><button class="btn ghost" id="moveStay" style="font-size:.85em">先留在舊網址</button></p></div></div>
       <div class="ov hide" id="newsov" style="z-index:25"><div class="card wide" style="text-align:left"><h2 style="text-align:center">最新消息</h2><div class="news"><div class="nlist" id="newsList"></div><div class="nbody" id="newsBody"></div></div><p style="text-align:center"><button class="btn" id="newsClose">關閉</button></p></div></div>
@@ -573,14 +573,14 @@ const MECH={
  cross:{b:32,cd:3.4,d:v=>`以自己為中心展開十字形聖光，傷害 ${v}`},
  breath:{b:8,cd:2.8,d:v=>`朝前方噴出火焰吐息，連續傷害 ${v}`},
  bolt:{b:18,cd:1.1,d:(v,l)=>`發射 ${1+(l>>1)} 發追蹤彈，每發可以貫穿 ${2+(l>>2)} 隻，傷害 ${v}`}};
-const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k)*((G.st&&G.st[s.dt==='mag'?'mgc':s.dt])||1):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+.35*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
+const skDmg=(s,l,inRun)=>Math.round((inRun?bMul(s.k)*((G.st&&G.st[s.dt==='mag'?'mgc':s.dt])||1):1)*(l>=8?1.25:1)*Math.round(MECH[s.k].b*s.m*(1+BAL.skg*(l-1))*(s.x.big?1.3:1)*(inRun&&s.sig?G.st.sig:1)));
 const skX=x=>(x.slow?'，還會讓敵人變慢':'')+(x.rock?'，會把敵人撞飛':'')+(x.fire?'（火屬性）':x.zap?'（雷屬性）':'');
 const skDesc=(s,l)=>MECH[s.k].d(skDmg(s,l,!!G),l,s.x)+skX(s.x);
 
 const PD={
  vit:{n:'強健',g:'體',c:'#ff8a8a',d:()=>'生命上限 +20，並回復 20',f:g=>{g.p.max+=20;g.p.hp=Math.min(g.p.max,g.p.hp+20)}},
  swift:{n:'輕盈',g:'速',c:'#9ff0c2',d:()=>'移動速度 +8%',f:g=>{g.st.spd+=.08}},
- might:{n:'力量',g:'力',c:'#ffb36b',d:()=>'所有傷害 +12%',f:g=>{g.st.dmg+=.12}},
+ might:{n:'力量',g:'力',c:'#ffb36b',d:()=>`所有傷害 +${Math.round(BAL.might*100)}%`,f:g=>{g.st.dmg+=BAL.might}},
  haste:{n:'專注',g:'疾',c:'#b8c8ff',d:()=>'技能冷卻 -8%',f:g=>{g.st.cd*=.92}},
  magnet:{n:'嗅覺',g:'嗅',c:'#f5c542',d:()=>'撿取經驗範圍 +30%',f:g=>{g.st.mag*=1.3}},
  regen:{n:'再生',g:'癒',c:'#7fe3a0',d:()=>'每秒回復 0.6 生命',f:g=>{g.st.regen+=.6}},
@@ -1231,8 +1231,11 @@ function initLoadout(g,job,bk,lv0){
   {const bk0=bk,fav=BCAT[bk0];
    for(const jid of chain(job)){const s=JM[jid].sk[0];if(jid==='novice'&&job!=='novice')continue;if(fav&&jid!==job&&!fav.includes(s.k))continue;g.wep[s.id]={l:lv0,cd:.3,a:0,tick:0,s}}}
   {const bk2=bk,bd=BUILDS[bk];g.build=bk;if(BCAT[bk]){g.bfav=BCAT[bk];g.bdm=bd.dm*(1+.08*Math.max(0,4-buildCount(job,bk)));g.bcd=bd.cd;g.bsk=buildSkill(job,bk);g.wep[g.bsk.id]={l:lv0+1,cd:.5,a:0,tick:0,s:g.bsk};const f2=chain(job).slice().reverse().filter(id=>id!=='novice'||job==='novice').flatMap(id=>JM[id].sk).find(s2=>g.bfav.includes(s2.k)&&!g.wep[s2.id]);if(f2)g.wep[f2.id]={l:lv0,cd:.6,a:0,tick:0,s:f2}}if(bd.perk)bd.perk(g)}
+  {const own=Object.values(g.wep),cur=JM[job].sk[0];const pri=w=>w.s===g.bsk?0:w.s===cur?1:2;own.sort((a,b)=>pri(a)-pri(b));for(const w of own.slice(2))delete g.wep[w.s.id]}
+  g.wcap=wepCap(job);
 }
-const GAP_HP=.03,GAP_DMG=.03,GAP_PEN=.025,DMG_NORM=1/.9;
+const wepCap=job=>{const t=JM[job]?JM[job].tier:1;return 4+(t>=3?1:0)+(t>=4?1:0)},PAS_CAP=4;
+const GAP_HP=0,GAP_DMG=0,GAP_PEN=0,DMG_NORM=1/.9;
 const gapMul=g=>g>0?Math.max(.35,1-GAP_PEN*g):1;
 function gapPen(){return G&&G.mul&&G.mul.gap?gapMul(G.mul.gap):1}
 function applyGap(mul,gap){mul.gap=gap;if(gap>0){mul.hp*=1+GAP_HP*gap;mul.dmg*=1+GAP_DMG*gap}}
@@ -1254,14 +1257,20 @@ function newRun(stage,trialJob,o){
   const lv0=1+st.bonusLv;initLoadout(G,job,trialJob?'balance':curBuild(job),lv0);if(!trialJob&&mode!=='raid'&&mode!=='def')applyStyle(G,curBuild(job));
   if(st.freePick)G.pend=1;
   G.cur.drop*=guildDrop()*(1+.2*(G.heat||0));
-  if(G.mul.gap>=3)setTimeout(()=>{if(G&&state==='play')banner(`越級挑戰：比推薦低 ${G.mul.gap} 級，你的傷害 ×${gapMul(G.mul.gap).toFixed(2)}、怪物血量 ×${(1+GAP_HP*G.mul.gap).toFixed(2)}、攻擊 ×${(1+GAP_DMG*G.mul.gap).toFixed(2)}`)},3200);
+  if(G.mul.gap>=3)setTimeout(()=>{if(G&&state==='play')banner(`越級挑戰：比推薦低 ${G.mul.gap} 級，怪物會比你強很多，小心！`)},3200);
   banner(trialJob?`試玩：${JM[job].n}（不會存檔）`:mode==='weekly'?`本週魔王：強化版${STAGES[stage].boss}！2:30 出現`:mode==='tower'?`無限之塔 第 ${G.floor} 層：撐 40 秒後打倒守衛`:mode==='dungeon'?`${DUNG[o.dtype].n}：撐到 3:00 打倒${STAGES[stage].boss}！`:`${STAGES[stage].n}：撐到 4:00 打倒${STAGES[stage].boss}！`);
   $('spdb').classList.toggle('hide',!!trialJob||!(mode!=='stage'||(SV.cleared||0)>stage));$('spdb').textContent='×1';
   state='play';show(null);$('pbtn').classList.remove('hide');$('dashb').classList.remove('hide');last=performance.now();document.body.classList.add('playing');playMusic('s'+stage);
   try{frame.scrollIntoView({block:'center'});frame.focus({preventScroll:true})}catch(e){}
   if(!trialJob)showTip('run','怎麼玩',`・<b>移動</b>：WASD／方向鍵，或按住滑鼠讓狗跟著游標走；手機按住畫面拖曳<br>・<b>攻擊</b>：招式會自動瞄準最近的怪物施放<br>・<b>升級</b>：撿寶石累積經驗，升級時從幾個強化裡挑一個<br>・<b>紅色磁鐵</b>：撿到會把畫面上的東西全部吸過來<br>・${mode==='tower'?'每層撐 40 秒後打倒守衛就能上樓':'撐到時間到、打倒魔王就通關'}`)
 }
-const xpNeed=l=>Math.floor(3+l*2.5+l*l*.45);
+/* V0.33 平衡參數（用機器人實測調出來的） */
+const BAL={ehp:2.5,edmg:1.5,bhp:6,skg:.25,xp:1.4,might:.08};
+/* 前期地圖的難度提升打折，新手比較好上手 */
+const BAL_RAMP=[.1,.4,.7,1,1,1,1],balK=(k,st)=>1+(BAL[k]-1)*(BAL_RAMP[st]??1);
+/* 各職業打魔王的傷害校正：讓每個職業打同級魔王都差不多 50 秒（V0.33 實測） */
+const BOSST={"lknight":1.38,"dknight":1.51,"paladin":0.9,"guard":1.0,"hwiz":2.22,"star":1.46,"savant":2.18,"elem":4,"sniper":0.58,"ranger":0.5,"clown":0.85,"maestro":1.48,"diva":0.45,"wander":2.48,"hpriest":1.24,"bishop":1.22,"champ":0.6,"fist":1.06,"wsmith":1.64,"mech":3,"creator":1.22,"genetic":2.14,"across":0.78,"gcross":1.06,"stalker":0.58,"chaser":0.54,"snov3":1.13,"snov4":4,"gun3":0.45,"gun4":0.45};
+const xpNeed=l=>Math.floor((3+l*2.5+l*l*.45)*BAL.xp);
 const fmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 function pause(){if(G&&G.coop&&!G.coop.ended){if(state==='play'||state==='level')coopAskLeave();return}if(state!=='play')return;state='pause';keys.clear();joy.on=false;
   $('plist').innerHTML=Object.values(G.wep).map(w=>`<div><b style="background:${w.evo?'#ffd35a':w.s.c}">${w.s.g}</b><span><strong>${w.s.n}${w.evo?'・進化':''}</strong> Lv ${w.l}<small>${skDesc(w.s,w.evo?8:w.l)}${!w.evo&&EVO[w.s.k]?`（Lv5 ＋ ${PD[EVO[w.s.k]].n} 可進化）`:''}</small></span></div>`).join('')+Object.keys(G.pas).map(k=>`<div><b style="background:${PD[k].c}">${PD[k].g}</b><span><strong>${PD[k].n}</strong> Lv ${G.pas[k]}<small>${PD[k].d()}</small></span></div>`).join('');
@@ -1277,9 +1286,9 @@ function sparks(x,y,n,c,sp,life,g){sp=sp||160;life=life||.45;for(let i=0;i<n;i++
 function heal(v,sh){if(G.vis&&!G.inLv)return;const C=G.coop;if(C&&C.role==='client'){if(G.cx===G.me&&!C.noHealRep){C.heal+=v;if(sh)C.sheal=(C.sheal||0)+v}return}if(G.p.down||G.p.dead)return;G.p.hp=Math.min(G.p.max,G.p.hp+v);if(C&&sh)coopHealAround(G.p,v)}
 
 function spawnEnemy(type,elite,x,y){
-  const p=G.coop?coopRandP():G.p,b=ET[type],sg=STAGES[G.stage],T0=tE(),hm=(1+T0/100*.8)*sg.hp*G.mul.hp*G.cur.hp;
+  const p=G.coop?coopRandP():G.p,b=ET[type],sg=STAGES[G.stage],T0=tE(),hm=(1+T0/100*.8)*sg.hp*G.mul.hp*G.cur.hp*balK('ehp',G.stage);
   if(x===undefined){const a=R(0,TAU),d=Math.hypot(W,H)/S/2+40;x=p.x+Math.cos(a)*d;y=p.y+Math.sin(a)*d}
-  const e={type,x,y,r:b.r*(elite?1.5:1),hp:b.hp*hm*(elite?10:1),spd:b.spd*(elite?.9:1)*(1+G.stage*.05),dmg:Math.round(b.dmg*sg.dmg*G.mul.dmg*(elite?1.5:1)*(.7+.4*Math.min(1,T0/120))*(1+T0/300)),elite:!!elite,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:R(0,TAU)};
+  const e={type,x,y,r:b.r*(elite?1.5:1),hp:b.hp*hm*(elite?10:1),spd:b.spd*(elite?.9:1)*(1+G.stage*.05),dmg:Math.round(b.dmg*sg.dmg*G.mul.dmg*balK('edmg',G.stage)*(elite?1.5:1)*(.7+.4*Math.min(1,T0/120))*(1+T0/300)),elite:!!elite,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:R(0,TAU)};
   if(elite){const pool=['fast','big','split','shield','boom','regen'],n=T0>180?2:1;e.aff=[];while(e.aff.length<n){const a=pool[Math.floor(Math.random()*pool.length)];if(!e.aff.includes(a))e.aff.push(a)}
     if(e.aff.includes('fast'))e.spd*=1.6;if(e.aff.includes('big')){e.r*=1.35;e.hp*=1.6}if(e.aff.includes('shield'))e.shield=e.hp*.4}
   e.max=e.hp;e.id=G.eidN=(G.eidN||0)+1;G.E.push(e);return e;
@@ -1289,7 +1298,7 @@ function pickType(t){const PL=STAGES[G.stage].pool,UT=[0,20,50,110,180];const po
 function ring(type,n){const p=G.coop?coopRandP():G.p,d=Math.hypot(W,H)/S/2+10;for(let i=0;i<n;i++){const a=i*TAU/n;spawnEnemy(type,false,p.x+Math.cos(a)*d,p.y+Math.sin(a)*d)}banner('被包圍了！')}
 function hurt(e,d,kx,ky,kb,col,raw){
   if(!e||e.dead)return;if(G.vis){e.hit=.12;return}if(e.inv){if(Math.random()<.15)txt(e.x,e.y-e.r-4,'護盾','#d8c8ff');return}
-  if(raw){if(e.stun>0)d*=1.5;d*=gapPen();e.hp-=d;e.hit=Math.max(e.hit,.05);if(Math.random()<.6)txt(e.x+R(-8,8),e.y-e.r-2,Math.round(d),col||'#ffb070');if(e.hp<=0)kill(e);return}if(e.stun>0)d*=1.5;d*=G.st.dmg*gapPen();const LO=G.st.lo||.75,RL=LO+Math.random()*(1-LO);d*=RL*DMG_NORM;const CC=Math.min(.75,G.st.crit),CD=G.st.critD+Math.max(0,G.st.crit-.75)*1.5;if(e.shield>0){const ab=Math.min(e.shield,d*.6);e.shield-=ab;d-=ab;if(e.shield<=0)sparks(e.x,e.y,14,'#8ec5ff',220)}if((e.elite||e.boss)&&G.st.bossDmg)d*=1+G.st.bossDmg;let crit=false;if(Math.random()<CC){d*=CD/RL;crit=true}else if(G.critOnly)d*=.9;
+  if(raw){if(e.stun>0)d*=1.5;d*=gapPen();e.hp-=d;e.hit=Math.max(e.hit,.05);if(Math.random()<.6)txt(e.x+R(-8,8),e.y-e.r-2,Math.round(d),col||'#ffb070');if(e.hp<=0)kill(e);return}if(e.stun>0)d*=1.5;d*=G.st.dmg*gapPen();const LO=G.st.lo||.75,RL=LO+Math.random()*(1-LO);d*=RL*DMG_NORM;const CC=Math.min(.75,G.st.crit),CD=G.st.critD+Math.max(0,G.st.crit-.75)*1.5;if(e.shield>0){const ab=Math.min(e.shield,d*.6);e.shield-=ab;d-=ab;if(e.shield<=0)sparks(e.x,e.y,14,'#8ec5ff',220)}if((e.elite||e.boss)&&G.st.bossDmg)d*=1+G.st.bossDmg;if(e.boss&&!G.coop)d*=BOSST[G.job]||1;let crit=false;if(Math.random()<CC){d*=CD/RL;crit=true}else if(G.critOnly)d*=.9;
   const SY=G.sty&&!G.coop;if(SY)d=styHit(e,d);
   e.hp-=d;e.hit=.12;e.sq=.22;if(SY&&G.sty.el&&e.hp>0)styProc(e,d,crit);
   if(!e.boss&&kb){const k=kb*1.25/(e.elite?3:1);e.kx+=kx*k;e.ky+=ky*k}
@@ -1450,8 +1459,8 @@ function updWorld(dt){const p=G.p;
   G.shT=(G.shT||70)-dt;if(G.shT<=0&&!G.boss){G.shT=75;const a=R(0,TAU);G.Z.push({k:'shrine',x:p.x+Math.cos(a)*260,y:p.y+Math.sin(a)*260,life:35,max:35});banner('附近出現了祭壇！')}
   if(G.mode!=='tower'&&!G.warned&&G.t>=G.bossT-15){G.warned=1;banner(`${STAGES[G.stage].boss}即將出現！`);sfx('bossin')}
   if(G.mode!=='tower'&&G.boss&&!G.bossDone&&G.t>=G.bossT+BOSS_ESC&&!G.winT){G.escaped=1;sfx('lose');end(false);return true}
-  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*STAGES[G.stage].hp*(G.mode==='weekly'?2.6:G.heat?1:([.75,.95][G.stage]||1));
-    const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};if(G.stage===0)e.dmg=Math.round(e.dmg*.75);
+  if(G.mode!=='tower'&&!G.boss&&!G.bossDone&&G.t>=G.bossT){const a=R(0,TAU),d=Math.hypot(W,H)/S/2,hp=4200*balK('bhp',G.stage)*STAGES[G.stage].hp*G.mul.hp*(G.mode==='weekly'?2.6/1.7:G.heat?1:([.75,.95][G.stage]||1));
+    const e={type:STAGES[G.stage].bt,x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,r:46,hp,max:hp,spd:42,dmg:Math.round(24*STAGES[G.stage].dmg*balK('edmg',G.stage)),boss:true,elite:false,hit:0,orbT:0,slow:0,kx:0,ky:0,face:1,ph:0,at:3,st:5};if(G.stage===0)e.dmg=Math.round(e.dmg*.75);
     e.ent=2.5;G.E.push(e);G.boss=e;banner(`${STAGES[G.stage].boss}出現了！`);playMusic('boss'+G.stage);sfx('bossin');bossRoar()}
   if(G.winT>0){G.winT-=dt;if(G.winT<=0){end(true);return true}}
 
@@ -1556,21 +1565,22 @@ const EVO={bash:'might',burst:'area',wave:'area',pierce:'swift',rain:'haste',bal
 function rollChoices(){
   const pool=[],evo=[];
   for(const w of Object.values(G.wep)){const req=EVO[w.s.k];if(w.l>=5&&!w.evo&&req&&(G.pas[req]||0)>=1)evo.push({t:'e',s:w.s,req})}
-  for(const s of runSkills()){const w=G.wep[s.id];if(!w)pool.push({t:'w',s,l:1});else if(w.l<5)pool.push({t:'w',s,l:w.l+1})}
-  for(const k in PD){const l=G.pas[k]||0;if(l<5)pool.push({t:'p',k,l:l+1})}
+  const wFull=Object.keys(G.wep).length>=(G.wcap||wepCap(G.job)),pFull=Object.values(G.pas).filter(v=>v>0).length>=PAS_CAP;
+  for(const s of runSkills()){const w=G.wep[s.id];if(!w){if(!wFull)pool.push({t:'w',s,l:1})}else if(w.l<5)pool.push({t:'w',s,l:w.l+1})}
+  for(const k in PD){const l=G.pas[k]||0;if(l===0&&pFull)continue;if(l<5)pool.push({t:'p',k,l:l+1})}
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
   if(G.bfav){const key=o=>Math.random()+(o.t==='w'?(G.bfav.includes(o.s.k)?.6:-.45):0);const ks=new Map(pool.map(o=>[o,key(o)]));pool.sort((a,b)=>ks.get(b)-ks.get(a))}
   const out=[...evo.slice(0,1),...pool].slice(0,G.build==='balance'?4:3);if(!out.length)out.push({t:'h'});return out;
 }
 function choiceScore(o){if(o.t==='h')return 0;if(o.t==='e')return 10;if(o.t==='w'&&G.bfav&&G.bfav.includes(o.s.k))return (o.l===1?2.6:3+(o.s.sig?1:0)+o.s.m*.3)+1.5;if(o.t==='p')return {might:2.3,haste:2.1,area:1.7,luck:1.6,vit:1.5,swift:1.2,regen:1.1,magnet:1}[o.k]||1;return o.l===1?2.6:3+(o.s.sig?1:0)+o.s.m*.3}
-function applyChoice(o){if(o.t==='e'){const w=G.wep[o.s.id];if(w){w.evo=1;banner(`${o.s.n} 進化了！`);flash=.4;sparks(G.p.x,G.p.y,40,'#ffe27a',260,.8);sfx('job')}return}if(o.t==='h')heal(40);else if(o.t==='w'){if(G.wep[o.s.id])G.wep[o.s.id].l++;else G.wep[o.s.id]={l:1,cd:.2,a:0,tick:0,s:o.s}}else{G.pas[o.k]=(G.pas[o.k]||0)+1;PD[o.k].f(G)}}
+function applyChoice(o){if(o.t==='e'){const w=G.wep[o.s.id];if(w){w.evo=1;banner(`${o.s.n} 進化了！`);flash=.4;sparks(G.p.x,G.p.y,40,'#ffe27a',260,.8);sfx('job')}return}if(o.t==='h')heal(40);else if(o.t==='w'){if(G.wep[o.s.id])G.wep[o.s.id].l++;else{G.wep[o.s.id]={l:1,cd:.2,a:0,tick:0,s:o.s};const n=Object.keys(G.wep).length,cap=G.wcap||wepCap(G.job);if(n>=cap)banner(`招式欄位滿了（${n}/${cap}），之後只會出現已學招式的升級`)}}else{G.pas[o.k]=(G.pas[o.k]||0)+1;PD[o.k].f(G)}}
 const choiceName=o=>o.t==='e'?o.s.n+'・進化':o.t==='h'?'大骨頭':o.t==='p'?PD[o.k].n+' Lv'+o.l:o.s.n+(o.l===1?'（學會）':' Lv'+o.l);
 function openLevel(){
   keys.clear();
   if(SV.autoPick&&!G.trialManual){while(G.pend>0){const cs=rollChoices();const o=cs.slice().sort((a,b)=>choiceScore(b)-choiceScore(a))[0];applyChoice(o);G.pend--;txt(G.p.x,G.p.y-46,'自動：'+choiceName(o),'#9fe0ff',true)}sfx('lvl');fx({k:'ring',x:G.p.x,y:G.p.y,R:70,c:'#ffe27a',life:.4,max:.4});return}
   state='level';sfx('lvl');showChoices(rollChoices());
 }
-function showChoices(list,coop){choicesNow=list;
+function showChoices(list,coop){choicesNow=list;try{const cap=G.wcap||wepCap(G.job),n=Object.keys(G.wep).length,pn=Object.values(G.pas).filter(v=>v>0).length;$('slotInfo').innerHTML=`招式 <b>${n}/${cap}</b>　被動 <b>${pn}/${PAS_CAP}</b>${n>=cap?'　（招式滿了，只會出現升級）':''}`}catch(e){}
   $('choices').innerHTML=choicesNow.map((o,i)=>{
     if(o.t==='h')return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:#ff8a8a">骨</b><span><strong>大骨頭</strong><small>回復 40 生命</small></span></button>`;
     if(o.t==='p'){const D=PD[o.k];return `<button class="ch" data-i="${i}"><span class="num">${i+1}</span><b style="background:${D.c}">${D.g}</b><span><strong>${D.n}</strong><em>${o.l===1?'新！':'Lv '+o.l}</em><small>${D.d()}</small></span></button>`}
@@ -2170,8 +2180,9 @@ function toTown(){if(bossPickOpen)takeBossPick(bossPickOpen.reduce((b,it,i,a)=>i
   else if(achReady().length)showTip('ach','有成就可以領','到<b>「成就」</b>分頁領取狗骨頭，骨頭可以拿去抽時裝、毛色或孵寵物蛋。')}
 
 /* ---------- changelog ---------- */
-const VERSION='0.31.1';
+const VERSION='0.33.0';
 const NEWS=[
+ {v:'0.33.0',d:'11/26',t:'整體難度重新平衡・招式欄位',items:[['說明','這次是用機器人把 30 個職業實際打過一輪、量出來的數字調整的：之前同級的魔王 10～30 秒就被打死，越級也差不多，所以太好打'],['調整','怪物和魔王變強：魔王血量大約變成 6 倍、怪物血量 2.5 倍、攻擊 1.5 倍；草原、森林、熔岩打折比較少，新手不會一開始就太難。現在同級打魔王大約 45～60 秒'],['調整','戰鬥中的成長放慢：招式每升一級的傷害 +35% → +25%、「力量」被動 +12% → +8%、升級需要的經驗 ×1.4'],['調整','拿掉上一版的「越級懲罰」（你的傷害 ×0.4 那個）。現在越級難不難完全看你和怪物的素質差距：低 10 級會明顯吃力、低 20 級基本上撐不住'],['調整','每個職業打魔王的傷害各自校正過，讓不同職業打魔王的時間差不多（之前最快 18 秒、最慢 6 分鐘都打不死）'],['調整','一局能帶的招式有上限了：一轉、二轉 4 招，三轉 5 招，四轉 6 招；被動最多 4 種。滿了之後升級只會出現已學會的招式和被動的升級，要想清楚帶哪幾招'],['調整','開場最多只送 2 招（流派招式和目前職業的招牌招式），其他招式升級時自己挑；升級畫面會顯示目前用了幾格']]},
  {v:'0.31.1',d:'11/26',t:'新地圖沒開放',items:[['修正','在新增黃沙金字塔、玩具時計塔之前就打通天空之城的玩家，後面的新地圖一直顯示「通關上一關後解鎖」，現在會正常開放']]},
  {v:'0.31.0',d:'11/26',t:'真實樂器配樂・傷害浮動・越級變難',items:[['調整','音樂改用真實樂器的取樣錄製（弦樂、木管、銅管、豎琴、合唱、定音鼓），不再是電子合成的聲音；音檔用到才下載，而且比之前省電很多'],['新增','傷害浮動：參考 RO 和楓之谷，每一下傷害會在最低～最高之間隨機（角色分頁有寫你的範圍），爆擊一定打最大值；靈巧越高、轉職越多，最低傷害越高'],['新增','裝備等級需求：每件裝備需要達到那張地圖的推薦等級才能穿（森林裝 Lv15、熔岩裝 Lv30……），已經穿在身上但等級不夠的裝備會暫時沒有效果；每轉生一次，需求等級 -6'],['調整','越級懲罰加重：比推薦等級低的話，你的傷害每級 -2.5%（最多 -65%），怪物血量和攻擊每級 +3%。例如 Lv36 打 Lv60 地圖：傷害 ×0.40、怪物血量 ×1.72'],['調整','武器的傷害加成整體 ×0.7（舊武器也一樣），讓等級和天賦的成長比較重要，不會一把武器就把傷害拉很高']]},
  {v:'0.30.0',d:'11/26',t:'全新交響樂配樂',items:[['新增','所有音樂重做成交響樂：弦樂、長笛、單簧管、雙簧管、法國號、小號、豎琴、鋼片琴、合唱、定音鼓，全部是原創曲'],['新增','主城：溫馨的圓舞曲，長笛和小提琴輪流唱旋律，豎琴伴奏'],['新增','七張地圖各有自己的主題曲：草原輕快、森林神祕、熔岩激昂、冰霜像音樂盒的圓舞曲、天空開闊、黃沙有異國風、玩具時計塔是八音盒；每首都有前奏、主旋律、換樂器的第二段和副歌'],['新增','魔王戰：兩首氣勢磅礡的魔王曲，銅管主旋律、弦樂急奏、合唱和定音鼓，每個魔王用不同的調和速度'],['說明','開啟「省電模式」時音樂會自動簡化，比較不耗電']]},
@@ -2321,7 +2332,7 @@ function renderHub(){
   $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${tab===k?' on':''}" data-tab="${k}">${n}${(k==='char'&&canJob())||(k==='tal'&&pts>0)||(k==='ach'&&(achReady().length||questReady()))?'<i class="dot"></i>':''}</button>`).join('');
   const H=$('hbody');
   if(tab==='go'){
-    H.innerHTML=`<p class="note">流派：${styleSum()}　<button class="btn sm ghost" data-style="main" style="margin:0">流派配置</button></p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>Math.max(SV.stage||0,Math.min(STAGES.length-1,SV.cleared||0));return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級：你的傷害 ×${gapMul(s.rec-SV.blv).toFixed(2)}、怪物血量 ×${(1+GAP_HP*(s.rec-SV.blv)).toFixed(2)}、攻擊 ×${(1+GAP_DMG*(s.rec-SV.blv)).toFixed(2)}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}；好裝備機率提高、卡片掉率 ×${(1+.2*h).toFixed(1)}${h>=5?'、魔王寶物全部史詩以上':h>=3?'、魔王寶物必有史詩':''}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
+    H.innerHTML=`<p class="note">流派：${styleSum()}　<button class="btn sm ghost" data-style="main" style="margin:0">流派配置</button></p><h3>選擇關卡</h3><div class="stages">${STAGES.map((s,i)=>{const lock=i>Math.max(SV.stage||0,Math.min(STAGES.length-1,SV.cleared||0));return `<div class="stg${lock?' lock':''}" style="background:linear-gradient(160deg,${s.g[2]},${s.col})"><strong>${s.n}</strong><small>推薦 Base Lv ${s.rec} · 魔王：${s.boss}</small>${!lock&&SV.blv<s.rec?`<small style="color:#fff3a0;font-weight:900">你現在 Lv ${SV.blv}，比推薦低 ${s.rec-SV.blv} 級${s.rec-SV.blv>=15?'，非常危險':s.rec-SV.blv>=8?'，會很吃力':''}</small>`:''}<small>獎勵 ×${s.rw}${SV.best[i]!==undefined?` · 最佳 ${fmt(SV.best[i])}`:''}${(SV.cleared||0)>i?' · 已通關':''}</small>${lock?'<small>通關上一關後解鎖</small>':`${(()=>{const hs=((SV.heatSel||{})[i])||0,top=((SV.heat||{})[i]||0)+1;const sel=(SV.cleared||0)>i?Math.min(hs,top):0;return `<button class="btn sm" data-stage="${i}" data-heat="${sel}">${sel?`出發（難${sel}）`:"出發"}</button>${(SV.cleared||0)>i?`<span class="heat"><small style="display:block;font-weight:700;margin-bottom:2px">先選難度，再按上面的「出發」（打倒難X的魔王才會打開下一級）：</small>${[0,1,2,3,4,5].map(h=>{const lock=h>top,on=h===sel;return `<button class="btn sm ${on?"":"ghost"}${on?" hsel":""}" data-hsel="${i}:${h}" ${lock?"disabled":""}>${lock?"🔒":""}${h?"難"+h:"普通"}${h&&h<=top-1?"✓":""}</button>`}).join("")}</span>`:""}`})()}${(SV.cleared||0)>i?`<small class="hinfo2">${(()=>{const h=Math.min(((SV.heatSel||{})[i])||0,((SV.heat||{})[i]||0)+1);return h?`<b>難${h}</b>：怪物血量 ×${(1+.35*h).toFixed(2)}、攻擊 ×${(1+.2*h).toFixed(2)}、數量 ×${(1+.12*h).toFixed(2)}；經驗 ×${Math.min(1+.3*h,1.6).toFixed(1)}、金幣 ×${(1+.3*h).toFixed(1)}；好裝備機率提高、卡片掉率 ×${(1+.2*h).toFixed(1)}${h>=5?'、魔王寶物全部史詩以上':h>=3?'、魔王寶物必有史詩':''}，第一次通過送 🦴${5*h}`:"<b>普通</b>：怪物血量、攻擊、數量都是 ×1。每升一級難度：血量 +35%、攻擊 +20%、數量 +12%、金幣 +30%（經驗最多 ×1.6）"})()}</small>`:''}`}</div>`}).join('')}</div>
       <h3 style="margin-top:18px" data-anchor="weekly">本週魔王　<span class="note">每週一換一隻，可以重複挑戰</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>強化版${STAGES[weeklyStage()].boss}</b>（${STAGES[weeklyStage()].n}）<p class="note" style="margin:2px 0 0">怪物血量 ×1.7、攻擊 ×1.4，魔王 2:30 就出現而且血量 ×2.6；金幣經驗 ×2、卡片掉率 ×2，魔王寶物至少史詩。${weeklyDone()?'<b style="color:#2f7a3e">本週已擊破 ✓</b>':'<b>每週第一次擊破：🦴20、團隊徽章 5、史詩裝備</b>'}</p></div><button class="btn sm" data-weekly="1">挑戰</button></div>
       <h3 style="margin-top:18px">團隊副本　<span class="note">徽章 ${SV.raidTok||0} 個</span></h3><div class="box" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><p class="note" style="margin:0;flex:1;min-width:200px">和好友或隨機玩家 2／4／6 人一起打「灰霧大魔王討伐」或「守護彩虹橋」，湊不到人會補 AI 狗狗。</p><button class="btn sm" data-tab="team">前往團隊副本</button></div>
       <h3 style="margin-top:18px" data-anchor="tower">無限之塔　<span class="note">最高紀錄：第 ${SV.towerBest||0} 層</span></h3>
